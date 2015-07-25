@@ -21,13 +21,15 @@
 
 loadAPI(1);
 
-host.defineController("Arturia Beatstep Pro", "BSP", "1.0", "6ae51a34-3310-11e5-a151-feff819cdc9f", "github@justlep.net");
+host.defineController("Arturia Beatstep Pro (All channels)", "BSP", "1.0", "6ae51caa-3310-11e5-a151-feff819cdc9f", "github@justlep.net");
 host.defineMidiPorts(1, 1);
-host.addDeviceNameBasedDiscoveryPair(["Arturia BeatStep Pro"], ["Arturia BeatStep Pro"]);
+
+// Leaving autodetection for the minimal version
+// host.addDeviceNameBasedDiscoveryPair(["Arturia BeatStep Pro"], ["Arturia BeatStep Pro"]);
 
 
 // CC 0 and CCs 120+ are reserved
-var SHOW_STANDARD_INPUTS_ONLY = true,
+var SHOW_STANDARD_INPUTS_ONLY = false,
     FIRST_MAPPED_CC_CHANNEL = 1,
     LAST_MAPPED_CC_CHANNEL = 16, // by default, beatstep pro sends CCs on channel 1
     TOTAL_CC_CHANNELS = (LAST_MAPPED_CC_CHANNEL - FIRST_MAPPED_CC_CHANNEL + 1),
@@ -51,7 +53,7 @@ var SHOW_STANDARD_INPUTS_ONLY = true,
         2: 'S2',
         10: 'DRUM'
     },
-    NOTE_INPUT_CHANNEL_ORDER = (SHOW_STANDARD_INPUTS_ONLY) ? [1,2,10,0] : [1,2,10,3,4,5,6,7,8,9,11,12,13,14,15,16,0],
+    NOTE_INPUT_CHANNEL_ORDER = (SHOW_STANDARD_INPUTS_ONLY) ? [1,2,10,0] : [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,0],
 // Two variables to hold the Values of all the CCs and to check if they have changed
 // ccValues = initArray(0, TOTAL_CC_MESSAGES),
 // ccValuesOld = initArray(0, TOTAL_CC_MESSAGES),
@@ -86,8 +88,8 @@ function init() {
 
     for (var i = 0, channel, inputName, noteInput, channelMask; i < NOTE_INPUT_CHANNEL_ORDER.length; i++) {
         channel = NOTE_INPUT_CHANNEL_ORDER[i];
-        channelMask = (channel % 17 == 0) ? '??????' : '?x????'.replace('x', (channel-1).toString(16));
-        inputName = INPUT_NAMES[channel % 17] || channel;
+        channelMask = (channel == 0) ? '??????' : '?x????'.replace('x', (channel-1).toString(16));
+        inputName = INPUT_NAMES[channel] || channel;
         noteInput = inPort.createNoteInput(inputName, channelMask);
         noteInput.setShouldConsumeEvents(false);
     }
