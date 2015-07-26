@@ -76,6 +76,16 @@ function getIndexByChannelAndCC(channel, cc) {
     return ((channel - 1) * TOTAL_CC_MESSAGES_PER_CHANNEL) + cc - LOWEST_CC;
 }
 
+function createNoteInput(channel, inputName) {
+    var channelMaskReplacement = (!channel) ? '?' : (channel - 1).toString(16),
+        noteOnMask = '8x????'.replace('x', channelMaskReplacement),
+        noteOffMask = '9x????'.replace('x', channelMaskReplacement),
+        noteAftertouchMask = 'Ax????'.replace('x', channelMaskReplacement),
+        noteInput = inPort.createNoteInput(inputName, noteOnMask, noteOffMask, noteAftertouchMask);
+
+    noteInput.setShouldConsumeEvents(false);
+}
+
 function init() {
 
     transport = host.createTransport();
@@ -86,12 +96,10 @@ function init() {
     // Enable Midi Beat Clock. Comment out if you don't want that
     outPort.setShouldSendMidiBeatClock(true);
 
-    for (var i = 0, channel, inputName, noteInput, channelMask; i < NOTE_INPUT_CHANNEL_ORDER.length; i++) {
+    for (var i = 0, channel, inputName; i < NOTE_INPUT_CHANNEL_ORDER.length; i++) {
         channel = NOTE_INPUT_CHANNEL_ORDER[i];
-        channelMask = (channel == 0) ? '??????' : '?x????'.replace('x', (channel-1).toString(16));
         inputName = INPUT_NAMES[channel] || channel;
-        noteInput = inPort.createNoteInput(inputName, channelMask);
-        noteInput.setShouldConsumeEvents(false);
+        createNoteInput(channel, inputName);
     }
 
     // Setting Callbacks for Midi and Sysex
