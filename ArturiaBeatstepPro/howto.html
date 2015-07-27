@@ -1,0 +1,57 @@
+<html>
+    <head>
+        <style type="text/css">
+            body {
+                font-family: sans-serif;
+                line-height: 1.5em;
+                padding: 20px;
+            }
+            img {
+                display: block;
+            }
+            li {
+                margin-bottom: 10px;
+            }
+            li li {
+                margin-bottom: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>How to start</h1>
+
+        <ol>
+            <li>
+                Download the Bitwig project as a ZIP files and extract it to your Bitwig control scripts folder:
+                <ul>
+                    <li><b>Windows:</b> ~Documents\Bitwig Studio\Controller Scripts</li>
+                    <li><b>Mac:</b> ~Documents/Bitwig Studio/Controller Scripts</li>
+                    <li><b>Linux:</b> ~Documents/Bitwig Studio/Controller Scripts</li>
+                </ul>
+            </li>
+            <li>
+                Open the preferences dialog in Bitwig and go to Controllers
+            </li>
+            <li>
+                Either click "Detect available controllers" which should automatically add the
+                BSP version with four inputs (S1, S2, DRUM and OMNI).<br/>
+                Or add of the controller manually:
+                <ul>
+                    <li><b>Arturia Beatstep Pro -> BSP</b> ... adds BSP with three inputs + OMNI (this is the autodetectable version)</li>
+                    <li><b>Arturia Beatstep Pro (All channels) -> BSP</b>  ... adds BSP with all 16 MIDI channels + OMNI</li>
+                </ul>
+            </li>
+            <li>
+                In the end the dialog should look something like this (ignoring the other controllers):
+                <img src="https://raw.githubusercontent.com/justlep/bitwig/master/ArturiaBeatstepPro/BeatstepPro-autodetect.png" alt=""/>
+            </li>
+            <li>
+                After that, you can select MIDI track inputs of BeatStep's sequencers..
+                <img src="https://raw.githubusercontent.com/justlep/bitwig/master/ArturiaBeatstepPro/BeatstepPro.control.png" alt=""/>
+            </li>
+        </ol>
+
+        Done :)
+
+    </body>
+</html>
