@@ -1,6 +1,3 @@
-Some Bitwig Script(s)
-=====================
-
 # How to install the Bitwig control script
 
 1.  Download the Bitwig project as a ZIP files and extract it to your Bitwig control scripts folder:
