@@ -1,6 +1,6 @@
-# How to install the Bitwig control script
+# How to install the Beatstep Pro controller script in Bitwig
 
-1.  Download the Bitwig project as a ZIP files and extract it to your Bitwig control scripts folder:
+1.  Download the Bitwig project as a ZIP files and extract it to your Bitwig controllers scripts folder:
     *   **Windows:** ~Documents\Bitwig Studio\Controller Scripts
     *   **Mac:** ~Documents/Bitwig Studio/Controller Scripts
     *   **Linux:** ~Documents/Bitwig Studio/Controller Scripts
@@ -12,4 +12,6 @@
 4.  In the end the dialog should look something like this (ignoring the other controllers):![](https://raw.githubusercontent.com/justlep/bitwig/master/ArturiaBeatstepPro/BeatstepPro-autodetect.png)
 5.  After that, you can select MIDI track inputs of BeatStep's sequencers..![](https://raw.githubusercontent.com/justlep/bitwig/master/ArturiaBeatstepPro/BeatstepPro.control.png)
 
-Done :)
+Put your Beatstep Pro in sync mode "USB" to make it start/stop synchronously with Bitwig.
+
+Have fun :)
