@@ -11,7 +11,8 @@ How to install:
      Or add one of the controllers manually:
     *   **Arturia Beatstep Pro -> BSP** ... adds BSP with three inputs + OMNI (this is the autodetectable version)
     *   **Arturia Beatstep Pro (All channels) -> BSP** ... adds BSP with all 16 MIDI channels + OMNI
-4.  In the end the dialog should look something like this (ignoring the other controllers):![](https://raw.githubusercontent.com/justlep/bitwig/master/ArturiaBeatstepPro/BeatstepPro-autodetect.png)
+4.  In the end the dialog should look something like this (ignore TouchOSC):![](https://raw.githubusercontent.com/justlep/bitwig/master/ArturiaBeatstepPro/BeatstepPro-autodetect.png)
+    (Note that for Mackie Control you don't need the controller script - it's comes with Bitwig. Assigning Mackie MCU PRO to BeatStepPro's MIDI-IN2/OUT2 allows you to switch control mode to MCU/HUI mode and then control track volumes, pan, mute and solo via BSP's knobs and buttons.)
 5.  After that, you can select MIDI track inputs of BeatStep's sequencers..![](https://raw.githubusercontent.com/justlep/bitwig/master/ArturiaBeatstepPro/BeatstepPro.control.png)
 
 Put your Beatstep Pro in sync mode "USB" to make it start/stop synchronously with Bitwig.
