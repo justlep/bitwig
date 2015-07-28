@@ -2,7 +2,7 @@
 
 How to install:
 
-1.  Download this project as a ZIP file (button on the right) and extract it to your Bitwig controllers scripts folder:
+1.  Download this project as a ZIP file (button on the right) and extract it to your Bitwig controller scripts folder:
     *   **Windows:** ~Documents\Bitwig Studio\Controller Scripts
     *   **Mac:** ~Documents/Bitwig Studio/Controller Scripts
     *   **Linux:** ~Documents/Bitwig Studio/Controller Scripts
