@@ -1,6 +1,6 @@
-# Beatstep Pro controller script in Bitwig
+# Beatstep Pro controller script for Bitwig
 
-How to install?
+How to install:
 
 1.  Download this project as a ZIP file (button on the right) and extract it to your Bitwig controllers scripts folder:
     *   **Windows:** ~Documents\Bitwig Studio\Controller Scripts
