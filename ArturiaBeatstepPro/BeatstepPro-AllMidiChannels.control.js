@@ -12,16 +12,15 @@
  *   - Knobs in control mode are mappable. However, as Beatstep Pro doesn't seem to receive CC messages,
  *     value changes made manually in the Bitwig GUI won't update the value of the mapped Beatstep knob :(.
  *
- * TODO: re-check if BeatstepPro really cannot receive CCs
- * TODO: check if PLAY/STOP button can control Bitwig even in USB sync mode (weird things happening when I tried)
+ * - [DONE] re-check if BeatstepPro really cannot receive CCs
+ *          => reply from Arturia saying that BSP's values cannot be updated via CC messages ;-(
  *
- * Originally based on Thomas Helzle's TomsMultiBiController:
- * https://github.com/ThomasHelzle/Toms_Bitwig_Scripts/tree/master/TomsGeneric
+ * TODO: check if PLAY/STOP button can control Bitwig even in USB sync mode (weird things happening when I tried)
  */
 
 loadAPI(1);
 
-host.defineController("Arturia Beatstep Pro (All channels)", "BSP", "1.0", "6ae51caa-3310-11e5-a151-feff819cdc9f", "github@justlep.net");
+host.defineController("Arturia Beatstep Pro (All channels)", "BSP", "1.1", "6ae51caa-3310-11e5-a151-feff819cdc9f", "github@justlep.net");
 host.defineMidiPorts(1, 1);
 
 // Leaving autodetection for the minimal version
@@ -78,10 +77,11 @@ function getIndexByChannelAndCC(channel, cc) {
 
 function createNoteInput(channel, inputName) {
     var channelMaskReplacement = (!channel) ? '?' : (channel - 1).toString(16),
-        noteOnMask = '8x????'.replace('x', channelMaskReplacement),
-        noteOffMask = '9x????'.replace('x', channelMaskReplacement),
+        noteOnMask = '9x????'.replace('x', channelMaskReplacement),
+        noteOffMask = '8x????'.replace('x', channelMaskReplacement),
         noteAftertouchMask = 'Ax????'.replace('x', channelMaskReplacement),
-        noteInput = inPort.createNoteInput(inputName, noteOnMask, noteOffMask, noteAftertouchMask);
+        noteCCMask = 'Bx????'.replace('x', channelMaskReplacement),
+        noteInput = inPort.createNoteInput(inputName, noteOnMask, noteOffMask, noteAftertouchMask, noteCCMask);
 
     noteInput.setShouldConsumeEvents(false);
 }
@@ -160,7 +160,6 @@ function onMidi(status, data1, data2) {
         // println("Received CC " + data1 + " with value " + data2);
 
         // println('onMidi  -> ' + data2);
-        userControls.getControl(index).set(data2, CC_RESOLUTION);
 
         if (data1 == CC_MESSAGES.PLAY && data2 && ccChannel == 1) {
             // println('PLAY');
@@ -169,7 +168,7 @@ function onMidi(status, data1, data2) {
             // println('STOP');
             // transport.stop();
         } else {
-            userControls.getControl(index).set(data2, 128);
+            userControls.getControl(index).set(data2, CC_RESOLUTION);
         }
     }
 }
