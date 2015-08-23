@@ -80,8 +80,9 @@ function createNoteInput(channel, inputName) {
         noteOnMask = '9x????'.replace('x', channelMaskReplacement),
         noteOffMask = '8x????'.replace('x', channelMaskReplacement),
         noteAftertouchMask = 'Ax????'.replace('x', channelMaskReplacement),
-        noteCCMask = 'Bx????'.replace('x', channelMaskReplacement),
-        noteInput = inPort.createNoteInput(inputName, noteOnMask, noteOffMask, noteAftertouchMask, noteCCMask);
+        ccMask = 'Bx????'.replace('x', channelMaskReplacement),
+        programChangeMask = 'Cx????'.replace('x', channelMaskReplacement),
+        noteInput = inPort.createNoteInput(inputName, noteOnMask, noteOffMask, noteAftertouchMask, ccMask, programChangeMask);
 
     noteInput.setShouldConsumeEvents(false);
 }
