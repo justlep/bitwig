@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+	<meta charset="UTF-8">
+	<title>Morpher prove of concept</title>
+	<script src="lib/knockout-3.3.0.js"></script>
+	<script src="lib/underscore-min.js"></script>
+	<link rel="stylesheet" type="text/css" href="morpher.css">
+</head>
+<body>
+
+<script type="text/template" id="snapshot-tpl">
+	<fieldset data-bind="css: {result: isResult, highlight: isHighlighted}">
+		<legend>
+			<label>
+				<b data-bind="text: name"></b>
+			</label>
+		</legend>
+		<span>
+			<input data-highlight="true" type="range" min="0" max="127" step="1" data-bind="value: a, valueUpdate: 'input'" orient="vertical" />
+			<b data-bind="text: a"></b>
+			<b data-bind="if: isSnapshot" class="useForMorph">
+				<input type="checkbox" data-bind="checked: $root.useA" title="Include this parameter for morphing">
+			</b>
+		</span>
+		<span>
+			<input type="range" min="0" max="127" step="1" data-bind="value: b, valueUpdate: 'input'" orient="vertical"/>
+			<b data-bind="text: b"></b>
+			<b data-bind="if: isSnapshot" class="useForMorph">
+				<input type="checkbox" data-bind="checked: $root.useB" title="Include this parameter for morphing">
+			</b>
+		</span>
+		<span>
+			<input type="range" min="0" max="127" step="1" data-bind="value: c, valueUpdate: 'input'" orient="vertical"/>
+			<b data-bind="text: c"></b>
+			<b data-bind="if: isSnapshot" class="useForMorph">
+				<input type="checkbox" data-bind="checked: $root.useC" title="Include this parameter for morphing">
+			</b>
+		</span>
+
+		<div data-bind="visible: isSnapshot">
+			<button data-bind="click: $root.setReference, css:{isReference: $data==$root.reference()}">Ref</button>
+			<button data-bind="click: $root.loadSnapshotToDawValues">Load</button>
+			<button data-bind="click: $root.saveDawValuesToSnapshot" title="Overwrite this snapshot with the current DAW values">Save</button>
+		</div>
+	</fieldset>
+</script>
+
+<table>
+	<tr>
+		<td style="text-align: center">
+			<div style="margin: 0 auto; clear:none" data-bind="template: {name: 'snapshot-tpl', data: dawValueSnapshot}"></div>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<div data-bind="template: {name: 'snapshot-tpl', foreach: snapshots}"></div>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<fieldset data-bind="css: {noRefereceSelected: !$root.reference()}" style="float: left">
+				<legend>Morph Weights</legend>
+				<!-- ko foreach: snapshots -->
+					<span data-bind="event: {mouseover: $data.highlight, mouseout: $data.unhighlight}">
+						<i data-bind="text: name"></i>
+						<input type="range" min="0" max="127" step="1" data-bind="value: weight, valueUpdate: 'input', enable: $root.reference" orient="vertical"/>
+						<b data-bind="text: weight"></b>
+						<button data-bind="click: $root.setReference, css:{isReference: $data==$root.reference()}">Ref</button>
+					</span>
+				<!-- /ko -->
+			</fieldset>
+
+			<div class="noReferenceNotice">
+				<p data-bind="visible: !reference()">
+					No snapshot is selected as <b>reference</b>,<br/>
+					so there's nothing "to morph to".
+					<br/><br/>
+					Press the "Ref" button on one of the snapshots.
+				</p>
+				<p data-bind="visible: reference">
+					The weight sliders determine "how much" of the respective snapshot<br/>
+					is morphed to the current reference snapshot.
+					<br/>
+					<br/>
+					<button data-bind="click: resetMorphWeights">Reset morph sliders</button>
+				</p>
+			</div>
+		</td>
+	</tr>
+</table>
+
+<script src="morpher.js"></script>
+
+<footer>
+	(c) 2015 Lennart Pegel - <a href="https://github.com/justlep/bitwig" target="_blank">https://github.com/justlep/bitwig</a>
+</footer>
+
+</body>
+</html>

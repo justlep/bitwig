@@ -1,0 +1,8 @@
+For better code completion (in IntelliJ), this folder is filled on project start with the Bitwig API stuff
+by calling the grunt default task in the project root folder:
+
+$ grunt
+
+Bitwig's API .js files (stubs and helpers) will be copied from the Bitwig installation folder
+which is determined automatically (currently tested on Windows only).
+If paths need adjustments for your machine, see /Gruntfile.js.
