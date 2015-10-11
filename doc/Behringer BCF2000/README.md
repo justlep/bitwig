@@ -12,7 +12,7 @@ You can use MidiOX or a similar tool to transfer the file to your BCF. When the 
     * **Windows:** ~Documents\Bitwig Studio\Controller Scripts
     * **Linux/Mac:** ~Documents/Bitwig Studio/Controller Scripts
 2.  Open the preferences dialog in Bitwig and go to Controllers
-3.  Add the Controller script **Behringer** > **BCF2000 (LeP)** and choose BCF2000 for both input and output. ![Preferences][prefs]
+3.  Add the Controller script **Behringer** > **BCF2000 (LeP)** and choose BCF2000 port 1 for both input and output. ![Preferences][prefs]
 
 That's it. Your BCF2000 should initialize. Have fun :)
 
