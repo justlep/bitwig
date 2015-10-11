@@ -2,7 +2,7 @@
 
 How to install:
 
-1.  Download the latest ZIP file from the stable-versions-for-download folder and extract it to your Bitwig controller scripts folder:
+1.  Download the latest ZIP file from the [stable-versions-for-download][stableFolder] folder and extract it to your Bitwig controller scripts folder:
     *   **Windows:** ~Documents\Bitwig Studio\Controller Scripts
     *   **Linux/Mac:** ~Documents/Bitwig Studio/Controller Scripts
 2.  Open the preferences dialog in Bitwig and go to Controllers
@@ -18,3 +18,5 @@ How to install:
 It's useful to put Beatstep in **sync mode "USB"** to make it start/stop synchronously with Bitwig, as the latest version of Bitwig (v1.1.10) is yet unable to be controlled by external clocks.
 
 Hope that helped. Have fun :)
+
+[stableFolder]: https://github.com/justlep/bitwig/tree/master/stable-version-for-download/
