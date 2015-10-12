@@ -9,7 +9,8 @@ lep.ToggledValue = lep.util.extendClass(lep.BaseValue, {
     _init: function(opts) {
         this._super(opts);
 
-        lep.util.assert(!!opts.togglableValue, 'Missing togglableValue for ' + opts.name);
+        lep.util.assert(!!opts.togglableValue, 'Missing togglableValue for {}', opts.name);
+        lep.util.assertFunction(opts.togglableValue.toggle, 'Invalid togglableValue for {}', opts.name);
 
         var self = this;
 
