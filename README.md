@@ -25,6 +25,7 @@ If you're a developer and want to reuse the project, you'll best have nodejs ins
    $ grunt validate
    $ grunt test
    ```
+   
 * To **copy the controller scripts to Bitwig** in order to test them live, run
    ```sh
    $ grunt copyToBitwigForTest
