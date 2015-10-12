@@ -28,7 +28,7 @@ lep.Button = lep.util.extendClass(lep.BaseControl, {
     /** @Override */
     onClickNotePressed: function() {
         if (this.value) {
-            this.value.onAbsoluteValueReceived(128);
+            this.value.onAbsoluteValueReceived(127);
         }
     },
     /** @Override */
