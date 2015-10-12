@@ -11,7 +11,7 @@ If you're a developer and want to reuse the project, you'll best have nodejs ins
 
 1.  Clone the project
 2.  In the project's root directory run:
-    ```shell
+    ```sh
     $ npm install
     $ grunt
     ```
@@ -19,15 +19,15 @@ If you're a developer and want to reuse the project, you'll best have nodejs ins
     Also, it will try to copy the .js stubs from Bitwig's install directory into the */bitwigApiStubs* folder (helping IDEs like Webstorm with code completion).
     If the right folders can't be determined on your machine, edit *Gruntfile.js* as you like. I wrote this on Windows, sorry ;-)
 * To **validate** all the .js files, run
-   ```shell
+   ```sh
    $ grunt validate
    ```
 * To **copy to Bitwig** all the script files in order to test it live, run
-   ```shell
+   ```sh
    $ grunt copyToBitwigForTest
    ```
 * To **pack and release** the script it as a new *ZIP* file, run
-   ```shell
+   ```sh
    $ grunt buildStableRelease
    ```
    Credentials for the ZIP's filename etc. will be taken from */package.json*, so the version in there should be counted up afterwards.
