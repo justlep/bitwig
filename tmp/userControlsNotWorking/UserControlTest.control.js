@@ -13,8 +13,8 @@ function init() {
     host.getMidiInPort(0).setMidiCallback(function(status, data1, data2) {
         printMidi(status, data1, data2);
         if (isChannelController(status) && data1 === CC) {
-			println('Updating value of invertedControl to ' + (127 - data2));
-			control.set(127 - data2, 128);
+            println('Updating value of invertedControl to ' + (127 - data2));
+            control.set(127 - data2, 128);
         }
     });
 }
