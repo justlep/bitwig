@@ -8,7 +8,7 @@ loadAPI(1);
  *      -> console shows channel0 change -> OK
  * 3. Change volume of track2
  *     -> console shows channel1 change -> OK
- * 4. Group track1+1, then change volume of the group track
+ * 4. Group track1+2, then change volume of the group track
  *     -> console shows change in channel0 AND channel3 -> ??? what is channel3 ???
  *     There is no visible channel 3 in the GUI
  *     (group = channel0, groupedTrack1 = channel1, groupedTrack2 = channel2, effectTrack = channel4)
