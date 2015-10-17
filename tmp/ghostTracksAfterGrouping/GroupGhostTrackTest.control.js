@@ -14,7 +14,7 @@ loadAPI(1);
  *     (group = channel0, groupedTrack1 = channel1, groupedTrack2 = channel2, effectTrack = channel4)
  */
 
-host.defineController('meme', 'GhostGroupTrackTest', '1.0', '42577295-71a7-11e5-9d70-feff819cdc9f', 'github@justlep.net');
+host.defineController('meme', 'GroupGhostTrackTest', '1.0', '42577295-71a7-11e5-9d70-feff819cdc9f', 'github@justlep.net');
 host.defineMidiPorts(0, 0);
 
 function init() {
