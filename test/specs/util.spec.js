@@ -14,6 +14,76 @@ describe('util.js', function() {
         assert.throw(function() {
             lep.util.assert(0);
         });
+        assert.throw(function() {
+            lep.util.assertDefined(dlkgkdsfghsdkfjg);
+        });
+        dlkgkdsfghsdkfjg = 1;
+        assert.doesNotThrow(function() {
+            lep.util.assertDefined(dlkgkdsfghsdkfjg);
+        });
+        assert.throw(function() {
+            lep.util.assertBoolean('true');
+        });
+        assert.doesNotThrow(function() {
+            lep.util.assertBoolean(true);
+        });
+        assert.throw(function() {
+            lep.util.assertString(true);
+        });
+        assert.doesNotThrow(function() {
+            lep.util.assertString('true');
+        });
+        assert.doesNotThrow(function() {
+            lep.util.assertStringOrEmpty(null);
+        });
+        assert.doesNotThrow(function() {
+            lep.util.assertStringOrEmpty(0);
+        });
+        assert.doesNotThrow(function() {
+            lep.util.assertStringOrEmpty('');
+        });
+        assert.doesNotThrow(function() {
+            lep.util.assertStringOrEmpty('abc');
+        });
+        assert.throw(function() {
+            lep.util.assertStringOrEmpty(123);
+        });
+        assert.doesNotThrow(function() {
+            lep.util.assertNumber(123);
+        });
+        assert.throw(function() {
+            lep.util.assertNumber('123');
+        });
+        assert.throw(function() {
+            lep.util.assertNumber(null);
+        });
+        assert.throw(function() {
+            lep.util.assertNumberInRange(5, 1, 4);
+        });
+        assert.doesNotThrow(function() {
+            lep.util.assertNumberInRange(5, 1, 5);
+        });
+        assert.doesNotThrow(function() {
+            lep.util.assertFunction(function(){});
+        });
+        assert.throw(function() {
+            lep.util.assertFunction(null);
+        });
+        assert.throw(function() {
+            lep.util.assertFunction('abc');
+        });
+        assert.doesNotThrow(function() {
+            lep.util.assertFunctionOrEmpty(null);
+        });
+        assert.doesNotThrow(function() {
+            lep.util.assertFunctionOrEmpty(function(){});
+        });
+        assert.doesNotThrow(function() {
+            lep.util.assertObject({});
+        });
+        assert.throw(function() {
+            lep.util.assertObject(null);
+        });
         assert.doesNotThrow(function() {
             lep.util.assertObjectOrEmpty(null);
         });
@@ -25,6 +95,15 @@ describe('util.js', function() {
         });
         assert.throw(function() {
             lep.util.assertObjectOrEmpty(123);
+        });
+        assert.throw(function() {
+            lep.util.assertArray(123);
+        });
+        assert.doesNotThrow(function() {
+            lep.util.assertArray([1,2,3]);
+        });
+        assert.throw(function() {
+            lep.util.assertArray({a:1,b:2});
         });
     });
     
