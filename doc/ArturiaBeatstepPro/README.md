@@ -3,7 +3,7 @@
 A very simple controller script for quickly integrating BeatstepPro's three sequencers and the usercontrols into Bitwig.  
 Encoders in control mode are mappable, but I didn't add any more magic to them as they are not even able to receive  values from Bitwig. No need for unidirectional encoders here.
 
-### How to install:
+### Download & Installation
 
 1.  Download the latest ZIP file from the [stable-versions-for-download][stableFolder] folder and extract it to your Bitwig controller scripts folder:
     *   **Windows:** ~Documents\Bitwig Studio\Controller Scripts
