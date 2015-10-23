@@ -16,7 +16,7 @@ You can use MidiOX or a similar tool to transfer the file to your BCF. When the 
 
 That's it. Your BCF2000 should initialize. Have fun :)
 
-[overviewImage]: https://raw.githubusercontent.com/justlep/bitwig/master/doc/Behringer%20BCF2000/LeP's-BCF-2000.png
+[overviewImage]: https://raw.githubusercontent.com/justlep/bitwig/master/doc/Behringer%20BCF2000/img/LeP's-BCF-2000.png
 [sysexfile]: https://raw.githubusercontent.com/justlep/bitwig/master/doc/Behringer%20BCF2000/BCF2000-Bitwig-Preset28(CH13)-29(CH14).syx
-[prefs]: https://raw.githubusercontent.com/justlep/bitwig/master/doc/Behringer%20BCF2000/preferences.png
+[prefs]: https://raw.githubusercontent.com/justlep/bitwig/master/doc/Behringer%20BCF2000/img/preferences.png
 [stableFolder]: https://github.com/justlep/bitwig/tree/master/stable-version-for-download/
