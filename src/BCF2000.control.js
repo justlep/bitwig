@@ -357,6 +357,10 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
                     refObservable: morpher.isActive,
                     onClick: function() {
                         if (morpher.isActive()) {
+                            if (isShiftPressed()) {
+                                morpher.clearAllSnapshots();
+                                return;
+                            }
                             morpher.deactivate(function(previousValueSet) {
                                 var isPreviousValueSetRestorable = (previousValueSet && !previousValueSet.isControlled());
 

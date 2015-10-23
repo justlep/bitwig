@@ -215,6 +215,13 @@ lep.Morpher = (function() {
             lep.logDebug('Morpher activated');
         };
 
+        this.clearAllSnapshots = function() {
+            for (var i = snapshotObservables.length-1; i >= 0; i--) {
+                snapshotObservables[i](null);
+            }
+            resetWeightValues();
+        };
+
         /**
          * Deactivates the morpher, detaching its weightsValueSet from the controlSet.
          * Then passes the old valueSet to the given valueSetRestoreCallback, so the caller can decide
