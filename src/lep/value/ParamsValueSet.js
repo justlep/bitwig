@@ -72,9 +72,9 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
             var isPageNamesString = (arguments.length && typeof pageNames === 'string'),
                 pageNamesCollection = !arguments.length ? [] : isPageNamesString ? arguments : pageNames;
 
-            if (!isPageNamesString) {
+            if (arguments.length && !isPageNamesString) {
                 // TODO remove this once Bitwig has fixed the API or the documentation
-                lep.logWarn('API bug for cursorDevice.addPageNamesObserver() is probably fixed now. Workaround can be removed');
+                lep.logWarn('(!) API bug probably fixed for cursorDevice.addPageNamesObserver()');
             }
 
             for (var i = pageNamesCollection.length - 1, nameIndex; i >= 0; i--) {
