@@ -1,7 +1,10 @@
 # LeP's BCF2000 Pro controller script for Bitwig
 ---
+
 ##### How to use
+
 See the [documentation in the Wiki][wikiLink].
+
 ---
 ##### Required SysEx file:
 For the script to work, you need to install a special preset on your BCF (actually it is two, however the script will use preset 28 by default).
