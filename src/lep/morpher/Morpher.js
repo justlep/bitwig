@@ -80,13 +80,13 @@ lep.Morpher = (function() {
             targetValueSet = targetValueSetObservable();
             isTargetValueSetReady = (targetValueSet instanceof lep.ValueSet);
             if (!isTargetValueSetReady) {
-                lep.logDev('Morpher waiting for new targetValueSet...');
+                lep.logDebug('Morpher waiting for new targetValueSet...');
                 return;
             }
             targetSize = targetValueSet.values.length;
             resetWeightValues();
             recallSnapshotsForValueSet();
-            lep.logDev('Morpher has new targetValueSet "{}" with {} values', targetValueSetObservable().name, targetSize);
+            lep.logDebug('Morpher has new targetValueSet "{}" with {} values', targetValueSetObservable().name, targetSize);
         });
 
         function recallSnapshotsForValueSet() {
@@ -108,7 +108,7 @@ lep.Morpher = (function() {
             }
             savedSnapshotsByValueSetId[targetValueSet.id][snapshotIndex] = rawValues;
             // morph();
-            lep.logDev('Saved snapshot in slot {}', snapshotIndex);
+            lep.logDebug('Saved snapshot in slot {}', snapshotIndex);
         }
 
         function loadSnapshotAndSetAsReference(snapshotIndex) {
@@ -119,7 +119,7 @@ lep.Morpher = (function() {
                 for (var i = targetSize- 1; i >= 0; i--) {
                     targetValueSet.values[i].setValue(rawValues[i]);
                 }
-                lep.logDev('Snapshot{} loaded within {} millis', snapshotIndex, lep.util.stopTimer(self.id));
+                lep.logDebug('Snapshot{} loaded within {} millis', snapshotIndex, lep.util.stopTimer(self.id));
             } else {
                 lep.logDebug('Cannot load snapshot from empty slot {}', snapshotIndex);
             }
@@ -199,7 +199,7 @@ lep.Morpher = (function() {
                 targetValueSetObservable = newTargetValueSetObservable;
             }
             _isActive(true);
-            lep.logDev('Morpher activated');
+            lep.logDebug('Morpher activated');
         };
 
         /**
