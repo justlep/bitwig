@@ -120,6 +120,7 @@ lep.Morpher = (function() {
                     targetValueSet.values[i].setValue(rawValues[i]);
                 }
                 lep.logDebug('Snapshot{} loaded within {} millis', snapshotIndex, lep.util.stopTimer(self.id));
+                markReferenceSnapshotSelected(snapshotIndex);
             } else {
                 lep.logDebug('Cannot load snapshot from empty slot {}', snapshotIndex);
             }
@@ -128,6 +129,18 @@ lep.Morpher = (function() {
         function resetWeightValues() {
             for (var i = 0; i < weightsValueSet.values.length; i++) {
                 weightsValueSet.values[i].setValue(0, true);
+            }
+        }
+
+        /**
+         * Marks the currently selected snapshot channel by slightly lifting its corresponding morph fader
+         * while resetting all other faders.
+         * @param snapshotIndex (Number) the index of the fader to lift
+         */
+        function markReferenceSnapshotSelected(snapshotIndex) {
+            for (var i = 0, newWeightValueToSet; i < weightsValueSet.values.length; i++) {
+                newWeightValueToSet = (snapshotIndex === i) ? 20 : 0;
+                weightsValueSet.values[i].setValue(newWeightValueToSet, true);
             }
         }
 
