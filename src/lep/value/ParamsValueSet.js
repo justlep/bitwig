@@ -27,6 +27,12 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
             recallParamPageForDevice = function() {
                 hasDeviceChanged = false;
                 self.currentPage(_savedPageByDeviceName[self.deviceName()] || 0);
+            },
+            popupNotification = function(message) {
+                var isValueSetActive = !!self.values[self.currentPageValueOffset()].controller;
+                if (isValueSetActive) {
+                    host.showPopupNotification(message);
+                }
             };
 
         this.deviceName = ko.observable('');
@@ -41,14 +47,17 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
                     return;
                 }
                 var effectiveNewPage = lep.util.limitToRange(proposedNewPage, 0, self.lastPage()),
-                    newCustomParameterPageIndex = (effectiveNewPage - NUMBER_OF_FIX_PARAM_PAGES);
+                    newCustomParameterPageIndex = (effectiveNewPage - NUMBER_OF_FIX_PARAM_PAGES),
+                    newParameterPageName = _paramPageNames[effectiveNewPage];
+
                 lep.logDebug('New page for {} -> proposed: {}, effective: {}', self.name, proposedNewPage, effectiveNewPage);
                 if (newCustomParameterPageIndex >= 0) {
                     lep.logDebug('setParameterPage({})', newCustomParameterPageIndex);
                     cursorDevice.setParameterPage(newCustomParameterPageIndex);
                 }
                 _currentPage(effectiveNewPage);
-                lep.logDebug('Selected device page: {}', _paramPageNames[effectiveNewPage]);
+                lep.logDebug('Selected parameter page: {}', newParameterPageName);
+                popupNotification('Parameter Page: ' + newParameterPageName);
                 saveParamPageForCurrentDevice();
             }
         });

@@ -38,6 +38,8 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
 
     sendProgramChange(0, bcfPresetNumber);
 
+    host.getNotificationSettings().getUserNotificationsEnabled().set(true);
+
     var WINDOW_SIZE = 8,
         SENDS_NUMBER = 6,
         PARAM_PAGES_NUMBER = 6,
