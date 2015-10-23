@@ -18,19 +18,38 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
             PARAMS_PER_PAGE = 8,
             _numberOfCustomParameterPages = ko.observable(0),
             _currentPage = ko.observable(0),
-            _paramPageNames = ['Common', 'Envelope'];
+            _savedPageByDeviceName = {},
+            _paramPageNames = ['Common', 'Envelope'],
+            hasDeviceChanged = false,
+            saveParamPageForCurrentDevice = function() {
+                _savedPageByDeviceName[self.deviceName()] = _currentPage();
+            },
+            recallParamPageForDevice = function() {
+                hasDeviceChanged = false;
+                self.currentPage(_savedPageByDeviceName[self.deviceName()] || 0);
+            };
 
         this.deviceName = ko.observable('');
 
         this.currentPage = ko.computed({
             read: _currentPage,
             write: function(proposedNewPage) {
-                var effectiveNewPage = lep.util.limitToRange(proposedNewPage, 0, self.lastPage());
+                if (hasDeviceChanged) {
+                    // If the device has changed, recallParamPageForDevice() is the only function allowed to
+                    // set the new page, as it will be invoked LAST after lastPage() is determined, too
+                    lep.logDebug('Skipped setting new page of ParamValueSet due to prior device change');
+                    return;
+                }
+                var effectiveNewPage = lep.util.limitToRange(proposedNewPage, 0, self.lastPage()),
+                    newCustomParameterPageIndex = (effectiveNewPage - NUMBER_OF_FIX_PARAM_PAGES);
                 lep.logDebug('New page for {} -> proposed: {}, effective: {}', self.name, proposedNewPage, effectiveNewPage);
-                if (proposedNewPage >= NUMBER_OF_FIX_PARAM_PAGES) {
-                    cursorDevice.setParameterPage(proposedNewPage - NUMBER_OF_FIX_PARAM_PAGES);
+                if (newCustomParameterPageIndex >= 0) {
+                    lep.logDebug('setParameterPage({})', newCustomParameterPageIndex);
+                    cursorDevice.setParameterPage(newCustomParameterPageIndex);
                 }
                 _currentPage(effectiveNewPage);
+                lep.logDebug('Selected device page: {}', _paramPageNames[effectiveNewPage]);
+                saveParamPageForCurrentDevice();
             }
         });
 
@@ -38,6 +57,7 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
             return _numberOfCustomParameterPages() + NUMBER_OF_FIX_PARAM_PAGES - 1;
         });
         this.lastPage.subscribe(function(newLastPage) {
+            lep.logDebug('lastPage changed: {}, fixing old currentPage: {}', newLastPage, self.currentPage());
             if (newLastPage < self.currentPage()) {
                 self.currentPage(newLastPage);
             }
@@ -48,30 +68,33 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
         });
 
         cursorDevice.addPageNamesObserver(function(/*...*/pageNames) {
-            // The API doc seems to have a mistake here - parameter is NOT an array but a rest-parameter of x Strings
-            lep.util.assertStringOrEmpty(pageNames, 'Possible API change for cursorDevice.addPageNamesObserver');
-                  lep.logDebug('New number of custom param pages: {}', arguments.length);
-            //for (var i = 0, nameIndex, name; i<arguments.length; i++) {
-            //    name = arguments[i];
-            //    nameIndex = i + NUMBER_OF_FIX_PARAM_PAGES;
-            //    _paramPageNames[nameIndex] = name;
-            //    lep.logDebug('ParamPage {} = "{}"', i, name);
-            //}
+            // (!) Bitwig Bug: API documentation says pageNames is an array, actual type is a rest-parameter of Strings
+            var isPageNamesString = (arguments.length && typeof pageNames === 'string'),
+                pageNamesCollection = !arguments.length ? [] : isPageNamesString ? arguments : pageNames;
+
+            if (!isPageNamesString) {
+                // TODO remove this once Bitwig has fixed the API or the documentation
+                lep.logWarn('API bug for cursorDevice.addPageNamesObserver() is probably fixed now. Workaround can be removed');
+            }
+
+            for (var i = pageNamesCollection.length - 1, nameIndex; i >= 0; i--) {
+                nameIndex = (NUMBER_OF_FIX_PARAM_PAGES + i);
+                _paramPageNames[nameIndex] = pageNamesCollection[i];
+            }
+
             _numberOfCustomParameterPages(arguments.length);
+            recallParamPageForDevice();
         });
+
         cursorDevice.addNameObserver(40, 'unknown device', function(deviceName) {
             lep.logDebug('Selected device: "{}"', deviceName);
             self.deviceName(deviceName);
+            hasDeviceChanged = true;
         });
-        cursorDevice.addSelectedPageObserver(-1, function(paramPage) {
-            // Probably a Bitwig bug: -1 will never occurr (Bitwig 1.2)
-            if (paramPage >= 0) {
-                lep.logDebug('Selected params page change reported by observer: {}', paramPage);
-                self.currentPage(NUMBER_OF_FIX_PARAM_PAGES + paramPage);
-            } else {
-                lep.logDebug('No page selected');
-            }
-        });
+
+        //cursorDevice.addSelectedPageObserver(-1, function(paramPage) {
+        //    lep.logDebug('Selected paramsPage observer reports: {}', paramPage);
+        //});
     }
 
 });
