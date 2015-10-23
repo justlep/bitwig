@@ -30,7 +30,6 @@ load('value/ChannelSelectValue.js');
 load('value/ToggledTransportValue.js');
 load('value/KnockoutSyncedValue.js');
 
-// load('morpher/ValueSetSnapshot.js');
 load('morpher/MorphWeightValue.js');
 load('morpher/Morpher.js');
 
