@@ -8,7 +8,7 @@ You can use MidiOX or a similar tool to transfer the file to your BCF. When the 
 ---
 ##### Installing the controller script:
 
-1.  Download the latest ZIP file from the [stable-versions-for-download][stableFolder] and extract it to your Bitwig controller scripts folder:
+1.  Download the [latest ZIP file][latestZip] from the [stable-versions-for-download][stableFolder] and extract it to your Bitwig controller scripts folder:
     * **Windows:** ~Documents\Bitwig Studio\Controller Scripts
     * **Linux/Mac:** ~Documents/Bitwig Studio/Controller Scripts
 2.  Open the preferences dialog in Bitwig and go to Controllers
@@ -16,6 +16,7 @@ You can use MidiOX or a similar tool to transfer the file to your BCF. When the 
 
 That's it. Your BCF2000 should initialize. Have fun :)
 
+[latestZip]: https://github.com/justlep/bitwig/blob/master/stable-version-for-download/LeP's%20Controller%20Scripts%20v1.0.0.zip?raw=true
 [overviewImage]: https://raw.githubusercontent.com/justlep/bitwig/master/doc/Behringer%20BCF2000/img/LeP's-BCF-2000.png
 [sysexfile]: https://raw.githubusercontent.com/justlep/bitwig/master/doc/Behringer%20BCF2000/BCF2000-Bitwig-Preset28(CH13)-29(CH14).syx
 [prefs]: https://raw.githubusercontent.com/justlep/bitwig/master/doc/Behringer%20BCF2000/img/preferences.png
