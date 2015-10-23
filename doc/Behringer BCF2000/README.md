@@ -1,5 +1,7 @@
 # LeP's BCF2000 Pro controller script for Bitwig
-![LeP's BCF2000][overviewImage]
+---
+##### How to use
+See the [documentation in the Wiki][wikiLink].
 ---
 ##### Required SysEx file:
 For the script to work, you need to install a special preset on your BCF (actually it is two, however the script will use preset 28 by default).
@@ -18,7 +20,7 @@ You can transmit the SysEx-file to your BCF using [MidiOX][midiOxLink] ([screens
 That's it. Bitwig should switch your BCF2000 to preset 28 and initialize the controls. Have fun :)
 
 [latestZip]: https://github.com/justlep/bitwig/blob/master/stable-version-for-download/LeP's%20Controller%20Scripts%20v1.0.0.zip?raw=true
-[overviewImage]: https://raw.githubusercontent.com/justlep/bitwig/master/doc/Behringer%20BCF2000/img/LeP's-BCF-2000.png
+[wikiLink]: https://github.com/justlep/bitwig/wiki/LeP's-BCF2000
 [sysexfile]: https://raw.githubusercontent.com/justlep/bitwig/master/doc/Behringer%20BCF2000/BCF2000-Bitwig-Preset28(CH13)-29(CH14).syx
 [prefs]: https://raw.githubusercontent.com/justlep/bitwig/master/doc/Behringer%20BCF2000/img/preferences.png
 [stableFolder]: https://github.com/justlep/bitwig/tree/master/stable-version-for-download/
