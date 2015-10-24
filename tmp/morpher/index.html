@@ -38,7 +38,7 @@
 			</b>
 		</span>
 
-		<div data-bind="visible: isSnapshot">
+		<div data-bind="visible: isSnapshot" class="snapshotButtons">
 			<button data-bind="click: $root.setReference, css:{isReference: $data==$root.reference()}">Ref</button>
 			<!-- <button data-bind="click: $root.loadSnapshotToDawValues">Load</button> -->
 			<button data-bind="click: $root.saveDawValuesToSnapshot" title="Overwrite this snapshot with the current DAW values">Save</button>
