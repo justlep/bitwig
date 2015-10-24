@@ -1,7 +1,7 @@
 loadAPI(1);
 
 /**
- * Bug in Bitwig 1.2
+ * Bug in Bitwig 1.2 (and Bitwig 1.3), Windows 7
  *
  * 1. Create new Project (2 audio or midi tracks, 1 effect track, 1 master)
  * 2. Change volume of track1
