@@ -1,4 +1,4 @@
-# LeP's BCF2000 Pro controller script for Bitwig
+# LeP's BCF2000 controller script for Bitwig
 
 #### How to use
 
