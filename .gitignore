@@ -1,2 +1,4 @@
 bitwigApiStubs/**/*.js
+node_modules/*
+!node_modules/lepApiAndMocksLoader
 tmp/target/**
