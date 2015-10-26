@@ -79,6 +79,9 @@ fieldset span i {
     margin-top: 30px;
     font-style: italic;
 }
+.snapshotButtons {
+    text-align: center;
+}
 footer {
     margin-top: 20px;
     border-top: 1px solid #eee;

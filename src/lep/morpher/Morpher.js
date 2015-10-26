@@ -1,5 +1,5 @@
 /**
- * Represents the Morpher, used to merge ValueSetSnapshots into the current target valueSet.
+ * Represents the Morpher, used to merge snapshots of valuesets into a current target valueSet.
  *
  * Author: Lennart Pegel - https://github.com/justlep
  * License: LGPLv3 (http://www.gnu.org/licenses/lgpl-3.0.txt)
@@ -80,13 +80,13 @@ lep.Morpher = (function() {
             targetValueSet = targetValueSetObservable();
             isTargetValueSetReady = (targetValueSet instanceof lep.ValueSet);
             if (!isTargetValueSetReady) {
-                lep.logDev('Morpher waiting for new targetValueSet...');
+                lep.logDebug('Morpher waiting for new targetValueSet...');
                 return;
             }
             targetSize = targetValueSet.values.length;
             resetWeightValues();
             recallSnapshotsForValueSet();
-            lep.logDev('Morpher has new targetValueSet "{}" with {} values', targetValueSetObservable().name, targetSize);
+            lep.logDebug('Morpher has new targetValueSet "{}" with {} values', targetValueSetObservable().name, targetSize);
         });
 
         function recallSnapshotsForValueSet() {
@@ -108,7 +108,7 @@ lep.Morpher = (function() {
             }
             savedSnapshotsByValueSetId[targetValueSet.id][snapshotIndex] = rawValues;
             // morph();
-            lep.logDev('Saved snapshot in slot {}', snapshotIndex);
+            lep.logDebug('Saved snapshot in slot {}', snapshotIndex);
         }
 
         function loadSnapshotAndSetAsReference(snapshotIndex) {
@@ -119,7 +119,8 @@ lep.Morpher = (function() {
                 for (var i = targetSize- 1; i >= 0; i--) {
                     targetValueSet.values[i].setValue(rawValues[i]);
                 }
-                lep.logDev('Snapshot{} loaded within {} millis', snapshotIndex, lep.util.stopTimer(self.id));
+                lep.logDebug('Snapshot{} loaded within {} millis', snapshotIndex, lep.util.stopTimer(self.id));
+                markReferenceSnapshotSelected(snapshotIndex);
             } else {
                 lep.logDebug('Cannot load snapshot from empty slot {}', snapshotIndex);
             }
@@ -128,6 +129,18 @@ lep.Morpher = (function() {
         function resetWeightValues() {
             for (var i = 0; i < weightsValueSet.values.length; i++) {
                 weightsValueSet.values[i].setValue(0, true);
+            }
+        }
+
+        /**
+         * Marks the currently selected snapshot channel by slightly lifting its corresponding morph fader
+         * while resetting all other faders.
+         * @param snapshotIndex (Number) the index of the fader to lift
+         */
+        function markReferenceSnapshotSelected(snapshotIndex) {
+            for (var i = 0, newWeightValueToSet; i < weightsValueSet.values.length; i++) {
+                newWeightValueToSet = (snapshotIndex === i) ? 20 : 0;
+                weightsValueSet.values[i].setValue(newWeightValueToSet, true);
             }
         }
 
@@ -199,7 +212,14 @@ lep.Morpher = (function() {
                 targetValueSetObservable = newTargetValueSetObservable;
             }
             _isActive(true);
-            lep.logDev('Morpher activated');
+            lep.logDebug('Morpher activated');
+        };
+
+        this.clearAllSnapshots = function() {
+            for (var i = snapshotObservables.length-1; i >= 0; i--) {
+                snapshotObservables[i](null);
+            }
+            resetWeightValues();
         };
 
         /**

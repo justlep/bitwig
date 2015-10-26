@@ -132,7 +132,7 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
                 control.detachValue();
             }
         }
-    })(); // TODO re-check if () is necessary.. computables should run intitially by default, anyway
+    });
 
     lep.ControlSet.instancesByName[this.name] = this;
 };
