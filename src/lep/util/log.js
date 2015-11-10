@@ -23,13 +23,13 @@ var lep = (typeof lep !== 'undefined') ? lep : {};
         NOP = function(){};
 
     if (typeof println === 'function') {
-        loggingFn = function () {
+        loggingFn = function() {
             println(this.util.formatString.apply(this, arguments));
-        }
+        };
     } else if (typeof console !== 'undefined' && typeof console.log === 'function') {
-        loggingFn = function () {
+        loggingFn = function() {
             console.log(this.util.formatString.apply(this.util, arguments));
-        }
+        };
     } else {
         loggingFn = function() {
             throw 'No logging method (console.log or println) was found!';

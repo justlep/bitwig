@@ -34,7 +34,7 @@
     "strict": false,
     "globalstrict": false,
 
-    "asi": true,
+    "asi": false,
     "laxbreak": true,
     "bitwise": false,
     "boss": false,

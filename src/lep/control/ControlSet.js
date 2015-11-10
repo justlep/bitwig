@@ -98,7 +98,7 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
 
     this.lastValuePage = ko.computed(function() {
         return (!_valueSet()) ? 0 : (self.hasParamsValueSet()) ? _valueSet().lastPage() :
-            Math.max(0, Math.ceil(_valueSet().values.length / numberOfControls) - 1)
+            Math.max(0, Math.ceil(_valueSet().values.length / numberOfControls) - 1);
     });
     this.hasPrevValuePage = ko.computed(function() {
         return !!self.valuePage();

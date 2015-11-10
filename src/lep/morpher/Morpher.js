@@ -60,7 +60,7 @@ lep.Morpher = (function() {
                 return new lep.BaseValue({
                     name: 'MorphParamSelected' + index,
                     syncToDaw: morph
-                })
+                });
             }),
             savedSnapshotsByValueSetId = [],
             previousValueSetToRestore = null,

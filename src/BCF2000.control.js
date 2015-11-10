@@ -180,7 +180,7 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
                         otherObservable(oldValueSet);
                     }
                 }
-            })
+            });
         })(),
         /**
          * Observable holding the VALUE_SET.* that is currently assigned to the faders.
@@ -205,7 +205,7 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
                         otherObservable(oldValueSet);
                     }
                 }
-            })
+            });
         })(),
 
         initEncodersAndFadersValueSet = function() {
@@ -510,7 +510,7 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
                 clickNote: NOTE_ACTION.PUNCH_IN,
                 midiChannel: bcfMidiChannel,
                 valueToAttach: ko.computed(function() {
-                    return isShiftPressed() ? TRANSPORT_VALUE.OVERDUB : TRANSPORT_VALUE.PUNCH_IN
+                    return isShiftPressed() ? TRANSPORT_VALUE.OVERDUB : TRANSPORT_VALUE.PUNCH_IN;
                 })
             });
             new lep.Button({

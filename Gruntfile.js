@@ -12,7 +12,7 @@ module.exports = function (grunt) {
 
     try {
         // the Bitwig installation's dir (Windows)
-        data.BITWIG_INSTALL_DIR = fs.realpathSync(process.env['ProgramFiles(x86)'] + '/Bitwig Studio')
+        data.BITWIG_INSTALL_DIR = fs.realpathSync(process.env['ProgramFiles(x86)'] + '/Bitwig Studio');
     } catch (e) {
         throw 'Unable to determine Bitwig\'s installation directory. Please fix Gruntfile.js.';
     }
