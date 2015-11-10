@@ -27,11 +27,8 @@
     "globals": {
         "lep": true,
         "ko": true,
-        "jquery": true,
-        "$": true,
-        "require": true,
-        "requirejs": true,
-        "host": true
+        "host": true,
+        "BeatstepPro": true
     },
 
     "strict": false,

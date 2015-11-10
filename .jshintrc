@@ -142,25 +142,15 @@
     "initArray",
     "areArraysEqual",
     "dump",
-    "makeIndexedFunction",
-    "BeatstepPro",
-    "Morpher",
-    "recallSnapshotsForValueSet",
-    "saveSnapshot",
-    "loadSnapshotAndSetAsReference",
-    "resetWeightValues",
-    "morph"
+    "makeIndexedFunction"
   ],
   "debug": false,
   "devel": true,
   "globals": {
     "lep": true,
     "ko": true,
-    "jquery": true,
-    "$": true,
-    "require": true,
-    "requirejs": true,
-    "host": true
+    "host": true,
+    "BeatstepPro": true
   },
   "strict": false,
   "globalstrict": false,

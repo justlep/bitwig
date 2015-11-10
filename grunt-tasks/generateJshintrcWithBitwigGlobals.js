@@ -1,12 +1,10 @@
 /**
- * Generates a new .jshintrc file containing all global functions of the Bitwig API and the control scripts
- * as 'predefined', so JSHINT won't report them as unknown.
+ * Generates a new .jshintrc file containing all global functions of the Bitwig API 'predefined',
+ * so jshint won't report them as unknown.
  *
- * The task is scanning all the .js files in the src/ folder (especially the Bitwig-API-ones)
- * for global function declarations.
- * Then loads the JSON of /.jshintrc and adds the found function names into the 'predef' property,
- * afterward saves the new version of .jshintrc into the src/bitwig-api/ folder,
- * where it will be expected and used by the jshint grunt task.
+ * The task is scanning all the .js files in the /bitwigApiStubs folder for global function declarations.
+ * Then loads /.jshintrc.in and adds the found function names into the JSON's 'predef' property,
+ * afterwards saves the altered JSON into .jshintrc which is used by the jshint grunt task.
  */
 module.exports = function (grunt, opts) {
     'use strict';
@@ -17,7 +15,7 @@ module.exports = function (grunt, opts) {
     grunt.registerTask('generateJshintrcWithBitwigGlobals', 'Copies an altered .jshintrc to the api path.',
         function() {
             var jshintrcJSON = grunt.file.readJSON('.jshintrc.in'),
-                apiSources = grunt.file.expand(['bitwigApiStubs/**/*.js', 'src/**/*.js', '!src/**/*.control.js', '!src/lib/**']);
+                apiSources = grunt.file.expand(['bitwigApiStubs/**/*.js', '!src/**/*.control.js', '!src/lib/**']);
 
             // grunt.log.writeln(apiSources);
             grunt.log.writeln('Generating bitwig-API-compatible .jshintrc ...');
