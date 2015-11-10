@@ -482,6 +482,7 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
             });
         },
         TRANSPORT_VALUE = {
+            PLAY: lep.ToggledTransportValue.create('Play'),
             RECORD: lep.ToggledTransportValue.create('Record'),
             ARRANGER_AUTOMATION: lep.ToggledTransportValue.create('ArrangerAutomation'),
             LOOP: lep.ToggledTransportValue.create('Loop'),
@@ -495,7 +496,7 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
                 name: 'PlayBtn',
                 clickNote: NOTE_ACTION.PLAY,
                 midiChannel: bcfMidiChannel,
-                valueToAttach: lep.ToggledTransportValue.create('Play')
+                valueToAttach: TRANSPORT_VALUE.PLAY
             });
             new lep.Button({
                 name: 'RecordBtn',
