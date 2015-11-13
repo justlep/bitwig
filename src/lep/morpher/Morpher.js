@@ -69,6 +69,7 @@ lep.Morpher = (function() {
             targetValueSetObservable = null,
             isTargetValueSetReady = false,
             targetValueSet = null,
+            deviceAwareTargetValueSetId = null,
             targetSize = 0,
             self = this,
             currentReferenceValues = null;
@@ -83,15 +84,18 @@ lep.Morpher = (function() {
                 lep.logDebug('Morpher waiting for new targetValueSet...');
                 return;
             }
+            deviceAwareTargetValueSetId = '' + targetValueSet.id + '_' + (targetValueSet.deviceName||lep.util.NOP)();
+            lep.logDebug('deviceAwareTargetValueSetId changed: {}', deviceAwareTargetValueSetId);
             targetSize = targetValueSet.values.length;
+
             resetWeightValues();
             recallSnapshotsForValueSet();
             lep.logDebug('Morpher has new targetValueSet "{}" with {} values', targetValueSetObservable().name, targetSize);
         });
 
         function recallSnapshotsForValueSet() {
-            for (var i=0; i<numberOfSnapshots; i++) {
-                snapshotObservables[i]( (savedSnapshotsByValueSetId[targetValueSet.id]||[])[i] );
+            for (var i= 0; i<numberOfSnapshots; i++) {
+                snapshotObservables[i]( (savedSnapshotsByValueSetId[deviceAwareTargetValueSetId]||[])[i] );
             }
             currentReferenceValues = null;
         }
@@ -103,11 +107,10 @@ lep.Morpher = (function() {
                 rawValues[i] = targetValueSet.values[i].value || 0;
             }
             snapshotObservables[snapshotIndex](rawValues);
-            if (!savedSnapshotsByValueSetId[targetValueSet.id]) {
-                savedSnapshotsByValueSetId[targetValueSet.id] = [];
+            if (!savedSnapshotsByValueSetId[deviceAwareTargetValueSetId]) {
+                savedSnapshotsByValueSetId[deviceAwareTargetValueSetId] = [];
             }
-            savedSnapshotsByValueSetId[targetValueSet.id][snapshotIndex] = rawValues;
-            // morph();
+            savedSnapshotsByValueSetId[deviceAwareTargetValueSetId][snapshotIndex] = rawValues;
             lep.logDebug('Saved snapshot in slot {}', snapshotIndex);
         }
 
