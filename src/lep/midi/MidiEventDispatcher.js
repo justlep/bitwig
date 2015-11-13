@@ -74,9 +74,9 @@ lep.MidiEventDispatcher = (function () {
                 },
                 addNoteOrCCHandler = function(handlerList, noteOrCC, callback, channel) {
                     lep.util.assertArray(handlerList, 'Invalid handlerList for MED.addNoteOrCCHandler()');
-                    lep.util.assertNumberInRange(noteOrCC, 0, 127, 'Invalid noteOrCC for MED.addNoteOrCCHandler()');
-                    lep.util.assertFunction(callback, 'Invalid callback for noteOrCC ' + noteOrCC);
-                    lep.util.assertNumberInRangeOrEmpty(channel, 0, 15, 'Invalid channel for noteOrCC ' + noteOrCC);
+                    lep.util.assertNumberInRange(noteOrCC, 0, 127, 'Invalid noteOrCC {} for MED.addNoteOrCCHandler()', noteOrCC);
+                    lep.util.assertFunction(callback, 'Invalid callback for noteOrCC {}', noteOrCC);
+                    lep.util.assertNumberInRangeOrEmpty(channel, 0, 15, 'Invalid channel {} for noteOrCC {}', channel, noteOrCC);
 
                     if (noteOrCC instanceof Array) {
                         for (var i = noteOrCC[0], lastNoteOrCC = noteOrCC[1]; i <= lastNoteOrCC; i++) {
@@ -114,7 +114,7 @@ lep.MidiEventDispatcher = (function () {
 
                         while (true) {
                             if (msgType === 0xB0) { // CC
-                                lep.logDebug('MED received value {} on CC {} / channel {}', value, noteOrCC, inPort);
+                                lep.logDebug('MED received value {} on CC {} / channel {}', value, noteOrCC, channel);
                                 genericHandlers = handlers.cc[handlerIndex];
                             } else if (msgType === 0x90) { // NOTE ON
                                 genericHandlers = handlers.note[handlerIndex];
