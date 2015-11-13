@@ -77,5 +77,5 @@ BeatstepPro.getInstanceForMainChannels = function() {
 
 /** @static */
 BeatstepPro.getInstanceForAllChannels = function() {
-    return new BeatstepPro(true);
+    return new BeatstepPro(false);
 };
