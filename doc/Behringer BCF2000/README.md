@@ -12,7 +12,7 @@ It is contained in this SysEx-file: [**BCF2000-Bitwig-Preset28(CH13)-29(CH14).sy
 ---
 #### Download & Installation
 
-1.  Download the [latest ZIP file][latestZip] from the [stable-versions-for-download][stableFolder] and extract it to your Bitwig controller scripts folder:
+1.  Download the latest ZIP file from the [stable-versions-for-download/][stableFolder] directory and extract it to your Bitwig controller scripts folder:
     * **Windows:** ~Documents\Bitwig Studio\Controller Scripts
     * **Linux/Mac:** ~Documents/Bitwig Studio/Controller Scripts
 2.  Open the preferences in Bitwig and go to Controllers
@@ -20,7 +20,6 @@ It is contained in this SysEx-file: [**BCF2000-Bitwig-Preset28(CH13)-29(CH14).sy
 
 That's it. Bitwig should switch your BCF2000 to preset 28 and initialize the controls. Have fun :)
 
-[latestZip]: https://github.com/justlep/bitwig/blob/master/stable-version-for-download/LeP's%20Controller%20Scripts%20v1.0.0.zip?raw=true
 [wikiLink]: https://github.com/justlep/bitwig/wiki/LeP's-BCF2000
 [sysexfile]: https://raw.githubusercontent.com/justlep/bitwig/master/doc/Behringer%20BCF2000/BCF2000-Bitwig-Preset28(CH13)-29(CH14).syx
 [prefs]: https://raw.githubusercontent.com/justlep/bitwig/master/doc/Behringer%20BCF2000/img/preferences.png
