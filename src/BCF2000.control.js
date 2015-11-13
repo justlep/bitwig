@@ -118,9 +118,7 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
             SEND: new lep.ValueSet('Sends', SENDS_NUMBER, WINDOW_SIZE, function(sendIndex, channelIndex) {
                 return lep.StandardRangedValue.createSendValue(trackBank, channelIndex, sendIndex);
             }),
-            MACRO: new lep.ValueSet('Macros', 1, 8, function(macroIndex) {
-                return lep.StandardRangedValue.createMacroValue(cursorDevice, macroIndex);
-            }),
+            MACRO: new lep.MacroValueSet(cursorDevice),
             PARAM: new lep.ParamsValueSet(cursorDevice),
 
             USERCONTROL: new lep.ValueSet('UserControls', USER_CONTROL_PAGES, WINDOW_SIZE, function(page, indexInPage) {

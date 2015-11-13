@@ -24,6 +24,7 @@ load('control/ControlSet.js');
 load('value/BaseValue.js');
 load('value/StandardRangedValue.js');
 load('value/ValueSet.js');
+load('value/MacroValueSet.js');
 load('value/ParamsValueSet.js');
 load('value/ToggledValue.js');
 load('value/ChannelSelectValue.js');
