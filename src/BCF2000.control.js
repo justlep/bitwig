@@ -191,7 +191,7 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
         },
 
         CONTROLSET = {
-            ENCODERS: new lep.ControlSet('ClickEncoders', 8, function(index) {
+            ENCODERS: new lep.ControlSet('ClickEncoders', WINDOW_SIZE, function(index) {
                 return new lep.ClickEncoder({
                     name: 'ClickEncoder' + index,
                     valueCC: CC.FIRST_ENCODER + index,
@@ -199,21 +199,21 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
                     midiChannel: bcfMidiChannel
                 });
             }),
-            FADERS: new lep.ControlSet('Faders', 8, function(index) {
+            FADERS: new lep.ControlSet('Faders', WINDOW_SIZE, function(index) {
                 return new lep.Fader({
                     name: 'Fader' + index,
                     valueCC: CC.FIRST_FADER + index,
                     midiChannel: bcfMidiChannel
                 });
             }),
-            UPPER_BUTTONS: new lep.ControlSet('Upper Buttons', 8, function(index) {
+            UPPER_BUTTONS: new lep.ControlSet('Upper Buttons', WINDOW_SIZE, function(index) {
                 return new lep.Button({
                     name: 'UpperBtn' + index,
                     clickNote: NOTE.A1 + index,
                     midiChannel: bcfMidiChannel
                 });
             }),
-            LOWER_BUTTONS: new lep.ControlSet('Lower Buttons', 8, function(index) {
+            LOWER_BUTTONS: new lep.ControlSet('Lower Buttons', WINDOW_SIZE, function(index) {
                 return new lep.Button({
                     name: 'LowerBtn' + index,
                     clickNote: NOTE.B1 + index,
