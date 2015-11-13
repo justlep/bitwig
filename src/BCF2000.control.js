@@ -82,7 +82,6 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
         trackBank = host.createTrackBank(WINDOW_SIZE, SENDS_NUMBER, 0),
         cursorDevice = host.createCursorDevice(),
         eventDispatcher = lep.MidiEventDispatcher.getInstance(),
-        userControlBank = host.createUserControls(USER_CONTROL_PAGES * WINDOW_SIZE),
 
         isShiftPressed = ko.observable(false),
 
@@ -109,36 +108,16 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
         },
 
         VALUESET = {
-            VOLUME: new lep.ValueSet('Volumes', 1, WINDOW_SIZE, function(index) {
-                return lep.StandardRangedValue.createVolumeValue(trackBank, index);
-            }),
-            PAN: new lep.ValueSet('Pans', 1, WINDOW_SIZE, function(index) {
-                return lep.StandardRangedValue.createPanValue(trackBank, index);
-            }),
-            SEND: new lep.ValueSet('Sends', SENDS_NUMBER, WINDOW_SIZE, function(sendIndex, channelIndex) {
-                return lep.StandardRangedValue.createSendValue(trackBank, channelIndex, sendIndex);
-            }),
-            MACRO: new lep.MacroValueSet(cursorDevice),
-            PARAM: new lep.ParamsValueSet(cursorDevice),
-
-            USERCONTROL: new lep.ValueSet('UserControls', USER_CONTROL_PAGES, WINDOW_SIZE, function(page, indexInPage) {
-                var indexInBank = (page * WINDOW_SIZE) + indexInPage,
-                    label = lep.util.formatString('BCF-UC{}-{}', page + 1, indexInPage + 1);
-                return lep.StandardRangedValue.createUserControlValue(userControlBank, indexInBank, label);
-            }),
-
-            SOLO: new lep.ValueSet('Solo', 1, 8, function(channelIndex) {
-                return lep.ToggledValue.createSoloValue(trackBank, channelIndex, prefs);
-            }),
-            ARM: new lep.ValueSet('Arm', 1, 8, function(channelIndex) {
-                return lep.ToggledValue.createArmValue(trackBank, channelIndex);
-            }),
-            MUTE: new lep.ValueSet('Mute', 1, 8, function(channelIndex) {
-                return lep.ToggledValue.createMuteValue(trackBank, channelIndex);
-            }),
-            SELECT: new lep.ValueSet('Select', 1, 8, function(channelIndex) {
-                return lep.ChannelSelectValue.create(trackBank, channelIndex);
-            })
+            VOLUME: lep.ValueSet.createVolumeValueSet(trackBank, WINDOW_SIZE),
+            PAN:    lep.ValueSet.createPanValueSet(trackBank, WINDOW_SIZE),
+            SEND:   lep.ValueSet.createSendsValueSet(trackBank, SENDS_NUMBER, WINDOW_SIZE),
+            MACRO:  new lep.MacroValueSet(cursorDevice),
+            PARAM:  new lep.ParamsValueSet(cursorDevice),
+            USERCONTROL: lep.ValueSet.createUserControlsValueSet(USER_CONTROL_PAGES, WINDOW_SIZE, 'BCF-UC-{}-{}'),
+            SOLO:   lep.ValueSet.createSoloValueSet(trackBank, WINDOW_SIZE, prefs),
+            ARM:    lep.ValueSet.createArmValueSet(trackBank, WINDOW_SIZE),
+            MUTE:   lep.ValueSet.createMuteValueSet(trackBank, WINDOW_SIZE),
+            SELECT: lep.ValueSet.createSelectValueSet(trackBank, WINDOW_SIZE)
         },
 
         SWITCHABLE_VALUESETS = [
