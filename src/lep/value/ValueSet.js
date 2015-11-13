@@ -79,7 +79,7 @@ lep.ValueSet.createArmValueSet = function(trackBank, windowSize) {
     lep.util.assertObject(trackBank, 'Invalid trackBank for ValueSet.createArmValueSet');
     lep.util.assertNumberInRange(windowSize, 1, 1000, 'Invalid windowSize {} for ValueSet.createArmValueSet', windowSize);
 
-    new lep.ValueSet('Arm', 1, windowSize, function(channelIndex) {
+    return new lep.ValueSet('Arm', 1, windowSize, function(channelIndex) {
         return lep.ToggledValue.createArmValue(trackBank, channelIndex);
     });
 };
