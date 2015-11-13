@@ -12,7 +12,7 @@ module.exports = function (grunt, opts) {
                 },
                 {
                     cwd: '.',
-                    src: ['doc/**'],
+                    src: ['doc/**', '!doc/**/wikiOnly/**'],
                     dest: './tmp/target/' + opts.packageJson.lep.releaseDirectoryName,
                     expand: true
                 }
