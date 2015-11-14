@@ -24,6 +24,15 @@ lep.BaseControl = function(opts) {
 
     this.sendsDiffValues = !!opts.sendsDiffValues;
     this.diffValueRange = opts.diffValueRange || lep.BaseControl.DIFF_VALUE_RANGE.NORMAL;
+    this.diffZeroValue = opts.diffZeroValue || 0;
+
+    // optional min/max value range for value sent back to the controller;
+    // e.g. for Behringer CMD series encoders whose LED circles expect values from 1 to 15, not 0 to 127 as on the BCF2000
+    lep.util.assertNumberInRangeOrEmpty(opts.minFeedbackValue, 0, 127, 'Invalid minFeedbackValue {} for {}', opts.minFeedbackValue, opts.name);
+    lep.util.assertNumberInRangeOrEmpty(opts.maxFeedbackValue, 0, 127, 'Invalid maxFeedbackValue {} for {}', opts.maxFeedbackValue, opts.name);
+    this.minFeedbackValue = opts.minFeedbackValue || 0;
+    this.maxFeedbackValue = opts.maxFeedbackValue || 0;
+    this.feedbackValueCorrectionMultiplier = (this.maxFeedbackValue - this.minFeedbackValue) / 127;
 
     this.clickNote = opts.clickNote || null;
     this.isClicked = false;
@@ -80,6 +89,10 @@ lep.BaseControl.prototype = {
             lep.util.assertNumberInRange(valueOverride, 0, 127, 'Invalid valueOverride {} for {}', valueOverride, this.name);
         }
         var value = (arguments.length) ? valueOverride : (this.value.value || 0);
+        if (this.feedbackValueCorrectionMultiplier) {
+            value = this.minFeedbackValue + Math.round(value * this.feedbackValueCorrectionMultiplier);
+        }
+
         if (this.valueNote) {
             sendNoteOn(this.midiChannel, this.valueNote, value);
         } else if (this.valueCC) {
@@ -93,7 +106,8 @@ lep.BaseControl.prototype = {
     onValueReceived: function(noteOrCC, receivedValue) {
         if (!this.value) return;
         if (this.sendsDiffValues) {
-            var delta = (receivedValue <= 64) ? receivedValue : (-1 * (128 - receivedValue));
+            var delta = (this.diffZeroValue) ? (receivedValue - this.diffZeroValue) :
+                                               (receivedValue <= 64) ? receivedValue : (-1 * (128 - receivedValue));
             this.value.onRelativeValueReceived(delta, this.diffValueRange);
         } else {
             this.value.onAbsoluteValueReceived(receivedValue);
