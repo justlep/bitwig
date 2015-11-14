@@ -9,7 +9,7 @@ lep.ChannelSelectValue = lep.util.extendClass(lep.BaseValue, {
     _init: function(opts) {
         this._super(opts);
 
-        lep.util.assert(opts.channel, 'Missing channel for ' + opts.name);
+        lep.util.assert(opts.channel, 'Missing channel for {}', opts.name);
 
         var self = this;
 
@@ -17,7 +17,7 @@ lep.ChannelSelectValue = lep.util.extendClass(lep.BaseValue, {
         this.toggleOnPressed = (opts.toggleOnPressed !== false);
 
         this.channel.addIsSelectedObserver(function(isSelected) {
-            self.value = isSelected ? 127 : 0;
+            self.value = isSelected ? self.velocityValueOn : self.velocityValueOff;
             self.syncToController();
         });
     },
@@ -25,8 +25,21 @@ lep.ChannelSelectValue = lep.util.extendClass(lep.BaseValue, {
     onAbsoluteValueReceived: function(absoluteValue) {
         if (this.toggleOnPressed ^ !!absoluteValue) return;
         this.channel.select();
-    }
+    },
+
+    velocityValueOn: 127,
+    velocityValueOff: 0
 });
+
+/** @static */
+lep.ChannelSelectValue.setVelocityValues = function(onValue, offValue) {
+    lep.util.assertNumberInRange(onValue, 0, 127, 'Invalid onValue {} for ChannelSelectValue.setVelocityValues', onValue);
+    lep.util.assertNumberInRange(offValue, 0, 127, 'Invalid offValue {} for ChannelSelectValue.setVelocityValues', offValue);
+    lep.util.extend(lep.ChannelSelectValue.prototype, {
+        velocityValueOn: onValue,
+        velocityValueOff: offValue
+    });
+};
 
 /** @static */
 lep.ChannelSelectValue.create = function(channelBank, channelIndex) {

@@ -31,10 +31,12 @@ lep.KnockoutSyncedValue = lep.util.extendClass(lep.BaseValue, {
 
         var self = this;
 
+        this.setInstanceVelocityValues(opts.velocityValueOn, opts.velocityValueOff);
+
         this.onClick = opts.onClick;
         this.refObservable = opts.refObservable;
         this.ownValue = opts.ownValue;
-        this.value = (this.refObservable() === self.ownValue) ? 127 : 0;
+        this.value = (this.refObservable() === self.ownValue) ? this.velocityValueOn : this.velocityValueOff;
 
         this.toggleOnPressed = (opts.toggleOnPressed !== false);
         this.restoreRefAfterLongClick = !!opts.restoreRefAfterLongClick;
@@ -45,10 +47,17 @@ lep.KnockoutSyncedValue = lep.util.extendClass(lep.BaseValue, {
         }
 
         this.refObservable.subscribe(function(newMode) {
-            self.value = (newMode === self.ownValue) ? 127 : 0;
+            self.value = (newMode === self.ownValue) ? self.velocityValueOn : self.velocityValueOff;
             self.syncToController();
         });
 
+    },
+
+    setInstanceVelocityValues: function(onValueOrEmpty, offValueOrEmpty) {
+        lep.util.assertNumberInRangeOrEmpty(onValueOrEmpty, 0, 127, 'Invalid onValueOrEmpty {} for {}', onValueOrEmpty, this.name);
+        lep.util.assertNumberInRangeOrEmpty(offValueOrEmpty, 0, 127, 'Invalid offValueOrEmpty {} for {}', offValueOrEmpty, this.name);
+        this.velocityValueOn = (typeof onValueOrEmpty === 'number') ? onValueOrEmpty : 127;
+        this.velocityValueOff = (typeof offValueOrEmpty === 'number') ? offValueOrEmpty : 0;
     },
 
     /** The time in millis after which a button-press is considered a 'long click' */
