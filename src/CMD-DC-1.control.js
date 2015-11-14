@@ -1,5 +1,5 @@
 /**
- * Bitwig Controller Script for the Behringer CMD LC-1.
+ * Bitwig Controller Script for the Behringer CMD DC-1.
  *
  * Author: Lennart Pegel - https://github.com/justlep/bitwig
  * License: LGPLv3 (http://www.gnu.org/licenses/lgpl-3.0.txt)
