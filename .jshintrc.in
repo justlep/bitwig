@@ -2,7 +2,7 @@
     "passfail": false,
     "maxerr": 100,
 
-    "maxlen": 140,
+    "maxlen": 145,
 
     "browser": false,
 
