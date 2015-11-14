@@ -41,7 +41,6 @@ lep.LC1 = function() {
             PREV_CHANNEL_PAGE: NOTE.MATRIX + (6 * 4) + 2,
             NEXT_CHANNEL_PAGE: NOTE.MATRIX + (6 * 4) + 3
         },
-
         MATRIX_COLOR = {
             OFF: 127,
             ORANGE_DEFAULT: 0,
@@ -60,9 +59,10 @@ lep.LC1 = function() {
             BLUE_BLINK: 2
         },
 
-        SENDS_NUMBER = 0,
+        USER_CONTROL_PAGES = 8,
+        SENDS_NUMBER = 8,
         WINDOW_SIZE = 4,
-        trackBank = host.createTrackBank(WINDOW_SIZE, SENDS_NUMBER, 4),
+        trackBank = host.createTrackBank(WINDOW_SIZE, SENDS_NUMBER, 0),
 
         cursorDevice = host.createCursorDevice(),
         eventDispatcher = lep.MidiEventDispatcher.getInstance(),
@@ -91,6 +91,35 @@ lep.LC1 = function() {
             SHIFT_CHANGE: function(note, value) {
                 isShiftPressed(!!value);
             }
+        },
+
+        CONTROLSET = {
+            ENCODERS: new lep.ControlSet('Encoders', WINDOW_SIZE, function(index) {
+                return new lep.Encoder({
+                    name: 'Encoder' + index,
+                    valueCC: CC.ENCODER0 + index,
+                    midiChannel: MIDI_CHANNEL,
+                    diffZeroValue: 64,
+                    minFeedbackValue: 1,
+                    maxFeedbackValue: 15
+                });
+            }),
+            NUM_BUTTONS: new lep.ControlSet('Num-Buttons', 8, function(index) {
+                return new lep.Button({
+                    name: 'NumBtn' + index,
+                    clickNote: NOTE.NUM + index,
+                    midiChannel: MIDI_CHANNEL
+                });
+            })
+        },
+
+        VALUESET = {
+            VOLUME: lep.ValueSet.createVolumeValueSet(trackBank, WINDOW_SIZE),
+            PAN: lep.ValueSet.createPanValueSet(trackBank, WINDOW_SIZE),
+            SEND: lep.ValueSet.createSendsValueSet(trackBank, SENDS_NUMBER, WINDOW_SIZE),
+            MACRO: new lep.MacroValueSet(cursorDevice),
+            PARAM: new lep.ParamsValueSet(cursorDevice),
+            USERCONTROL: lep.ValueSet.createUserControlsValueSet(USER_CONTROL_PAGES, WINDOW_SIZE, 'LC1-UC-{}-{}')
         };
 
     function testColors() {
@@ -116,9 +145,9 @@ lep.LC1 = function() {
     function initChannelButtons() {
 
         // Set colors for MUTE/SOLO/ARM/ChannelSelect buttons..
-        lep.ToggledValue.setArmVelocityValues(NONMATRIX_COLOR.BLUE_BLINK, NONMATRIX_COLOR.ORANGE);
+        lep.ToggledValue.setArmVelocityValues(NONMATRIX_COLOR.BLUE, NONMATRIX_COLOR.ORANGE);
         lep.ToggledValue.setSoloVelocityValues(NONMATRIX_COLOR.BLUE, NONMATRIX_COLOR.ORANGE);
-        lep.ToggledValue.setMuteVelocityValues(NONMATRIX_COLOR.BLUE, NONMATRIX_COLOR.ORANGE);
+        lep.ToggledValue.setMuteVelocityValues(NONMATRIX_COLOR.BLUE_BLINK, NONMATRIX_COLOR.ORANGE);
         lep.ChannelSelectValue.setVelocityValues(MATRIX_COLOR.GREEN, MATRIX_COLOR.OFF);
 
         for (var channelIndex = 0; channelIndex < WINDOW_SIZE; channelIndex++) {
@@ -193,6 +222,9 @@ lep.LC1 = function() {
             }
         });
     }
+
+    // CONTROLSET.ENCODERS.setValueSet(VALUESET.VOLUME);
+    CONTROLSET.ENCODERS.setValueSet(VALUESET.PAN);
 
     initChannelScrollButtons();
     initChannelButtons();
