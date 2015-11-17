@@ -9,8 +9,8 @@ lep.StandardRangedValue = lep.util.extendClass(lep.BaseValue, {
     _init: function(opts) {
         this._super(opts);
 
-        lep.util.assert(!!opts.rangedValue, 'Missing rangedValue for ' + opts.name);
-        lep.util.assertStringOrEmpty(opts.label, 'Invalid label for ' + opts.name);
+        lep.util.assertObject(opts.rangedValue, 'Missing rangedValue for {}', opts.name);
+        lep.util.assertStringOrEmpty(opts.label, 'Invalid label for {}', opts.name);
 
         var self = this;
 
