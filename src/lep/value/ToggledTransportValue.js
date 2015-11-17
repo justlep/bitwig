@@ -9,16 +9,16 @@ lep.ToggledTransportValue = lep.util.extendClass(lep.BaseValue, {
     _init: function(opts) {
         this._super(opts);
 
-        lep.util.assertString(opts.togglingMethodName, 'Missing togglingMethodName for ToggledTransportValue');
-        lep.util.assertString(opts.observerAdderMethodName, 'Missing observerAdderMethodName for ToggledTransportValue');
+        lep.util.assertString(opts.togglingMethodName, 'Missing togglingMethodName for ToggledTransportValue {}', this.name);
+        lep.util.assertString(opts.observerAdderMethodName, 'Missing observerAdderMethodName for ToggledTransportValue {}', this.name);
 
         var self = this,
             transport = lep.util.getTransport(),
             togglingMethod = transport[opts.togglingMethodName],
             observerAdderMethod = transport[opts.observerAdderMethodName];
 
-        lep.util.assertFunction(togglingMethod, 'Missing Bitwig API method transport.' + opts.togglingMethodName);
-        lep.util.assertFunction(observerAdderMethod, 'Missing Bitwig API method transport.' + opts.observerAdderMethodName);
+        lep.util.assertFunction(togglingMethod, 'Missing Bitwig API method: Transport.{}', opts.togglingMethodName);
+        lep.util.assertFunction(observerAdderMethod, 'Missing Bitwig API method: Transport.{}', opts.observerAdderMethodName);
 
         this.togglingMethod = lep.util.bind(togglingMethod, transport);
         this.toggleOnPressed = (opts.toggleOnPressed !== false);

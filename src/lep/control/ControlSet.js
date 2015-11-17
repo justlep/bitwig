@@ -11,9 +11,9 @@
  */
 lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
     lep.util.assertString(name, 'Invalid name for ControlSet');
-    lep.util.assert(!lep.ControlSet.instancesByName[name], 'ControlSet with name '+ name +' already exists');
-    lep.util.assertNumberInRange(numberOfControls, 1, 32, 'Invalid numberOfControls for ControlSet.createAndAddControls');
-    lep.util.assertFunction(controlCreationFn, 'Invalid controlCreationFn for ControlSet');
+    lep.util.assert(!lep.ControlSet.instancesByName[name], 'ControlSet with name "{}" already exists', name);
+    lep.util.assertNumberInRange(numberOfControls, 1, 32, 'Invalid numberOfControls {} for ControlSet {}', numberOfControls, name);
+    lep.util.assertFunction(controlCreationFn, 'Invalid controlCreationFn for ControlSet {}', name);
 
     var self = this,
         _valueSet = ko.observable(),
@@ -26,7 +26,7 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
 
     for (var controlIndex = 0, control; controlIndex < numberOfControls; controlIndex++) {
         control = controlCreationFn(controlIndex);
-        lep.util.assertBaseControl(control, 'controlCreationFn created invalid Control for createAndAddControls');
+        lep.util.assertBaseControl(control, 'controlCreationFn returned invalid BaseControl {} for ControlSet {}', control, name);
         this.controls.push(control);
     }
 

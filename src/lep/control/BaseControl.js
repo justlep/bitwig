@@ -9,8 +9,7 @@
  */
 lep.BaseControl = function(opts) {
     lep.util.assertString(opts.name, 'Missing name for BaseControl');
-    lep.util.assert((!!opts.valueNote ^ !!opts.valueCC) || opts.clickNote,
-        'BaseControl needs (valueCC xor valueNote) or clickNote');
+    lep.util.assert((!!opts.valueNote ^ !!opts.valueCC) || opts.clickNote, 'Missing (valueCC xor valueNote) or clickNote for {}', this.name);
 
     this.midiInPort = lep.util.limitToRange(opts.midiInPort||0, 0, 10);
     this.midiChannel = lep.util.limitToRange(opts.midiChannel||0, 0, 15);
@@ -62,7 +61,7 @@ lep.BaseControl.prototype = {
         }
     },
     attachValue: function(value) {
-        lep.util.assertBaseValue(value, 'invalid value for BaseControl['+ this.name +'].attachValue()');
+        lep.util.assertBaseValue(value, 'invalid value for BaseControl<{}>.attachValue()', this.name);
         if (value === this.value) {
             return;
         } else if (value.controller && value.controller !== this) {
