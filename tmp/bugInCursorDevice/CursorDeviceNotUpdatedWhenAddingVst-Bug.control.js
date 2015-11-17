@@ -1,12 +1,10 @@
 loadAPI(1);
 
-// TODO check if fixed in Bitwig 1.3.1
-
 /**
- * Bug in Bitwig 1.3 Controller API:
+ * Bug in Bitwig 1.3 Controller API (persists in Bitwig 1.3.1):
  *
  * How to reproduce:
- *   1. Add one of Bitwig's own devices to a channel (Comb, Chorus, Compressor, ..)
+ *   1. Add one of Bitwig's own devices to a channel (e.g. Blur)
  *      -> observers of CursorDevice are triggered -> OK
  *   2. Add a VST to a channel
  *      -> NO observers of CursorDevice are triggered -> FAIL
@@ -17,7 +15,7 @@ host.defineController('meme', 'CursorDeviceNotUpdatedWhenAddingVst', '1.0', '6ac
 host.defineMidiPorts(0, 0);
 
 function init() {
-    var cursorDevice = host.createCursorDevice();
+    var cursorDevice = host.createEditorCursorDevice();
 
     cursorDevice.addNameObserver(40, 'unknown device', function(deviceName) {
         println('Observer of CursorDevice.addNameObserver(..) reports: ' + deviceName);

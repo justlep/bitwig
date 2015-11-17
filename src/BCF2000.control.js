@@ -80,7 +80,7 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
 
         transport = lep.util.getTransport(),
         trackBank = host.createTrackBank(WINDOW_SIZE, SENDS_NUMBER, 0),
-        cursorDevice = host.createCursorDevice(),
+        cursorDevice = host.createEditorCursorDevice(),
         eventDispatcher = lep.MidiEventDispatcher.getInstance(),
 
         isShiftPressed = ko.observable(false),

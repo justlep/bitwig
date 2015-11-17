@@ -35,7 +35,7 @@ function init() {
     });
     */
 
-    var cursorDevice = host.createCursorDevice();
+    var cursorDevice = host.createEditorCursorDevice();
 
     cursorDevice.addCanSelectNextObserver(function(hasNext) {
         lep.logDebug('has next device: {}', hasNext);

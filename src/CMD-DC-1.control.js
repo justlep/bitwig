@@ -51,7 +51,7 @@ lep.DC1 = function() {
         WINDOW_SIZE = 4,
         trackBank = host.createTrackBank(WINDOW_SIZE, SENDS_NUMBER, 0),
 
-        cursorDevice = host.createCursorDevice(),
+        cursorDevice = host.createEditorCursorDevice(),
         eventDispatcher = lep.MidiEventDispatcher.getInstance(),
         isShiftPressed = ko.observable(false),
 
