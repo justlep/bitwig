@@ -7,6 +7,8 @@ module.exports = function (grunt, opts) {
 
     var fs = require('fs');
 
+    // /resources/doc/control-surface/api/deprecated.html
+
     grunt.registerTask('findPossibleDeprecations', 'Finds usages of deprecated methods in the controller scripts.',
         function() {
             var jsSources = grunt.file.expand(['src/**/*.js', '!src/lib/**']);
