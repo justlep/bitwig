@@ -24,14 +24,14 @@ module.exports = function (grunt) {
 
     /**
      * Parses the deprecation html from the Bitwig API documentation.
-     * @param (String) html
      * @return {Object} containing an object with two lists
      *          - fullNames (String[]) fully-qualified method names (e.g. "ClassX.methodY")
      *          - shortNames (String[]) only method names (e.g. "methodY")
      *          - signatures (String[]) e.g. "(String, String)"
      */
-    function parseDeprecationHtml(html) {
-        var firstIndex = html.indexOf('<dl'),
+    function parseDeprecationHtml() {
+        var html = getBitwigDeprecationsHtml(),
+            firstIndex = html.indexOf('<dl'),
             lastIndex = html.lastIndexOf('</dl>'),
             length = lastIndex - firstIndex + 5,
             REGEX = /<a.+[a-z0-9]{20}">(.+\..+)<\/a>([^<]*)/ig,
@@ -45,12 +45,14 @@ module.exports = function (grunt) {
             throw 'Deprecation HTML has unexpected format';
         }
 
+        grunt.log.writeln('Scraping deprecations from Bitwig HTML documentation...');
         html.substr(firstIndex, length).replace(REGEX, function(found, fullName, sig, idx, foo) {
-            var shortName = fullName.replace(/^[^\.]*\./, '');
+            var shortName = fullName.replace(/^[^\.]*\./, ''),
+                signature = sig.replace(/^\s*/,'');
             lists.fullNames.push(fullName);
             lists.shortNames.push(shortName);
-            lists.signatures.push(sig.replace(/^\s*/,''));
-            grunt.log.writeln('Found: ' + fullName + ' / short: ' + shortName);
+            lists.signatures.push(signature);
+            grunt.log.writeln('Parsed: ' + fullName + signature);
         });
 
         return lists;
@@ -60,24 +62,25 @@ module.exports = function (grunt) {
     grunt.registerTask('findPossibleDeprecations', 'Finds usages of deprecated methods in the controller scripts.', function() {
         var fs = require('fs'),
             jsSources = grunt.file.expand(['src/**/*.js', '!src/lib/**']),
-            html = getBitwigDeprecationsHtml(),
-            deprecationLists = parseDeprecationHtml(html);
+            deprecationLists = parseDeprecationHtml();
 
-        grunt.log.writeln('Scanning for usages of deprecated methods...');
+        grunt.log.writeln('\nScanning for usages of deprecated methods...');
 
         jsSources.forEach(function(filename) {
-            var jsLowerCase = grunt.file.read(filename).toLowerCase(),
+            var jsLines = grunt.file.read(filename).split('\n'),
                 matchFound = false;
 
-            // grunt.log.writeln('Scanning ' + filename + '...');
-
-            deprecationLists.shortNames.forEach(function(shortName, i) {
-                if (jsLowerCase.indexOf('.'+shortName.toLowerCase()+'(') < 0) return;
-                if (!matchFound) {
-                    grunt.log.writeln('\n------\n' + filename);
-                    matchFound = true;
-                }
-                grunt.log.warn(shortName + ' <--- ' + deprecationLists.fullNames[i] + deprecationLists.signatures[i]);
+            jsLines.forEach(function(jsLine, lineIndex) {
+                var jsLineLowercase = jsLine.toLowerCase();
+                deprecationLists.shortNames.forEach(function(shortName, i) {
+                    if (jsLineLowercase.indexOf('.'+shortName.toLowerCase()+'(') < 0) return;
+                    if (!matchFound) {
+                        grunt.log.writeln('\n------\n**** ' + filename + ' ****');
+                        matchFound = true;
+                    }
+                    grunt.log.warn('Line ' + (lineIndex+1) + ': ' + jsLine.replace(/^\s*/,''));
+                    grunt.log.writeln('Deprecated: ' + deprecationLists.fullNames[i] + deprecationLists.signatures[i] + '\n');
+                });
             });
         });
     });
