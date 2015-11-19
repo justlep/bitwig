@@ -27,7 +27,8 @@ module.exports = function (grunt) {
      * @param (String) html
      * @return {Object} containing an object with two lists
      *          - fullNames (String[]) fully-qualified method names (e.g. "ClassX.methodY")
-     *          - methodNames (String[]) only method names (e.g. "methodY")
+     *          - shortNames (String[]) only method names (e.g. "methodY")
+     *          - signatures (String[]) e.g. "(String, String)"
      */
     function parseDeprecationHtml(html) {
         var firstIndex = html.indexOf('<dl'),
@@ -74,6 +75,7 @@ module.exports = function (grunt) {
                 if (jsLowerCase.indexOf('.'+shortName.toLowerCase()+'(') < 0) return;
                 if (!matchFound) {
                     grunt.log.writeln('\n------\n' + filename);
+                    matchFound = true;
                 }
                 grunt.log.warn(shortName + ' <--- ' + deprecationLists.fullNames[i] + deprecationLists.signatures[i]);
             });
