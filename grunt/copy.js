@@ -6,7 +6,7 @@ module.exports = function (grunt, opts) {
             files: [
                 {
                     cwd: './src',
-                    src: ['**/*.js', '!Test.control.js'],
+                    src: ['**/*.js', '!Test.control.js', '!CMD*.js'],
                     dest: './tmp/target/' + opts.packageJson.lep.releaseDirectoryName,
                     expand: true
                 },
@@ -17,6 +17,14 @@ module.exports = function (grunt, opts) {
                     expand: true
                 }
             ]
+        },
+        historyToTarget: {
+            files: [{
+                src: ['./stable-version-for-download/history.txt'],
+                dest: './tmp/target/' + opts.packageJson.lep.releaseDirectoryName,
+                expand: true,
+                flatten: true
+            }]
         },
         toBitwigForLiveTest: {
             files: [

@@ -12,6 +12,7 @@ module.exports = function (grunt, opts) {
         'clean:target',
         'clean:oldReleaseZip',
         'copy:sourcesToTarget',
+        'copy:historyToTarget',
         'generateInfoTxtInTarget',
         'compress:zipTargetToRelease',
         'clean:target'

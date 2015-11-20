@@ -1,4 +1,7 @@
 
+Version 1.0.3 (20-Nov-2015)
+  - BCF2000: Shift+PunchOut toggles auto-reset for PunchIn/PunchOut when playback stops
+
 Version 1.0.2 (13-Nov-2015)
   - BCF2000: Morpher now saves snapshots per device when Macro or Params is selected as value type on the encoders
 
