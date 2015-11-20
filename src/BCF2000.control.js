@@ -84,6 +84,7 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
         eventDispatcher = lep.MidiEventDispatcher.getInstance(),
 
         isShiftPressed = ko.observable(false),
+        clearPunchOnStop = ko.observable(true),
 
         morpher = lep.Morpher.getInstance(WINDOW_SIZE, MAX_MORPHABLE_PARAMS_NUMBER, isShiftPressed),
 
@@ -104,6 +105,16 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
             },
             SHIFT_CHANGE: function(note, value) {
                 isShiftPressed(!!value);
+            },
+            PLAYING_STATUS_CHANGED: function(isPlaying) {
+                if (!isPlaying && clearPunchOnStop()) {
+                    if (TRANSPORT_VALUE.PUNCH_IN.value) {
+                        transport.togglePunchIn();
+                    }
+                    if (TRANSPORT_VALUE.PUNCH_OUT.value) {
+                        transport.togglePunchOut();
+                    }
+                }
             }
         },
 
@@ -466,7 +477,15 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
             METRONOME: lep.ToggledTransportValue.create('Metronome'),
             OVERDUB: lep.ToggledTransportValue.create('Overdub'),
             PUNCH_IN: lep.ToggledTransportValue.create('PunchIn'),
-            PUNCH_OUT: lep.ToggledTransportValue.create('PunchOut')
+            PUNCH_OUT: lep.ToggledTransportValue.create('PunchOut'),
+            CLEAR_PUNCH_ON_STOP: new lep.KnockoutSyncedValue({
+                name: 'ClearPunchInOutOnStop',
+                ownValue: true,
+                refObservable: clearPunchOnStop,
+                onClick: function() {
+                    clearPunchOnStop(!clearPunchOnStop());
+                }
+            })
         },
         initTransportButtons = function() {
             new lep.Button({
@@ -495,7 +514,9 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
                 name: 'PunchOutBtn',
                 clickNote: NOTE_ACTION.PUNCH_OUT,
                 midiChannel: bcfMidiChannel,
-                valueToAttach: TRANSPORT_VALUE.PUNCH_OUT
+                valueToAttach: ko.computed(function() {
+                    return isShiftPressed() ? TRANSPORT_VALUE.CLEAR_PUNCH_ON_STOP : TRANSPORT_VALUE.PUNCH_OUT;
+                })
             });
             new lep.Button({
                 name: 'LoopBtn',
@@ -524,6 +545,8 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
                     }
                 })
             });
+
+            transport.addIsPlayingObserver(HANDLERS.PLAYING_STATUS_CHANGED);
         };
 
     eventDispatcher.onNotePressed(NOTE_ACTION.NEXT_DEVICE_OR_CHANNEL_PAGE, HANDLERS.NEXT_DEVICE_OR_CHANNEL_PAGE);
