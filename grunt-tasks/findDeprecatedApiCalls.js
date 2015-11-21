@@ -27,7 +27,7 @@ module.exports = function (grunt) {
         try {
             html = grunt.file.read(htmlFileLocation);
         } catch (e) {
-            throw 'Unable to read ' + htmlFileLocation;
+            grunt.fail.warn('Unable to read ' + htmlFileLocation);
         }
 
         return html;
@@ -58,12 +58,12 @@ module.exports = function (grunt) {
             };
 
         if (!bitwigVersion) {
-            throw 'Cound not find Bitwig version in depreations HTML';
+            grunt.fail.warn('Could not find Bitwig version in depreations HTML');
         } else if (length < 9) {
-            throw 'Could not find deprecations list in depreations HTML';
+            grunt.fail.warn('Could not find deprecations list in depreations HTML');
         }
 
-        grunt.log.write('Scraping Bitwig HTML documentation...');
+        grunt.log.writeln('Scraping Bitwig HTML documentation');
         html.substr(firstIndex, length).replace(REGEX, function(found, fullName, sig, idx, foo) {
             var shortName = fullName.replace(/^[^\.]*\./, ''),
                 signature = sig.replace(/^\s*/,'');
@@ -73,7 +73,11 @@ module.exports = function (grunt) {
             // grunt.log.writeln('Parsed: ' + fullName + signature);
         });
 
-        grunt.log.writeln(' (' + deprecations.fullNames.length + ' deprecated methods, Bitwig v' + deprecations.bitwigVersion + ')');
+        if (!deprecations.fullNames.length) {
+            grunt.fail.warn('Found no methods in the HTML documentation. Please check findDeprecatedApiCalls.js.');
+        }
+
+        grunt.log.writeln('Bitwig ' + deprecations.bitwigVersion + ' is documenting ' + deprecations.fullNames.length + ' deprecated methods');
 
         return deprecations;
     }
@@ -88,12 +92,12 @@ module.exports = function (grunt) {
              *                no deprecation warning will be output
              */
             IGNORE_MARKER = '@deprecationChecked:' + deprecations.bitwigVersion,
-            LINE_WITH_IGNORE_MARKER_ONLY_REGEX = new RegExp('^[\\t\\s]*\/[*\/][\\s\\t]*' + IGNORE_MARKER + '([^\\d]|$)'),
-            LINE_WITH_IGNORE_MARKER_AFTER_CODE_REGEX = new RegExp('\/[*\/][\\s\\t]*' + IGNORE_MARKER + '([^\\d]|$)'),
+            MARKED_BLANK_LINE_REGEX = new RegExp('^[\\t\\s]*\/[*\/][\\s\\t]*' + IGNORE_MARKER + '([^\\d]|$)'),
+            MARKED_CODE_LINE_REGEX = new RegExp('\/[*\/][\\s\\t]*' + IGNORE_MARKER + '([^\\d]|$)'),
             suspectLinesCount = 0;
 
 
-        grunt.log.writeln('Scanning for usages of deprecated methods...');
+        grunt.log.writeln('Scanning for usages...');
 
         jsSources.forEach(function(filename) {
             var jsLines = grunt.file.read(filename).split('\n'),
@@ -101,11 +105,11 @@ module.exports = function (grunt) {
                 previousLineContainedIgnoreMarker = false;
 
             jsLines.forEach(function(jsLine, lineIndex) {
-                if (LINE_WITH_IGNORE_MARKER_ONLY_REGEX.test(jsLine)) {
+                if (MARKED_BLANK_LINE_REGEX.test(jsLine)) {
                     previousLineContainedIgnoreMarker = true;
                     return;
                 }
-                if (previousLineContainedIgnoreMarker || LINE_WITH_IGNORE_MARKER_AFTER_CODE_REGEX.test(jsLine)) {
+                if (previousLineContainedIgnoreMarker || MARKED_CODE_LINE_REGEX.test(jsLine)) {
                     previousLineContainedIgnoreMarker = false;
                     return;
                 }
