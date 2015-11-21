@@ -1,39 +1,11 @@
 loadAPI(1);
 load('lep/api.js');
 
-host.defineController('LeP', 'Test-Script', '1.0', '98eac9c6-68fb-11e5-9d70-feff819cdc9f', 'github@justlep.net');
+host.defineController('LeP', 'Test-Script', '1.0', '98eac9c6-68fb-11e5-9d70-feff819cdc9f', 'github@justlep.net'); // @deprecationChecked:1.3.3
 host.defineMidiPorts(0, 0);
 
 function init() {
     println('init..');
-
-    // var inPort = host.getMidiInPort(0);
-
-    /*
-    var CHANNEL_PREFS_CATEGORY = 'MIDI Channels (click refresh after change)',
-        drumChannelValue = host.getPreferences().getNumberSetting('DRUM', CHANNEL_PREFS_CATEGORY, 1, 16, 1, '', 10),
-        seq1ChannelValue = host.getPreferences().getNumberSetting('SEQ 1', CHANNEL_PREFS_CATEGORY, 1, 16, 1, '', 1),
-        seq2ChannelValue = host.getPreferences().getNumberSetting('SEQ 2', CHANNEL_PREFS_CATEGORY, 1, 16, 1, '', 2),
-        controlModeChannelValue = host.getPreferences().getNumberSetting('CONTROL', CHANNEL_PREFS_CATEGORY, 1, 16, 1, '', 2);
-
-    drumChannelValue.addRawValueObserver(function(channel) {
-        println('NEW DRUM CHANNEL: ' + channel);
-    });
-    seq1ChannelValue.addRawValueObserver(function(channel) {
-        println('NEW SEQ1 CHANNEL: ' + channel);
-    });
-    seq2ChannelValue.addRawValueObserver(function(channel) {
-        println('NEW SEQ2 CHANNEL: ' + channel);
-        // inPort.createNoteInput('test');
-    });
-    controlModeChannelValue.addRawValueObserver(function(channel) {
-        println('NEW CONTROL CHANNEL: ' + channel);
-        // inPort.createNoteInput('test');
-        // var inPort = host.getMidiInPort(0);
-        // inPort.createNoteInput('test');
-        // println("created note input");
-    });
-    */
 
     var cursorDevice = host.createEditorCursorDevice();
 

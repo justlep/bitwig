@@ -9,14 +9,14 @@ lep.ChannelSelectValue = lep.util.extendClass(lep.BaseValue, {
     _init: function(opts) {
         this._super(opts);
 
-        lep.util.assert(opts.channel, 'Missing channel for {}', opts.name);
+        lep.util.assertObject(opts.channel, 'Invalid channel {} for {}', opts.channel, opts.name);
 
         var self = this;
 
         this.channel = opts.channel;
         this.toggleOnPressed = (opts.toggleOnPressed !== false);
 
-        this.channel.addIsSelectedObserver(function(isSelected) {
+        this.channel.addIsSelectedInEditorObserver(function(isSelected) {
             self.value = isSelected ? self.velocityValueOn : self.velocityValueOff;
             self.syncToController();
         });
@@ -24,7 +24,7 @@ lep.ChannelSelectValue = lep.util.extendClass(lep.BaseValue, {
     /** @Override */
     onAbsoluteValueReceived: function(absoluteValue) {
         if (this.toggleOnPressed ^ !!absoluteValue) return;
-        this.channel.select();
+        this.channel.selectInMixer();
     },
 
     velocityValueOn: 127,
