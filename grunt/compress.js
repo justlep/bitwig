@@ -5,7 +5,9 @@ module.exports = function (grunt, opts) {
         zipComment = [
             pkg.title,
             'Version ' + pkg.version,
-            pkg.repository.url
+            pkg.repository.url,
+            'History:',
+            grunt.file.read('stable-version-for-download/history.txt')
         ].join('\n\n');
 
     return {
