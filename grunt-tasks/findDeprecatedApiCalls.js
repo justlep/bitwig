@@ -35,12 +35,10 @@ module.exports = function (grunt) {
 
     /**
      * Parses the deprecation html from the Bitwig API documentation.
-     * @return {Object} containing an object with following properties:
-     *          - bitwigVersion (String) the Bitwig version of the deprecations file
-     *          - deprecationHtmlFileLocation (String) location of the HTML file in the filesystem
-     *          - fullNames (String[]) fully-qualified method names (e.g. "ClassX.methodY")
-     *          - shortNames (String[]) only method names (e.g. "methodY")
-     *          - signatures (String[]) e.g. "(String, String)"
+     * @return {Object} with these properties:
+     *                   - bitwigVersion (String) the Bitwig version of the parsed deprecations file
+     *                   - shortNames (String[]) only method names without class and signature (e.g. "methodY")
+     *                   - fullNames (String[]) full method names incl. signature (e.g. "ClassX.methodY(String s)")
      */
     function parseDeprecationHtml() {
         var html = getBitwigDeprecationsHtml(),
@@ -52,9 +50,8 @@ module.exports = function (grunt) {
             REGEX = /<a.+[a-z0-9]{20}">(.+\..+)<\/a>([^<]*)/ig,
             deprecations = {
                 bitwigVersion: bitwigVersion,
-                fullNames: [],
                 shortNames: [],
-                signatures: []
+                fullNames: []
             };
 
         if (!bitwigVersion) {
@@ -63,14 +60,13 @@ module.exports = function (grunt) {
             grunt.fail.warn('Could not find deprecations list in depreations HTML');
         }
 
-        grunt.log.writeln('Scraping Bitwig HTML documentation');
-        html.substr(firstIndex, length).replace(REGEX, function(found, fullName, sig, idx, foo) {
-            var shortName = fullName.replace(/^[^\.]*\./, ''),
-                signature = sig.replace(/^\s*/,'');
+        grunt.log.writeln('Scraping Bitwig HTML documentation...');
+        html.substr(firstIndex, length).replace(REGEX, function(found, fullNameWithoutSig, sig, idx, foo) {
+            var shortName = fullNameWithoutSig.replace(/^[^\.]*\./, ''),
+                fullName = fullNameWithoutSig + sig.replace(/^\s*/,'');
             deprecations.fullNames.push(fullName);
             deprecations.shortNames.push(shortName);
-            deprecations.signatures.push(signature);
-            // grunt.log.writeln('Parsed: ' + fullName + signature);
+            // grunt.log.writeln('Scraped: ' + fullName);
         });
 
         if (!deprecations.fullNames.length) {
@@ -123,7 +119,7 @@ module.exports = function (grunt) {
                         suspectLinesCount++;
                     }
                     grunt.log.warn('Line ' + (lineIndex+1) + ': ' + jsLine.replace(/^\s*/,''));
-                    grunt.log.writeln('Deprecated: ' + deprecations.fullNames[i] + deprecations.signatures[i] + '\n');
+                    grunt.log.writeln('Deprecated: ' + deprecations.fullNames[i] + '\n');
                 });
             });
         });
