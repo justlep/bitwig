@@ -1,7 +1,8 @@
 loadAPI(1);
 load('lep/api.js');
 
-host.defineController('LeP', 'Test-Script', '1.0', '98eac9c6-68fb-11e5-9d70-feff819cdc9f', 'github@justlep.net'); // @deprecationChecked:1.3.3
+// @deprecationChecked:1.3.4
+host.defineController('LeP', 'Test-Script', '1.0', '98eac9c6-68fb-11e5-9d70-feff819cdc9f', 'github@justlep.net');
 host.defineMidiPorts(0, 0);
 
 function init() {
