@@ -1,11 +1,10 @@
 module.exports = function (grunt, opts) {
     'use strict';
 
-    var pkg = opts.packageJson,
-        zipComment = [
-            pkg.title,
-            'Version ' + pkg.version,
-            pkg.repository.url,
+    var zipComment = [
+            '<%= package.title %>',
+            'Version <%= package.version %>',
+            '<%= package.repository.url %>',
             'History:',
             grunt.file.read('stable-version-for-download/history.txt')
         ].join('\n\n');

@@ -7,13 +7,13 @@ module.exports = function (grunt, opts) {
                 {
                     cwd: './src',
                     src: ['**/*.js', '!Test.control.js', '!CMD*.js'],
-                    dest: './tmp/target/' + opts.packageJson.lep.releaseDirectoryName,
+                    dest: './tmp/target/<%= package.lep.releaseDirectoryName %>',
                     expand: true
                 },
                 {
                     cwd: '.',
                     src: ['doc/**', '!doc/**/wikiOnly/**'],
-                    dest: './tmp/target/' + opts.packageJson.lep.releaseDirectoryName,
+                    dest: './tmp/target/<%= package.lep.releaseDirectoryName %>',
                     expand: true
                 }
             ]
@@ -21,7 +21,7 @@ module.exports = function (grunt, opts) {
         historyToTarget: {
             files: [{
                 src: ['./stable-version-for-download/history.txt'],
-                dest: './tmp/target/' + opts.packageJson.lep.releaseDirectoryName,
+                dest: './tmp/target/<%= package.lep.releaseDirectoryName %>',
                 expand: true,
                 flatten: true
             }]
@@ -40,7 +40,7 @@ module.exports = function (grunt, opts) {
             files: [
                 {
                     src: opts.BITWIG_API_SOURCE_PATHS,
-                    dest: opts.packageJson.lep.bitwigApiStubsPath,
+                    dest: './bitwigApiStubs',
                     flatten: true,
                     expand: true
                 }

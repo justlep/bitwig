@@ -8,6 +8,6 @@ module.exports = function (grunt, opts) {
         controllerScriptInBitwig: [opts.RELEASE_PATH_IN_BITWIG],
         target: ['tmp/target/*'],
         oldReleaseZip: [opts.VERSIONED_RELEASE_ZIP_PATH],
-        bitwigApiSources: [opts.packageJson.lep.bitwigApiStubsPath + '/**/*.js']
+        bitwigApiSources: ['./bitwigApiStubs/**/*.js']
     };
 };

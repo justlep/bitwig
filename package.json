@@ -32,7 +32,6 @@
   },
   "lep": {
     "releaseDirectoryName": "LeP's Controller Scripts",
-    "releaseZipFilenamePattern": "stable-version-for-download/LeP's Controller Scripts v{version}.zip",
-    "bitwigApiStubsPath": "./bitwigApiStubs"
+    "releaseZipFilenamePattern": "stable-version-for-download/LeP's Controller Scripts v{version}.zip"
   }
 }

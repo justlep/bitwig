@@ -6,9 +6,7 @@ module.exports = function (grunt) {
     var fs = require('fs'),
         packageJson = grunt.file.readJSON('package.json'),
         // provided as 'opts' parameter to the task files in grunt/*.js
-        data = {
-            packageJson: packageJson
-        };
+        data = {};
 
     try {
         // the Bitwig installation's dir (Windows)
