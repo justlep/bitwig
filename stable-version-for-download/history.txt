@@ -1,4 +1,7 @@
 
+v1.0.5 (04-Dec-2015)
+ - Added Roland A-49 script
+
 v1.0.4 (21-Nov-2015)
   - All scripts: replaced usages of deprecated Bitwig API methods
 

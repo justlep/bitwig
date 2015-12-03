@@ -1,7 +1,7 @@
 ## Stable version download
 #### How to install:
 
-1.  Download the ZIP file of the version you want
+1.  Download the latest ZIP file
 2.  Unpack that ZIP file to your Bitwig Controller Scripts folder:
     *   **Windows:** ~Documents\Bitwig Studio\Controller Scripts
     *   **Linux/Mac:** ~Documents/Bitwig Studio/Controller Scripts
