@@ -25,8 +25,8 @@ var MIDI_CHANNEL = 0,
 
 function init() {
     var inPort = host.getMidiInPort(0),
-        filterMask = '??????'.replace('x', MIDI_CHANNEL.toString(16)),
-        noteInput = inPort.createNoteInput('Keys', filterMask),
+        filterMask = '?x????'.replace('x', MIDI_CHANNEL.toString(16)),
+        noteInput = inPort.createNoteInput('Keys', filterMask), // null as filterMask crashes Bitwig despite API doc says otherwise
         userControlBank = host.createUserControls(1),
         channelAftertouchAsUserControl = userControlBank.getControl(0);
 
