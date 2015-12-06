@@ -29,13 +29,13 @@ function init() {
         noteOnMask = NOTEON_MASK_TEMPLATE.replace('xx', note.toString(16));
         noteOffMask = NOTEOFF_MASK_TEMPLATE.replace('xx', note.toString(16));
         noteInput = inPort.createNoteInput(inputName, noteOnMask, noteOffMask);
-        noteInput.setShouldConsumeEvents(true);
+        noteInput.setShouldConsumeEvents(false);
         allChannelNoteInputCreationParams.push(noteOnMask);
         allChannelNoteInputCreationParams.push(noteOffMask);
     }
 
     noteInput = inPort.createNoteInput.apply(inPort, allChannelNoteInputCreationParams);
-    noteInput.setShouldConsumeEvents(true);
+    noteInput.setShouldConsumeEvents(false);
 
     println('\n--------------\nDrumPads ready');
 }
