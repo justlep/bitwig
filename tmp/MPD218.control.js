@@ -9,7 +9,7 @@ host.addDeviceNameBasedDiscoveryPair([DEVICE_NAME], [DEVICE_NAME]);
 
 function init() {
     var midiIn = host.getMidiInPort(0),
-        padNotes = midiIn.createNoteInput('MPD218 Pads', '89????', '99????', 'D?????', 'EF????', 'AF????'),
+        padNotes = midiIn.createNoteInput('MPD218 Pads', '89????', '99????', 'B?????', 'D?????', 'EF????', 'AF????'),
         cursorDevice = host.createEditorCursorDevice(),
         channelAftertouchAsUserControl = host.createUserControls(1).getControl(0);
 
