@@ -1,4 +1,7 @@
 
+v1.0.7 (16-Dec-2015)
+ - made PerformancePad's note remapping optional (via preferences)
+
 v1.0.6 (16-Dec-2015)
  - Added Alesis PerformancePad script
 
