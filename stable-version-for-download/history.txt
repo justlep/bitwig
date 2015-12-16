@@ -1,4 +1,7 @@
 
+v1.0.6 (16-Dec-2015)
+ - Added Alesis PerformancePad script
+
 v1.0.5 (04-Dec-2015)
  - Added Roland A-49 script
 
