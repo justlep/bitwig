@@ -3,7 +3,7 @@
 * [LeP's Behringer BCF2000](./doc/Behringer%20BCF2000/)
 * [Arturia Beatstep Pro](./doc/ArturiaBeatstepPro/)
 * Roland A-49
-* Alesis PerformancePad
+* [Alesis PerformancePad](./doc/Alesis%20PerformancePad/)
 
 For the latest version, go to the [stable-version-for-download](./stable-version-for-download/)-directory and download the ZIP with the latest  version.
 
