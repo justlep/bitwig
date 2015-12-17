@@ -5,7 +5,9 @@
 * Roland A-49
 * [Alesis PerformancePad](./doc/Alesis%20PerformancePad/)
 
-For the latest version, go to the [stable-version-for-download](./stable-version-for-download/)-directory and download the ZIP with the latest  version.
+### Installation 
+Go to the [stable-version-for-download](./stable-version-for-download/)-directory and get the latest release there.  
+Do NOT use the "Download ZIP" button on top of this page.
 
 ---
 
