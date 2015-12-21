@@ -1,35 +1,52 @@
 loadAPI(1);
 load('json2.js');
 
+/**
+ * Script for collecting volume 'display values' ("xx dB") for
+ * resolution-based numeric values as used for RangedValue.set(value, resolution).
+ *
+ * (!) Relying on current Bitwig 1.3.5 behavior where valueObservers are called *after* valueDisplayObservers.
+ */
+
 // @deprecationChecked:1.3.5
-host.defineController('Test', 'VolumeDisplayValues', '1.0', 'e3e424f2-a764-11e5-bf7f-feff819cdc9f', 'github@justlep.net');
+host.defineController('Test', 'VolumeDisplayValues', '1.1', 'e3e424f2-a764-11e5-bf7f-feff819cdc9f', 'github@justlep.net');
 host.defineMidiPorts(0, 0);
 
-function init() {
-    var trackBank = host.createTrackBank(1, 0, 0),
-        channelVolume = trackBank.getChannel(0).getVolume(),
-        lastVolValue,
-        volumes = {},
-        volumeDisplayValuesArray = [],
-        valuesLeft = 128;
+const RESOLUTION = 128;
 
-    channelVolume.addValueObserver(128, function(newVol) {
-        lastVolValue = newVol;
+function init() {
+    var channelVolume = host.createTrackBank(1, 0, 0).getChannel(0).getVolume(),
+        currentVolValue,
+        volumeDisplayValuesArray = [],
+        hasStarted = false;
+
+    channelVolume.addValueObserver(RESOLUTION, function(newVol) {
+        if (!hasStarted) return;
+        currentVolValue = newVol;
     });
 
     channelVolume.addValueDisplayObserver(30, '??', function(valAsString) {
-        if (lastVolValue === undefined) return;
+        if (!hasStarted) return;
 
-        if (!volumes[lastVolValue]) {
-            volumes[lastVolValue] = valAsString;
-            volumeDisplayValuesArray[lastVolValue] = valAsString;
-            valuesLeft--;
-            println('values left: ' + valuesLeft);
+        if (valAsString === '??') {
+            currentVolValue = -1;
+        } else {
+            println(currentVolValue + ' -> ' + valAsString);
+            volumeDisplayValuesArray[currentVolValue] = valAsString;
         }
-        if (!valuesLeft) {
-            println('const VOLUME_DISPLAY_VALUES = ' + JSON.stringify(volumeDisplayValuesArray, null, 2));
+
+        if (currentVolValue < RESOLUTION - 1) {
+            channelVolume.set(currentVolValue + 1, RESOLUTION);
+        } else {
+            println("\n-----------------------------------------\n");
+            println('const VOLUME_DISPLAY_VALUES_'+ RESOLUTION +' = ' + JSON.stringify(volumeDisplayValuesArray, null, 2) + ';');
         }
     });
+
+    host.scheduleTask(function() {
+        hasStarted = true;
+        channelVolume.set(0, RESOLUTION);
+    }, [], 200);
 }
 
 function exit(){}
@@ -39,7 +56,7 @@ function exit(){}
  * The array of 128 volume display values as generated in Bitwig 1.3.5
  * @type {string[]}
  */
-const VOLUME_DISPLAY_VALUES = [
+const VOLUME_DISPLAY_VALUES_128 = [
     "-Inf dB",
     "-120.2 dB",
     "-102.1 dB",
