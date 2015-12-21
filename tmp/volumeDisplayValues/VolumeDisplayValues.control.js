@@ -5,7 +5,7 @@ load('json2.js');
  * Script for collecting volume 'display values' ("xx dB") for
  * resolution-based numeric values as used for RangedValue.set(value, resolution).
  *
- * (!) Relying on current Bitwig 1.3.5 behavior where valueObservers are called *after* valueDisplayObservers.
+ * (!) Relying on current Bitwig 1.3.5 behavior where valueObservers are called *before* valueDisplayObservers.
  */
 
 // @deprecationChecked:1.3.5
