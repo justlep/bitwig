@@ -7,9 +7,12 @@ See the [documentation in the Wiki][wikiLink].
 ---
 #### Required BCF Preset
 You need a special preset installed on your BCF for the script to work.
-It is contained in this SysEx-file: [**BCF2000-Bitwig-Preset28(CH13)-29(CH14).syx**][sysexfile] (The file contains two presets: Preset 28  will be used by default, Preset 29 is an alternative). You can transfer the file to your BCF using [MidiOX][midiOxLink]* ([screenshot][midiOxScreenshot]) or a similar tool. When Bitwig loads the controller script, it will try to switch your BCF to preset 28.
+It is contained in this SysEx-file: [**BCF2000-Bitwig-Preset28(CH13)-29(CH14).syx**][sysexfile]
+(The file contains two presets: Preset 28  will be used by default, Preset 29 is an alternative).
+You can transfer the file to your BCF using [MidiOX][midiOxLink]* ([screenshot][midiOxScreenshot])
+or a similar tool. When Bitwig loads the controller script, it will try to switch your BCF to preset 28.
 
-_(* During the sysex transfer, the BCF may show some weird "Error 14" messages which you can ignore. [More info here][err14].)_
+_(* The presets 28/29 are saved permanently on your BCF, so the sysex file needs to be transmitted only ONCE ever. )_
 
 ---
 #### Download & Installation

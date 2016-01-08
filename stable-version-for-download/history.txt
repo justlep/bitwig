@@ -1,4 +1,8 @@
 
+v1.0.8 (08-Jan-2016)
+ - fixed the Sysex file for the BCF2000, so no more ERROR 14 occurs while transmitting it to the BCF.
+   (Updating the BCF is not necessary if the script was working already)
+
 v1.0.7 (16-Dec-2015)
  - made PerformancePad's note remapping optional (via preferences)
 
