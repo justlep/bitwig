@@ -132,7 +132,7 @@ lep.BaseControl.prototype = {
         }
         if (this.clickNote) {
             eventDispatcher.onNote(this.clickNote, this.onClickNoteReceived, this, this.listeningMidiChannel);
-            lep.logDebug('MIDI clickNote bound: {} -> CC {} channel {}', this.name, this.clickNote, this.listeningMidiChannel);
+            lep.logDebug('MIDI clickNote bound: {} -> note {} channel {}', this.name, this.clickNote, this.listeningMidiChannel);
         }
     }
 };
