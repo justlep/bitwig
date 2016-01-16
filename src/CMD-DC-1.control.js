@@ -68,13 +68,14 @@ lep.DC1 = function() {
 
     // Bank Mode Button
     (new lep.Button({
-        midiChannel: MIDI_CHANNEL,
         name: 'BankModeButton',
         clickNote: NOTE.FIRST_TOP_BUTTON + 4,
+        midiChannel: MIDI_CHANNEL,
         valueToAttach: new lep.KnockoutSyncedValue({
             name: 'BankModeValue',
             ownValue: currentBank,
             refObservable: pushEncoderTarget,
+            restoreRefAfterLongClick: true,
             velocityValueOn: COLOR.BLUE,
             velocityValueOff: COLOR.ORANGE
         })
@@ -82,13 +83,14 @@ lep.DC1 = function() {
 
     // Preset Mode Button
     (new lep.Button({
-        midiChannel: MIDI_CHANNEL,
         name: 'PresetModeButton',
         clickNote: NOTE.FIRST_TOP_BUTTON + 5,
+        midiChannel: MIDI_CHANNEL,
         valueToAttach: new lep.KnockoutSyncedValue({
             name: 'PresetModeValue',
             ownValue: currentPreset,
             refObservable: pushEncoderTarget,
+            restoreRefAfterLongClick: true,
             velocityValueOn: COLOR.BLUE,
             velocityValueOff: COLOR.ORANGE
         })
@@ -191,6 +193,8 @@ lep.DC1 = function() {
             })
         }));
     }
+
+    pushEncoderTarget(currentPreset);
 
     println('\n--------------\nCMD DC-1 ready');
 };
