@@ -112,6 +112,12 @@ lep.MidiEventDispatcher = (function () {
                         //    channel.toString(16), noteOrCC.toString(16), handlerIndex.toString(16), channelAwareIndex.toString(16)
                         //);
 
+                        // if strictNoteOff is disabled, just treat incoming NoteOff messages as NoteOn with value=0
+                        if (msgType === 0x80 && !useStrictNoteOff) {
+                            value = 0;
+                            msgType = 0x90;
+                        }
+
                         while (true) {
                             if (msgType === 0xB0) { // CC
                                 lep.logDebug('MED received value {} on CC {} / channel {}', value, noteOrCC, channel);
