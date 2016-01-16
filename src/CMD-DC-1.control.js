@@ -18,9 +18,6 @@ function init() {
     new lep.DC1();
 }
 
-function exit() {
-}
-
 /**
  * @constructor
  */
@@ -31,17 +28,16 @@ lep.DC1 = function() {
         NOTE = {
             PUSH_ENCODER_CLICK: 32,
             FIRST_TOP_BUTTON: 0, // ascending left-to-right, top-to-bottom; i.e. second row starting with 4
-            FIRST_NUM: 16,
+            FIRST_NUM_BUTTON: 16,
             PAD1: 36
         },
         CC = {
             PUSH_ENCODER: 32,
             FIRST_ENCODER: 16
         },
-
         /**
          * Button color velocities. Push encoder color can not be changed.
-         * Lights can't be turned off completely.
+         * Lights can't be turned off completely :(
          */
         COLOR = {
             ORANGE: 0,
@@ -52,7 +48,23 @@ lep.DC1 = function() {
         noteInput = eventDispatcher.createNoteInput('DC-1', MIDI_CHANNEL_FOR_PROGRAM_CHANGE, true),
         currentBank = ko.observable(0).extend({notify: 'always'}),
         currentPreset = ko.observable(0).extend({notify: 'always'}),
-        pushButtonObservable = ko.observable();
+        pushEncoderTarget = ko.observable(),
+        bankOrPresetPageIndex = ko.computed(function() {
+            var targetObservable = pushEncoderTarget(),
+                isBankOrPresetMode = (targetObservable === currentBank || targetObservable === currentPreset),
+                pageIndex = (isBankOrPresetMode) ? Math.floor(targetObservable() / 16) : -1;
+
+            return pageIndex;
+        }),
+        bankOrPresetPadIndex = ko.computed(function() {
+            var targetObservable = pushEncoderTarget(),
+                isBankOrPresetMode = (targetObservable === currentBank || targetObservable === currentPreset),
+                padIndex = (isBankOrPresetMode) ? Math.floor(targetObservable() % 16) : -1;
+
+            lep.logDebug('padIndex: ' + padIndex);
+            return padIndex;
+        }),
+        initDone = false;
 
 
     // Bank Mode Button
@@ -63,7 +75,7 @@ lep.DC1 = function() {
         valueToAttach: new lep.KnockoutSyncedValue({
             name: 'BankModeValue',
             ownValue: currentBank,
-            refObservable: pushButtonObservable,
+            refObservable: pushEncoderTarget,
             velocityValueOn: COLOR.BLUE,
             velocityValueOff: COLOR.ORANGE
         })
@@ -77,74 +89,70 @@ lep.DC1 = function() {
         valueToAttach: new lep.KnockoutSyncedValue({
             name: 'PresetModeValue',
             ownValue: currentPreset,
-            refObservable: pushButtonObservable,
+            refObservable: pushEncoderTarget,
             velocityValueOn: COLOR.BLUE,
             velocityValueOff: COLOR.ORANGE
         })
     }));
 
-    // bind click events for the top push encoder..
+    // Make 'click' on push encoder reset the bank and/or preset..
     eventDispatcher.onNote(NOTE.PUSH_ENCODER_CLICK, function(note, value, channel) {
-        var obs = pushButtonObservable(),
-            isBankObserver = (obs === currentBank),
-            isPresetObserver = (obs === currentPreset);
+        var targetObservable = pushEncoderTarget(),
+            isBankMode = (targetObservable === currentBank),
+            isPresetMode = (targetObservable === currentPreset);
 
-        if (isBankObserver) {
+        if (isBankMode) {
             currentBank(0);
         }
-        if (isPresetObserver || isBankObserver) {
+        if (isPresetMode || isBankMode) {
             currentPreset(0);
         }
     });
 
-    // bind twist events for the top push encoder..
+    // Bind 'twisting' events for the push encoder..
     eventDispatcher.onCC(CC.PUSH_ENCODER, function(cc, value, channel){
-        var obs = pushButtonObservable(),
+        var targetObservable = pushEncoderTarget(),
+            isBankMode = (targetObservable === currentBank),
+            isPresetMode = (targetObservable === currentPreset),
             diff = (value - 64);
 
-        if (obs === currentBank || obs === currentPreset) {
-            var newBankOrPreset = lep.util.limitToRange(obs() + diff, 0, 127);
-            obs(newBankOrPreset);
+        if (isBankMode || isPresetMode) {
+            var newBankOrPreset = lep.util.limitToRange(targetObservable() + diff, 0, 127);
+            targetObservable(newBankOrPreset);
+            if (isBankMode) {
+                // changing the bank switches to that bank's first preset
+                currentPreset(0);
+            }
         }
     });
 
+    // Send MIDI ProgramChange (and bank change) messages when bank or preset changes
     ko.computed(function() {
-        lep.logDev('Changed bank {} preset {}', currentBank(), currentPreset());
-        noteInput.sendRawMidiEvent(0xB0 + MIDI_CHANNEL_FOR_PROGRAM_CHANGE, 0, 0);
-        noteInput.sendRawMidiEvent(0xB0 + MIDI_CHANNEL_FOR_PROGRAM_CHANGE, 32, currentBank());
-        noteInput.sendRawMidiEvent(0xC0 + MIDI_CHANNEL_FOR_PROGRAM_CHANGE, currentPreset(), 0);
+        var bankToSend = currentBank() || 0,
+            presetToSend = currentPreset() || 0;
+
+        if (initDone) {
+            lep.logDebug('Changed bank {} preset {}', bankToSend, presetToSend);
+            noteInput.sendRawMidiEvent(0xB0 + MIDI_CHANNEL_FOR_PROGRAM_CHANGE, 0, 0);
+            noteInput.sendRawMidiEvent(0xB0 + MIDI_CHANNEL_FOR_PROGRAM_CHANGE, 32, bankToSend);
+            noteInput.sendRawMidiEvent(0xC0 + MIDI_CHANNEL_FOR_PROGRAM_CHANGE, presetToSend, 0);
+        }
     });
 
-    var bankOrPresetPageIndex = ko.computed(function() {
-            var pushButtonObs = pushButtonObservable(),
-                isBankOrPresetMode = (pushButtonObs === currentBank || pushButtonObs === currentPreset),
-                pageIndex = (isBankOrPresetMode) ? Math.floor(pushButtonObs() / 16) : -1;
-
-            return pageIndex;
-        }),
-        bankOrPresetModulo16 = ko.computed(function() {
-            var pushButtonObs = pushButtonObservable(),
-                isBankOrPresetMode = (pushButtonObs === currentBank || pushButtonObs === currentPreset),
-                modValue = (isBankOrPresetMode) ? Math.floor(pushButtonObs() % 16) : -1;
-
-                lep.logDev('modulo: ' + modValue);
-
-            return modValue;
-        });
-
+    // Init the Pads..
     for (var padIndex = 0; padIndex < 16; padIndex++) {
         (new lep.Button({
             name: 'PadBtn' + (padIndex + 1),
             midiChannel: MIDI_CHANNEL,
             clickNote: NOTE.PAD1 + padIndex,
             valueToAttach: new lep.KnockoutSyncedValue({
-                name: 'PadValue' + (padIndex + 1),
+                name: 'PadValue' + (padIndex + 1 ),
                 ownValue: padIndex,
-                refObservable: bankOrPresetModulo16,
+                refObservable: bankOrPresetPadIndex,
                 velocityValueOn: COLOR.BLUE,
                 velocityValueOff: COLOR.ORANGE,
                 onClick: function(buttonIndex) {
-                    var bankOrPresetObservable = pushButtonObservable(),
+                    var bankOrPresetObservable = pushEncoderTarget(),
                         currentFirstValueInMatrix = Math.floor(bankOrPresetObservable() / 16) * 16,
                         newPresetOrBank = currentFirstValueInMatrix + buttonIndex;
 
@@ -154,11 +162,12 @@ lep.DC1 = function() {
         }));
     }
 
+    // Init the numeric buttons..
     for (var numButtonIndex = 0; numButtonIndex < 8; numButtonIndex++) {
         (new lep.Button({
             name: 'NumBtn' + (numButtonIndex + 1),
             midiChannel: MIDI_CHANNEL,
-            clickNote: NOTE.FIRST_NUM + numButtonIndex,
+            clickNote: NOTE.FIRST_NUM_BUTTON + numButtonIndex,
             valueToAttach: new lep.KnockoutSyncedValue({
                 name: 'NumValue' + (numButtonIndex + 1),
                 ownValue: numButtonIndex,
@@ -167,17 +176,19 @@ lep.DC1 = function() {
                 velocityValueOff: COLOR.ORANGE,
                 onClick: function(buttonIndex) {
                     var isSamePage = (buttonIndex === bankOrPresetPageIndex()),
-                        newValue = (buttonIndex * 16) + (isSamePage ? 0 : bankOrPresetModulo16());
+                        newValue = (buttonIndex * 16) + (isSamePage ? 0 : bankOrPresetPadIndex()),
+                        bankOrPresetObservable = pushEncoderTarget();
 
                     // if different page was selected: switch to it but preserve the relative position of preset/bank-pad in the 4x4 matrix
                     // if the same page was clicked, switch to first first preset/bank-pad of that page
 
-                    pushButtonObservable()(newValue);
+                    bankOrPresetObservable(newValue);
                 }
             })
         }));
     }
 
+    initDone = true;
     println('\n--------------\nCMD DC-1 ready');
 };
 
@@ -207,3 +218,8 @@ lep.DC1 = function() {
 //        isShiftPressed(!!value);
 //    }
 //},
+
+
+
+function exit() {
+}
