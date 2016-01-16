@@ -63,8 +63,7 @@ lep.DC1 = function() {
 
             lep.logDebug('padIndex: ' + padIndex);
             return padIndex;
-        }),
-        initDone = false;
+        });
 
 
     // Bank Mode Button
@@ -126,18 +125,23 @@ lep.DC1 = function() {
         }
     });
 
-    // Send MIDI ProgramChange (and bank change) messages when bank or preset changes
-    ko.computed(function() {
-        var bankToSend = currentBank() || 0,
-            presetToSend = currentPreset() || 0;
+    (function() {
+        var isReady = false;
+        // Send MIDI ProgramChange (and bank change) messages when bank or preset changes
+        ko.computed(function() {
+            var bankToSend = currentBank() || 0,
+                presetToSend = currentPreset() || 0;
 
-        if (initDone) {
-            lep.logDebug('Changed bank {} preset {}', bankToSend, presetToSend);
-            noteInput.sendRawMidiEvent(0xB0 + MIDI_CHANNEL_FOR_PROGRAM_CHANGE, 0, 0);
-            noteInput.sendRawMidiEvent(0xB0 + MIDI_CHANNEL_FOR_PROGRAM_CHANGE, 32, bankToSend);
-            noteInput.sendRawMidiEvent(0xC0 + MIDI_CHANNEL_FOR_PROGRAM_CHANGE, presetToSend, 0);
-        }
-    });
+            if (isReady) {
+                lep.logDebug('Changed bank {} preset {}', bankToSend, presetToSend);
+                noteInput.sendRawMidiEvent(0xB0 + MIDI_CHANNEL_FOR_PROGRAM_CHANGE, 0, 0);
+                noteInput.sendRawMidiEvent(0xB0 + MIDI_CHANNEL_FOR_PROGRAM_CHANGE, 32, bankToSend);
+                noteInput.sendRawMidiEvent(0xC0 + MIDI_CHANNEL_FOR_PROGRAM_CHANGE, presetToSend, 0);
+            } else {
+                isReady = true;
+            }
+        });
+    })();
 
     // Init the Pads..
     for (var padIndex = 0; padIndex < 16; padIndex++) {
@@ -188,7 +192,6 @@ lep.DC1 = function() {
         }));
     }
 
-    initDone = true;
     println('\n--------------\nCMD DC-1 ready');
 };
 
