@@ -49,6 +49,7 @@ lep.DC1 = function() {
         },
         eventDispatcher = lep.MidiEventDispatcher.getInstance(),
         noteInput = eventDispatcher.createNoteInput('DC-1', MIDI_CHANNEL_FOR_PROGRAM_CHANGE, true),
+        pushEncoderTarget = ko.observable(),
         currentPreset = ko.observable(0).extend({notify: 'always'}),
         currentBank = (function() {
             var _bank = ko.observable(0).extend({notify: 'always'});
@@ -60,25 +61,33 @@ lep.DC1 = function() {
                 }
             });
         })(),
-        pushEncoderTarget = ko.observable(),
-        bankPageIndex = ko.computed(function() {
-            return Math.floor(currentBank() / 16);
+
+        displayedBankPage = ko.observable(0),
+        computedBankPage = ko.computed(function() {
+            var bankPage = Math.floor(currentBank() / 16);
+            displayedBankPage(bankPage);
+            return bankPage;
         }),
-        bankPadIndex = ko.computed(function() {
+        computedBankPad = ko.computed(function() {
             return currentBank() % 16;
         }),
-        presetPageIndex = ko.computed(function() {
-            return Math.floor(currentPreset() / 16);
+
+        displayedPresetPage = ko.observable(0),
+        computedPresetPage = ko.computed(function() {
+            var presetPage = Math.floor(currentPreset() / 16);
+            displayedPresetPage(presetPage);
+            return presetPage;
         }),
-        presetPadIndex = ko.computed(function() {
+        computedPresetPad = ko.computed(function() {
             return currentPreset() % 16;
         }),
+
         CONTROL_SET = {
             NUM_BUTTONS: new lep.ControlSet('NumericButtons', 8, function(numButtonIndex) {
                 return new lep.Button({
                     name: 'NumBtn' + (numButtonIndex + 1),
                     midiChannel: MIDI_CHANNEL,
-                    clickNote: NOTE.FIRST_NUM_BUTTON + numButtonIndex,
+                    clickNote: NOTE.FIRST_NUM_BUTTON + numButtonIndex
                 });
             }),
             PADS: new lep.ControlSet('Pads', 16, function(padIndex) {
@@ -92,27 +101,27 @@ lep.DC1 = function() {
         VALUE_SET = {
             BANK_PAGES:  new lep.ValueSet('BankPageSet', 1, 8, function (index) {
                 return new lep.KnockoutSyncedValue({
-                    name: 'BankPage' + (bankPageIndex + 1),
+                    name: 'BankPage' + (index + 1),
                     ownValue: index,
-                    refObservable: bankPageIndex,
-                    velocityValueOn: COLOR.BLUE,
-                    velocityValueOff: COLOR.ORANGE,
-                    onClick: function(numButtonIndex) {
-                        var newBank = (numButtonIndex * 16) + bankPadIndex();
-                        currentBank(newBank);
+                    refObservable: displayedBankPage,
+                    computedVelocity: function() {
+                        var isDisplayedPage = (index === displayedBankPage()),
+                            isActivePage = (index === computedBankPage());
+
+                        return (isDisplayedPage) ? COLOR.BLUE : (isActivePage) ? COLOR.BLUE_BLINK : COLOR.ORANGE;
                     }
                 });
             }),
             PRESET_PAGES: new lep.ValueSet('PresetPageSet', 1, 8, function (index) {
                 return new lep.KnockoutSyncedValue({
-                    name: 'PresetPage' + (presetPageIndex + 1),
+                    name: 'PresetPage' + (index + 1),
                     ownValue: index,
-                    refObservable: presetPageIndex,
-                    velocityValueOn: COLOR.BLUE,
-                    velocityValueOff: COLOR.ORANGE,
-                    onClick: function(numButtonIndex) {
-                        var newPreset = (numButtonIndex * 16) + presetPadIndex();
-                        currentPreset(newPreset);
+                    refObservable: displayedPresetPage,
+                    computedVelocity: function() {
+                        var isDisplayedPage = (index === displayedPresetPage()),
+                            isActivePage = (index === computedPresetPage());
+
+                        return (isDisplayedPage) ? COLOR.BLUE : (isActivePage) ? COLOR.BLUE_BLINK : COLOR.ORANGE;
                     }
                 });
             }),
@@ -120,11 +129,15 @@ lep.DC1 = function() {
                 return new lep.KnockoutSyncedValue({
                     name: 'BankVal' + (index + 1),
                     ownValue: index,
-                    refObservable: bankPadIndex,
-                    velocityValueOn: COLOR.BLUE,
-                    velocityValueOff: COLOR.ORANGE,
+                    refObservable: computedBankPad,
+                    computedVelocity: function() {
+                        var isVisible = (displayedBankPage() === computedBankPage()),
+                            isActive = isVisible && (currentBank() % 16 === index);
+
+                        return isActive ? COLOR.BLUE : COLOR.ORANGE;
+                    },
                     onClick: function(padIndex) {
-                        var newBank = (bankPageIndex() * 16) + padIndex;
+                        var newBank = (displayedBankPage() * 16) + padIndex;
                         currentBank(newBank);
                     }
                 });
@@ -133,11 +146,15 @@ lep.DC1 = function() {
                 return new lep.KnockoutSyncedValue({
                     name: 'PresetVal' + (index + 1),
                     ownValue: index,
-                    refObservable: presetPadIndex,
-                    velocityValueOn: COLOR.BLUE,
-                    velocityValueOff: COLOR.ORANGE,
+                    refObservable: computedPresetPad,
+                    computedVelocity: function() {
+                        var isVisible = (displayedPresetPage() === computedPresetPage()),
+                            isActive = isVisible && (currentPreset() % 16 === index);
+
+                        return isActive ? COLOR.BLUE : COLOR.ORANGE;
+                    },
                     onClick: function(padIndex) {
-                        var newPreset = (presetPageIndex() * 16) + padIndex;
+                        var newPreset = (displayedPresetPage() * 16) + padIndex;
                         currentPreset(newPreset);
                     }
                 });
