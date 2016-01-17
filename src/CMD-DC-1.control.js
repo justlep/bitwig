@@ -44,6 +44,9 @@ lep.DC1 = function() {
             BLUE: 1,
             BLUE_BLINK: 2
         },
+        prefs = {
+            sendBankMSB: false
+        },
         eventDispatcher = lep.MidiEventDispatcher.getInstance(),
         noteInput = eventDispatcher.createNoteInput('DC-1', MIDI_CHANNEL_FOR_PROGRAM_CHANGE, true),
         currentPreset = ko.observable(0).extend({notify: 'always'}),
@@ -217,25 +220,40 @@ lep.DC1 = function() {
         pushEncoderTarget(currentPreset);
     }
 
+    function initPreferences() {
+        var preferences = host.getPreferences(),
+            bankMsbSetting = preferences.getEnumSetting('Send MSB with ProgramChange', 'Preferences', ['YES','NO'], 'NO');
+
+        bankMsbSetting.addValueObserver(function(useMSB) {
+            prefs.sendBankMSB = (useMSB === 'YES');
+            lep.logDebug('Send MSB with ProgramChange: {}', prefs.sendBankMSB);
+        });
+    }
+
     function initMidiProgramChangeSender() {
-        var isReady = false;
+        var isFirstEvaluation = false;
 
         // Send MIDI ProgramChange (and bank change) messages when bank or preset changes
         ko.computed(function() {
             var bankToSend = currentBank() || 0,
                 presetToSend = currentPreset() || 0;
 
-            if (isReady) {
-                lep.logDebug('Changed bank {} preset {}', bankToSend, presetToSend);
-                noteInput.sendRawMidiEvent(0xB0 + MIDI_CHANNEL_FOR_PROGRAM_CHANGE, 0, 0);
-                noteInput.sendRawMidiEvent(0xB0 + MIDI_CHANNEL_FOR_PROGRAM_CHANGE, 32, bankToSend);
-                noteInput.sendRawMidiEvent(0xC0 + MIDI_CHANNEL_FOR_PROGRAM_CHANGE, presetToSend, 0);
-            } else {
-                isReady = true;
+            if (isFirstEvaluation) {
+                // prevent the script from sending program change on start
+                isFirstEvaluation = false;
+                return;
             }
+
+            lep.logDebug('Changed bank {} preset {}', bankToSend, presetToSend);
+            if (prefs.sendBankMSB) {
+                noteInput.sendRawMidiEvent(0xB0 + MIDI_CHANNEL_FOR_PROGRAM_CHANGE, 0, 0);        // Bank MSB
+            }
+            noteInput.sendRawMidiEvent(0xB0 + MIDI_CHANNEL_FOR_PROGRAM_CHANGE, 32, bankToSend);  // Bank LSB
+            noteInput.sendRawMidiEvent(0xC0 + MIDI_CHANNEL_FOR_PROGRAM_CHANGE, presetToSend, 0); // ProgramChange
         });
     }
 
+    initPreferences();
     initMidiProgramChangeSender();
     initModeButtons();
     initPushEncoder();
