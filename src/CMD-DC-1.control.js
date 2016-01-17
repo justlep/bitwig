@@ -35,6 +35,12 @@ lep.DC1 = function() {
             PUSH_ENCODER: 32,
             FIRST_ENCODER: 16
         },
+        NOTE_ACTION = {
+            BANK_MODE: NOTE.FIRST_TOP_BUTTON + 4,
+            PRESET_MODE: NOTE.FIRST_TOP_BUTTON + 5,
+            SNAPSHOT_MODE: NOTE.FIRST_TOP_BUTTON + 6,
+            SHIFT: NOTE.FIRST_TOP_BUTTON + 7
+        },
         /**
          * Button color velocities. Push encoder color can not be changed.
          * Lights can't be turned off completely :(
@@ -47,9 +53,11 @@ lep.DC1 = function() {
         prefs = {
             sendBankMSB: false
         },
+        isShiftButtonPressed = false,
         eventDispatcher = lep.MidiEventDispatcher.getInstance(),
         noteInput = eventDispatcher.createNoteInput('DC-1', MIDI_CHANNEL_FOR_PROGRAM_CHANGE, true),
         pushEncoderTarget = ko.observable(),
+        snapshots = ko.observableArray(),
         currentPreset = ko.observable(0).extend({notify: 'always'}),
         currentBank = (function() {
             var _bank = ko.observable(0).extend({notify: 'always'});
@@ -81,6 +89,11 @@ lep.DC1 = function() {
         computedPresetPad = ko.computed(function() {
             return currentPreset() % 16;
         }),
+
+        currentSnapshotValue = ko.computed(function() {
+            return (currentBank() << 8) + currentPreset();
+        }),
+        displayedSnapshotPage = ko.observable(0),
 
         CONTROL_SET = {
             NUM_BUTTONS: new lep.ControlSet('NumericButtons', 8, function(numButtonIndex) {
@@ -125,6 +138,15 @@ lep.DC1 = function() {
                     }
                 });
             }),
+            SNAPSHOT_PAGES: new lep.ValueSet('SnapshotPageSet', 1, 8, function (index) {
+                return new lep.KnockoutSyncedValue({
+                    name: 'SnapshotPage' + (index + 1),
+                    ownValue: index,
+                    refObservable: displayedSnapshotPage,
+                    velocityValueOn: COLOR.BLUE,
+                    velocityValueOff: COLOR.OFF
+                });
+            }),
             BANKS: new lep.ValueSet('BanksValueSet', 1, 16, function(index) {
                 return new lep.KnockoutSyncedValue({
                     name: 'BankVal' + (index + 1),
@@ -158,6 +180,43 @@ lep.DC1 = function() {
                         currentPreset(newPreset);
                     }
                 });
+            }),
+            SNAPSHOTS: new lep.ValueSet('SnapshotValueSet', 1, 16, function(index) {
+                return new lep.KnockoutSyncedValue({
+                    name: 'SnapshotVal' + (index + 1),
+                    ownValue: index,
+                    refObservable: computedPresetPad,
+                    computedVelocity: function() {
+                        var snapshotIndex = (displayedSnapshotPage() * 16) + index,
+                            snapshot = snapshots()[snapshotIndex],
+                            isSnapshot = (typeof  snapshot === 'number'),
+                            isActive = isSnapshot && (currentSnapshotValue() === snapshot);
+
+                        return isActive ? COLOR.BLUE_BLINK : isSnapshot ? COLOR.BLUE : COLOR.ORANGE;
+                    },
+                    onClick: function(padIndex) {
+                        var snapshotIndex = (displayedSnapshotPage() * 16) + index,
+                            snapshot;
+
+                        if (isShiftButtonPressed) {
+                            // save snapshot..
+                            snapshot = (currentBank() << 8) + currentPreset();
+                            snapshots()[snapshotIndex] = snapshot;
+                            snapshots.valueHasMutated();
+                            lep.logDebug('Saved snapshot {} in slot {}', snapshot.toString(16), snapshotIndex);
+                        } else {
+                            // load snapshot..
+                            snapshot = snapshots()[snapshotIndex];
+                            if (typeof snapshot === 'number') {
+                                currentBank(snapshot >> 8);
+                                currentPreset(snapshot & 0xFF);
+                                lep.logDebug('Loaded snapshot {} from slot {}', snapshot.toString(16), snapshotIndex);
+                            } else {
+                                lep.logDebug('No snapshot in slot {}', snapshotIndex);
+                            }
+                        }
+                    }
+                });
             })
         };
 
@@ -166,7 +225,7 @@ lep.DC1 = function() {
         // Bank Mode Button
         new lep.Button({
             name: 'BankModeButton',
-            clickNote: NOTE.FIRST_TOP_BUTTON + 4,
+            clickNote: NOTE_ACTION.BANK_MODE,
             midiChannel: MIDI_CHANNEL,
             valueToAttach: new lep.KnockoutSyncedValue({
                 name: 'BankModeValue',
@@ -181,7 +240,7 @@ lep.DC1 = function() {
         // Preset Mode Button
         new lep.Button({
             name: 'PresetModeButton',
-            clickNote: NOTE.FIRST_TOP_BUTTON + 5,
+            clickNote: NOTE_ACTION.PRESET_MODE,
             midiChannel: MIDI_CHANNEL,
             valueToAttach: new lep.KnockoutSyncedValue({
                 name: 'PresetModeValue',
@@ -192,6 +251,30 @@ lep.DC1 = function() {
                 velocityValueOff: COLOR.ORANGE
             })
         });
+
+        new lep.Button({
+            name: 'SnapshotModeButton',
+            clickNote: NOTE_ACTION.SNAPSHOT_MODE,
+            midiChannel: MIDI_CHANNEL,
+            valueToAttach: new lep.KnockoutSyncedValue({
+                name: 'SnapshotModeValue',
+                ownValue: snapshots,
+                refObservable: pushEncoderTarget,
+                restoreRefAfterLongClick: true,
+                velocityValueOn: COLOR.BLUE,
+                velocityValueOff: COLOR.ORANGE
+            })
+        });
+
+
+        eventDispatcher.onNote(NOTE_ACTION.SHIFT, function(note, value, channel) {
+            isShiftButtonPressed = !!value;
+            if (value) {
+                sendNoteOn(channel, note, COLOR.BLUE_BLINK);
+            } else {
+                sendNoteOn(channel, note, COLOR.ORANGE);
+            }
+        }, null, MIDI_CHANNEL);
     }
 
     function initPushEncoder() {
@@ -231,6 +314,9 @@ lep.DC1 = function() {
                     CONTROL_SET.NUM_BUTTONS.setValueSet(VALUE_SET.PRESET_PAGES);
                     CONTROL_SET.PADS.setValueSet(VALUE_SET.PRESETS);
                     break;
+                case snapshots:
+                    CONTROL_SET.NUM_BUTTONS.setValueSet(VALUE_SET.SNAPSHOT_PAGES);
+                    CONTROL_SET.PADS.setValueSet(VALUE_SET.SNAPSHOTS);
             }
         });
 
@@ -250,6 +336,10 @@ lep.DC1 = function() {
     function initMidiProgramChangeSender() {
         var isFirstEvaluation = false;
 
+        setTimeout = function(fn, delay) {
+            host.scheduleTask(fn, null, delay);
+        };
+
         // Send MIDI ProgramChange (and bank change) messages when bank or preset changes
         ko.computed(function() {
             var bankToSend = currentBank() || 0,
@@ -262,12 +352,14 @@ lep.DC1 = function() {
             }
 
             lep.logDebug('Changed bank {} preset {}', bankToSend, presetToSend);
+
             if (prefs.sendBankMSB) {
                 noteInput.sendRawMidiEvent(0xB0 + MIDI_CHANNEL_FOR_PROGRAM_CHANGE, 0, 0);        // Bank MSB
             }
             noteInput.sendRawMidiEvent(0xB0 + MIDI_CHANNEL_FOR_PROGRAM_CHANGE, 32, bankToSend);  // Bank LSB
             noteInput.sendRawMidiEvent(0xC0 + MIDI_CHANNEL_FOR_PROGRAM_CHANGE, presetToSend, 0); // ProgramChange
-        });
+
+        }).extend({rateLimit: 50});
     }
 
     initPreferences();
@@ -277,34 +369,6 @@ lep.DC1 = function() {
 
     println('\n--------------\nCMD DC-1 ready');
 };
-
-
-// maybe for later
-//SENDS_NUMBER = 0,
-//WINDOW_SIZE = 4,
-//trackBank = host.createTrackBank(WINDOW_SIZE, SENDS_NUMBER, 0),
-//cursorDevice = host.createEditorCursorDevice(),
-//isShiftPressed = ko.observable(false),
-//HANDLERS = {
-//    NEXT_DEVICE_OR_CHANNEL_PAGE: function() {
-//        if (isShiftPressed()) {
-//            cursorDevice.selectNext();
-//        } else {
-//            trackBank.scrollChannelsPageDown();
-//        }
-//    },
-//    PREV_DEVICE_OR_CHANNEL_PAGE: function() {
-//        if (isShiftPressed()) {
-//            cursorDevice.selectPrevious();
-//        } else {
-//            trackBank.scrollChannelsPageUp();
-//        }
-//    },
-//    SHIFT_CHANGE: function(note, value) {
-//        isShiftPressed(!!value);
-//    }
-//},
-
 
 
 function exit() {
