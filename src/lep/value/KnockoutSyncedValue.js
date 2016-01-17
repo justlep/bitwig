@@ -14,6 +14,10 @@
  *          - ownValue (mixed) the constant value represented by this KnockoutSyncedValue
  *          - refObservable (Observable) the Knockout Observable holding the reference value to compare ownValue to
  *          - [onClick] (function) (optional) function to call when an absolute value > 0 is received
+ *          - [velocityValueOn] (number) (optional) velo midi value to send if ownValue matches refObservable
+ *          - [velocityValueOff] (number) (optional) velo midi value to send if ownValue matches refObservable
+ *          - [computedVelocity] (function|Observable) (optional) function returning the velocity value to send to the controller
+ *            (!) If computedVelocity is given, it overrides any given velocityValueOn/velocityValueOff value.
  *
  * Author: Lennart Pegel - https://github.com/justlep
  * License: LGPLv3 (http://www.gnu.org/licenses/lgpl-3.0.txt)
@@ -28,15 +32,27 @@ lep.KnockoutSyncedValue = lep.util.extendClass(lep.BaseValue, {
         lep.util.assertDefined(opts.ownValue , 'Missing ownValue for {}', opts.name);
         lep.util.assertObservable(opts.refObservable, 'Missing refObservable for {}', opts.name);
         lep.util.assertFunctionOrEmpty(opts.onClick, 'Invalid onClick for {}', opts.name);
+        lep.util.assertFunctionOrEmpty(opts.computedVelocity, 'Invalid computedVelocity for {}', opts.name);
+        lep.util.assertNumberInRangeOrEmpty(opts.velocityValueOn, 0, 127, 'Invalid velocityValueOn {} for {}', opts.velocityValueOn, this.name);
+        lep.util.assertNumberInRangeOrEmpty(opts.velocityValueOff, 0, 127, 'Invalid velocityValueOff {} for {}',
+                                            opts.velocityValueOff, this.name);
 
-        var self = this;
+        var self = this,
+            initDone = false;
 
-        this.setInstanceVelocityValues(opts.velocityValueOn, opts.velocityValueOff);
+        if (opts.computedVelocity) {
+            lep.util.assert(typeof opts.velocityValueOn === 'undefined' && typeof opts.velocityValueOn === 'undefined',
+                            'Given computedVelocity overrides velocityValueOn/velocityValueOff in {}', this.name);
+            this.computedVelocity = opts.computedVelocity.bind(this);
+        } else {
+            this.velocityValueOn = (typeof opts.velocityValueOn === 'number') ? opts.velocityValueOn : 127;
+            this.velocityValueOff = (typeof opts.velocityValueOff === 'number') ? opts.velocityValueOff : 0;
+        }
 
         this.onClick = opts.onClick;
         this.refObservable = opts.refObservable;
         this.ownValue = opts.ownValue;
-        this.value = (this.refObservable() === self.ownValue) ? this.velocityValueOn : this.velocityValueOff;
+        this.value = null;
 
         this.toggleOnPressed = (opts.toggleOnPressed !== false);
         this.restoreRefAfterLongClick = !!opts.restoreRefAfterLongClick;
@@ -46,18 +62,20 @@ lep.KnockoutSyncedValue = lep.util.extendClass(lep.BaseValue, {
             lep.util.assert(!this.onClick, 'restoreRefAfterLongClick is not supported in conjunction with onClick, {}', this.name);
         }
 
-        this.refObservable.subscribe(function(newMode) {
-            self.value = (newMode === self.ownValue) ? self.velocityValueOn : self.velocityValueOff;
-            self.syncToController();
-        });
+        ko.computed(function() {
+            self.value = (opts.computedVelocity) ? opts.computedVelocity() :
+                         (self.refObservable() === self.ownValue) ? self.velocityValueOn : self.velocityValueOff;
 
+            if (initDone) {
+                self.syncToController();
+            } else {
+                initDone = true;
+            }
+        });
     },
 
-    setInstanceVelocityValues: function(onValueOrEmpty, offValueOrEmpty) {
-        lep.util.assertNumberInRangeOrEmpty(onValueOrEmpty, 0, 127, 'Invalid onValueOrEmpty {} for {}', onValueOrEmpty, this.name);
-        lep.util.assertNumberInRangeOrEmpty(offValueOrEmpty, 0, 127, 'Invalid offValueOrEmpty {} for {}', offValueOrEmpty, this.name);
-        this.velocityValueOn = (typeof onValueOrEmpty === 'number') ? onValueOrEmpty : 127;
-        this.velocityValueOff = (typeof offValueOrEmpty === 'number') ? offValueOrEmpty : 0;
+    skipRestore: function() {
+        delete this._savedRefValue;
     },
 
     /** The time in millis after which a button-press is considered a 'long click' */
@@ -77,8 +95,7 @@ lep.KnockoutSyncedValue = lep.util.extendClass(lep.BaseValue, {
                 this.refObservable(this._savedRefValue);
                 // lep.logDebug('KSV {} restoring old value {}', this.name, this._savedRefValue);
             }
-            delete this._savedRefValue;
-            return;
+            return this.skipRestore();
         }
 
         if (this.toggleOnPressed ^ isPressed) return;
@@ -94,7 +111,7 @@ lep.KnockoutSyncedValue = lep.util.extendClass(lep.BaseValue, {
         if (this.restoreRefAfterLongClick) {
             lep.util.startTimer(this.id);
             if (isAlreadySelected) {
-                delete this._savedRefValue;
+                this.skipRestore();
             } else {
                 this._savedRefValue = this.refObservable();
             }
