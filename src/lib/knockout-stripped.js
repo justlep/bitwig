@@ -6,6 +6,20 @@
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  */
 
+/**
+ * Global setTimeout(..) is not available in the Bitwig context,
+ * but it's needed for Knockout's rateLimit extender.
+ */
+if (typeof setTimeout !== 'function' && typeof host === 'object') {
+    setTimeout = function(fn, delay) {
+        // println('set timeout ' + delay);
+        host.scheduleTask(fn, null, delay);
+    };
+    clearTimeout = function(){
+        throw new Error('clearTimeout is unavailable');
+    };
+}
+
 (function() {(function(l){var u=this||(0,eval)("this"),q=u.JSON;(function(l){"function"===typeof define&&define.amd?define(["exports","require"],l):"object"===typeof exports&&"object"===typeof module?l(module.exports||exports):l(u.ko={})})(function(t){function v(a,b){return null===a||typeof a in x?a===b:!1}function u(a,c){var d;return function(){d||(d=b.a.setTimeout(function(){d=l;a()},c))}}function y(a,c){var d;return function(){clearTimeout(d);d=b.a.setTimeout(a,c)}}function z(a,b){b&&"change"!==b?"beforeChange"===
 b?this.qa(a):this.T(a,b):this.ra(a)}function A(a,b){null!==b&&b.c&&b.c()}function B(a,b){var d=this.Xa,e=d[g];e.w||(this.ja&&this.W[b]?(d.ua(b,a,this.W[b]),this.W[b]=null,--this.ja):e.f[b]||d.ua(b,a,e.g?{J:a}:d.Ja(a)))}var b="undefined"!==typeof t?t:{};b.b=function(a,c){for(var d=a.split("."),e=b,f=0;f<d.length-1;f++)e=e[d[f]];e[d[d.length-1]]=c};b.i=function(a,b,d){a[b]=d};b.version="3.3.0";b.b("version",b.version);b.options={deferUpdates:!1,useOnlyNativeEvents:!1};b.a=function(){function a(b,a){if(a)for(var c in a)a.hasOwnProperty(c)&&
 (b[c]=a[c]);return b}function c(a,b){a.__proto__=b;return a}var d={__proto__:[]}instanceof Array,e="function"===typeof Symbol;return{V:function(a,b){for(var c=0,e=a.length;c<e;c++)b(a[c],c)},v:function(a,b){if("function"==typeof Array.prototype.indexOf)return Array.prototype.indexOf.call(a,b);for(var c=0,e=a.length;c<e;c++)if(a[c]===b)return c;return-1},Ra:function(a,b,c){for(var e=0,d=a.length;e<d;e++)if(b.call(c,a[e],e))return a[e];return null},va:function(a,c){var e=b.a.v(a,c);0<e?a.splice(e,1):
