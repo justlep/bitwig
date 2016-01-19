@@ -92,7 +92,7 @@ lep.DC1 = function() {
 
         currentSnapshotValue = ko.computed(function() {
             return (currentBank() << 8) + currentPreset();
-        }),
+        }).extend({rateLimit: 0}),
         displayedSnapshotPage = ko.observable(0),
 
         CONTROL_SET = {
@@ -334,16 +334,13 @@ lep.DC1 = function() {
     }
 
     function initMidiProgramChangeSender() {
-        var isFirstEvaluation = false;
-
-        setTimeout = function(fn, delay) {
-            host.scheduleTask(fn, null, delay);
-        };
+        var isFirstEvaluation = true;
 
         // Send MIDI ProgramChange (and bank change) messages when bank or preset changes
         ko.computed(function() {
-            var bankToSend = currentBank() || 0,
-                presetToSend = currentPreset() || 0;
+            var snapshot = currentSnapshotValue(),
+                bankToSend = (snapshot >> 8),
+                presetToSend = (snapshot & 0xFF);
 
             if (isFirstEvaluation) {
                 // prevent the script from sending program change on start
@@ -358,8 +355,7 @@ lep.DC1 = function() {
             }
             noteInput.sendRawMidiEvent(0xB0 + MIDI_CHANNEL_FOR_PROGRAM_CHANGE, 32, bankToSend);  // Bank LSB
             noteInput.sendRawMidiEvent(0xC0 + MIDI_CHANNEL_FOR_PROGRAM_CHANGE, presetToSend, 0); // ProgramChange
-
-        }).extend({rateLimit: 50});
+        });
     }
 
     initPreferences();
