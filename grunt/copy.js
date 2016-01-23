@@ -6,7 +6,7 @@ module.exports = function (grunt, opts) {
             files: [
                 {
                     cwd: './src',
-                    src: ['**/*.js', '!Test.control.js', '!CMD*.js'],
+                    src: ['**/*.js', '!Test.control.js', '!CMD-LC*.js'],
                     dest: './tmp/target/<%= package.lep.releaseDirectoryName %>',
                     expand: true
                 },
