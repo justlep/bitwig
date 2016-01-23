@@ -309,7 +309,7 @@ lep.DC1 = function() {
             snapIndex = (i % TOTAL_SNAPSHOTS);
             snap = _savedSnapshots[snapIndex];
             if ((typeof snap === 'number') && snap !== _currentSnapshot) {
-                // lep.logDebug('Found for snapshot {} at index {}', snap, snapIndex);
+                // lep.logDebug('Found next/prev snapshot {} at index {}', snap, snapIndex);
                 lastClickedSnapshotIndex = snapIndex;
                 currentSnapshot(snap);
                 displayedSnapshotPage(Math.floor(snapIndex / 16));
@@ -321,7 +321,8 @@ lep.DC1 = function() {
 
     function initPushEncoder() {
         // 'clicking' the push encoder resets the bank and/or preset..
-        eventDispatcher.onNote(NOTE.PUSH_ENCODER_CLICK, function(note, value, channel) {
+        eventDispatcher.onNotePressed(NOTE.PUSH_ENCODER_CLICK, function(note, value, channel) {
+            lep.logDev('clicked push-encoder, value: {}', value);
             if (isBankMode()) {
                 currentBank(0);
             } else if (isPresetMode()) {
