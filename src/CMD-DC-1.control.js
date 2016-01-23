@@ -322,7 +322,6 @@ lep.DC1 = function() {
     function initPushEncoder() {
         // 'clicking' the push encoder resets the bank and/or preset..
         eventDispatcher.onNotePressed(NOTE.PUSH_ENCODER_CLICK, function(note, value, channel) {
-            lep.logDev('clicked push-encoder, value: {}', value);
             if (isBankMode()) {
                 currentBank(0);
             } else if (isPresetMode()) {
