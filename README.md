@@ -4,6 +4,7 @@
 * [Arturia Beatstep Pro](./doc/ArturiaBeatstepPro/)
 * Roland A-49
 * [Alesis PerformancePad](./doc/Alesis%20PerformancePad/)
+* [Behringer CMD DC-1](./doc/Behringer%20CMD%20DC-1)
 
 ### Installation 
 Go to the [stable-version-for-download](./stable-version-for-download/)-directory and get the latest release there.  
