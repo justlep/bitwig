@@ -1,7 +1,7 @@
 # Behringer CMD DC-1 controller script for Bitwig
 
 Written for generating Program Change (and Bank change) messages, enabling you to quickly 
-browse Banks and Presets of Softsynths like Reaktor, Z3TA, Harmor, Morphine, Microtonic etc.
+browse Banks and Presets of Softsynths like Reaktor, Microtonic, Z3TA, Morphine, Toxic Biohazard etc.
 
 * Three modes: Bank Mode, Preset Mode, Snapshot Mode ("snapshot" meaning a saved combination of bank+preset). 
 * In each mode, you have 8 pages (numeric buttons) à 16 pads, hence 128 banks, 128 programs, 128 snapshots in total. 
@@ -12,6 +12,12 @@ browse Banks and Presets of Softsynths like Reaktor, Z3TA, Harmor, Morphine, Mic
 * If you hold a mode buttons pressed, the mode will switch back automatically after button release.
 
 ![](https://raw.githubusercontent.com/justlep/bitwig/master/doc/Behringer%20CMD%20DC-1/img/DC-1-ProgramChange.png)
+
+### Routing
+
+The best routing in Bitwig for me was to create a seperate MIDI channel for the DC-1, switching its "track monitoring" on and routing its MIDI output to the channel containing the Synth I want to send ProgramChanges to. That way, the target channel doesn't need to be armed to receive the messages.
+
+![](https://raw.githubusercontent.com/justlep/bitwig/master/doc/Behringer%20CMD%20DC-1/img/routing.png)
 
 ### Download & Installation
 
