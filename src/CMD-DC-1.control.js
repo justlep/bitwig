@@ -51,24 +51,33 @@ lep.DC1 = function() {
             BLUE_BLINK: 2
         },
         prefs = {
-            sendBankMSB: false
+            sendBankMSB: false,
+            resetPresetOnBankChange: true
         },
         isShiftButtonPressed = false,
         eventDispatcher = lep.MidiEventDispatcher.getInstance(),
         noteInput = eventDispatcher.createNoteInput('DC-1', MIDI_CHANNEL_FOR_PROGRAM_CHANGE, true),
         pushEncoderTarget = ko.observable(),
-        snapshots = ko.observableArray(),
-        currentPreset = ko.observable(0).extend({notify: 'always'}),
-        currentBank = (function() {
-            var _bank = ko.observable(0).extend({notify: 'always'});
-            return ko.computed({
-                read: _bank,
-                write: function(newBank) {
-                    _bank(newBank);
-                    currentPreset(0); // changing the bank ALWAYS resets the preset
-                }
-            });
-        })(),
+        savedSnapshots = ko.observableArray(),
+        currentSnapshot = ko.observable(0).extend({notify: 'always'}),
+        currentBank = ko.computed({
+            read: ko.computed(function() {
+                return currentSnapshot() >> 8;
+            }),
+            write: function(newBank) {
+                var newSnapshot = (newBank << 8) + (prefs.resetPresetOnBankChange ? 0 : currentPreset());
+                currentSnapshot(newSnapshot);
+            }
+        }),
+        currentPreset = ko.computed({
+            read: ko.computed(function() {
+                return currentSnapshot() & 0xff;
+            }),
+            write: function(newPreset) {
+                var newSnapshot = (currentSnapshot() & 0xff00) + newPreset;
+                currentSnapshot(newSnapshot);
+            }
+        }),
 
         displayedBankPage = ko.observable(0),
         computedBankPage = ko.computed(function() {
@@ -90,9 +99,6 @@ lep.DC1 = function() {
             return currentPreset() % 16;
         }),
 
-        currentSnapshotValue = ko.computed(function() {
-            return (currentBank() << 8) + currentPreset();
-        }).extend({rateLimit: 0}),
         displayedSnapshotPage = ko.observable(0),
 
         CONTROL_SET = {
@@ -188,29 +194,28 @@ lep.DC1 = function() {
                     refObservable: computedPresetPad,
                     computedVelocity: function() {
                         var snapshotIndex = (displayedSnapshotPage() * 16) + index,
-                            snapshot = snapshots()[snapshotIndex],
+                            snapshot = savedSnapshots()[snapshotIndex],
                             isSnapshot = (typeof  snapshot === 'number'),
-                            isActive = isSnapshot && (currentSnapshotValue() === snapshot);
+                            isActive = isSnapshot && (currentSnapshot() === snapshot);
 
                         return isActive ? COLOR.BLUE_BLINK : isSnapshot ? COLOR.BLUE : COLOR.ORANGE;
                     },
                     onClick: function(padIndex) {
-                        var snapshotIndex = (displayedSnapshotPage() * 16) + index,
-                            snapshot;
+                        var snapshotIndex = (displayedSnapshotPage() * 16) + padIndex,
+                            snapshotToSaveOrLoad;
 
                         if (isShiftButtonPressed) {
                             // save snapshot..
-                            snapshot = (currentBank() << 8) + currentPreset();
-                            snapshots()[snapshotIndex] = snapshot;
-                            snapshots.valueHasMutated();
-                            lep.logDebug('Saved snapshot {} in slot {}', snapshot.toString(16), snapshotIndex);
+                            snapshotToSaveOrLoad = currentSnapshot();
+                            savedSnapshots()[snapshotIndex] = snapshotToSaveOrLoad;
+                            savedSnapshots.valueHasMutated();
+                            lep.logDebug('Saved snapshot {} in slot {}', snapshotToSaveOrLoad.toString(16), snapshotIndex);
                         } else {
                             // load snapshot..
-                            snapshot = snapshots()[snapshotIndex];
-                            if (typeof snapshot === 'number') {
-                                currentBank(snapshot >> 8);
-                                currentPreset(snapshot & 0xFF);
-                                lep.logDebug('Loaded snapshot {} from slot {}', snapshot.toString(16), snapshotIndex);
+                            snapshotToSaveOrLoad = savedSnapshots()[snapshotIndex];
+                            if (typeof snapshotToSaveOrLoad === 'number') {
+                                currentSnapshot(snapshotToSaveOrLoad);
+                                lep.logDebug('Loaded snapshot {} from slot {}', snapshotToSaveOrLoad.toString(16), snapshotIndex);
                             } else {
                                 lep.logDebug('No snapshot in slot {}', snapshotIndex);
                             }
@@ -258,7 +263,7 @@ lep.DC1 = function() {
             midiChannel: MIDI_CHANNEL,
             valueToAttach: new lep.KnockoutSyncedValue({
                 name: 'SnapshotModeValue',
-                ownValue: snapshots,
+                ownValue: savedSnapshots,
                 refObservable: pushEncoderTarget,
                 restoreRefAfterLongClick: true,
                 velocityValueOn: COLOR.BLUE,
@@ -314,7 +319,7 @@ lep.DC1 = function() {
                     CONTROL_SET.NUM_BUTTONS.setValueSet(VALUE_SET.PRESET_PAGES);
                     CONTROL_SET.PADS.setValueSet(VALUE_SET.PRESETS);
                     break;
-                case snapshots:
+                case savedSnapshots:
                     CONTROL_SET.NUM_BUTTONS.setValueSet(VALUE_SET.SNAPSHOT_PAGES);
                     CONTROL_SET.PADS.setValueSet(VALUE_SET.SNAPSHOTS);
             }
@@ -325,11 +330,16 @@ lep.DC1 = function() {
 
     function initPreferences() {
         var preferences = host.getPreferences(),
-            bankMsbSetting = preferences.getEnumSetting('Send MSB with ProgramChange', 'Preferences', ['YES','NO'], 'NO');
+            bankMsbSetting = preferences.getEnumSetting('Send MSB with ProgramChange', 'Preferences', ['YES','NO'], 'NO'),
+            resetPresetSetting = preferences.getEnumSetting('Reset to Preset 0 on BankChange', 'Preferences', ['YES','NO'], 'YES');
 
         bankMsbSetting.addValueObserver(function(useMSB) {
             prefs.sendBankMSB = (useMSB === 'YES');
             lep.logDebug('Send MSB with ProgramChange: {}', prefs.sendBankMSB);
+        });
+        resetPresetSetting.addValueObserver(function(resetPreset) {
+            prefs.resetPresetOnBankChange = (resetPreset === 'YES');
+            lep.logDebug('Reset Preset on Bank change: {}', prefs.resetPresetOnBankChange);
         });
     }
 
@@ -338,7 +348,7 @@ lep.DC1 = function() {
 
         // Send MIDI ProgramChange (and bank change) messages when bank or preset changes
         ko.computed(function() {
-            var snapshot = currentSnapshotValue(),
+            var snapshot = currentSnapshot(),
                 bankToSend = (snapshot >> 8),
                 presetToSend = (snapshot & 0xFF);
 
