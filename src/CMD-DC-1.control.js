@@ -60,6 +60,7 @@ lep.DC1 = function() {
         pushEncoderTarget = ko.observable(),
         savedSnapshots = ko.observableArray(),
         currentSnapshot = ko.observable(0).extend({notify: 'always'}),
+        lastClickedSnapshotIndex = 0,
         currentBank = ko.computed({
             read: ko.computed(function() {
                 return currentSnapshot() >> 8;
@@ -77,6 +78,15 @@ lep.DC1 = function() {
                 var newSnapshot = (currentSnapshot() & 0xff00) + newPreset;
                 currentSnapshot(newSnapshot);
             }
+        }),
+        isBankMode = ko.computed(function() {
+            return (pushEncoderTarget() === currentBank);
+        }),
+        isPresetMode = ko.computed(function() {
+            return (pushEncoderTarget() ===  currentPreset);
+        }),
+        isSnapshotMode = ko.computed(function() {
+            return (pushEncoderTarget() === savedSnapshots);
         }),
 
         displayedBankPage = ko.observable(0),
@@ -204,6 +214,8 @@ lep.DC1 = function() {
                         var snapshotIndex = (displayedSnapshotPage() * 16) + padIndex,
                             snapshotToSaveOrLoad;
 
+                        lastClickedSnapshotIndex = snapshotIndex;
+
                         if (isShiftButtonPressed) {
                             // save snapshot..
                             snapshotToSaveOrLoad = currentSnapshot();
@@ -282,17 +294,37 @@ lep.DC1 = function() {
         }, null, MIDI_CHANNEL);
     }
 
+    /**
+     * @param nextOrPrev (number) positive or negative
+     */
+    function loadNextOrPrevSnapshot(nextOrPrev) {
+        const TOTAL_SNAPSHOTS = 8 * 16;
+        var direction = (nextOrPrev < 0) ? -1 : 1,
+            _currentSnapshot = currentSnapshot(),
+            _savedSnapshots = savedSnapshots(),
+            startIndex = lastClickedSnapshotIndex + TOTAL_SNAPSHOTS,
+            endIndex = startIndex + (TOTAL_SNAPSHOTS * direction);
+        // lep.logDebug('Searching for snapshot, direction: {}, start: {}, end: {}', direction, startIndex, endIndex);
+        for (var i = startIndex + direction, snapIndex, snap; i !== endIndex; i += direction) {
+            snapIndex = (i % TOTAL_SNAPSHOTS);
+            snap = _savedSnapshots[snapIndex];
+            if ((typeof snap === 'number') && snap !== _currentSnapshot) {
+                // lep.logDebug('Found for snapshot {} at index {}', snap, snapIndex);
+                lastClickedSnapshotIndex = snapIndex;
+                currentSnapshot(snap);
+                displayedSnapshotPage(Math.floor(snapIndex / 16));
+                return;
+            }
+        }
+        // lep.logDebug('No snap found');
+    }
+
     function initPushEncoder() {
         // 'clicking' the push encoder resets the bank and/or preset..
         eventDispatcher.onNote(NOTE.PUSH_ENCODER_CLICK, function(note, value, channel) {
-            var targetObservable = pushEncoderTarget(),
-                isBankMode = (targetObservable === currentBank),
-                isPresetMode = (targetObservable === currentPreset);
-
-            if (isBankMode) {
+            if (isBankMode()) {
                 currentBank(0);
-            }
-            if (isPresetMode || isBankMode) {
+            } else if (isPresetMode()) {
                 currentPreset(0);
             }
         });
@@ -300,15 +332,17 @@ lep.DC1 = function() {
         // 'twisting' the push encoder..
         eventDispatcher.onCC(CC.PUSH_ENCODER, function(cc, value, channel){
             var targetObservable = pushEncoderTarget(),
-                isBankOrPresetMode = (targetObservable === currentBank || targetObservable === currentPreset),
                 diff = (value - 64);
 
-            if (isBankOrPresetMode) {
+            if (isBankMode() || isPresetMode()) {
                 var newBankOrPreset = lep.util.limitToRange(targetObservable() + diff, 0, 127);
                 targetObservable(newBankOrPreset);
+            } else if (isSnapshotMode() && diff) {
+                loadNextOrPrevSnapshot(diff);
             }
         });
 
+        // On mode change...
         pushEncoderTarget.subscribe(function(newTarget) {
             switch(newTarget) {
                 case currentBank:
