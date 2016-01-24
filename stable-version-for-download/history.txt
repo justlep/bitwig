@@ -1,4 +1,7 @@
 
+v1.0.10 (24-01-2016)
+ - DC-1 script: made MIDI channel for program/bank change messages configurable
+
 v1.0.9 (23-01-2016)
  - added Behringer CMD DC-1 script for generating ProgramChange messages
 

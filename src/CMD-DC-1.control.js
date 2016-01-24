@@ -9,7 +9,7 @@ loadAPI(1);
 load('lep/api.js');
 
 // @deprecationChecked:1.3.5
-host.defineController('Behringer', 'CMD DC-1 (LeP)', '1.1', '047f0d84-8ace-11e5-af63-feff819cdc9f', 'Lennart Pegel <github@justlep.net>');
+host.defineController('Behringer', 'CMD DC-1 (LeP)', '1.2', '047f0d84-8ace-11e5-af63-feff819cdc9f', 'Lennart Pegel <github@justlep.net>');
 host.defineMidiPorts(1, 1);
 host.addDeviceNameBasedDiscoveryPair(['CMD DC-1'], ['CMD DC-1']);
 
@@ -24,7 +24,6 @@ function init() {
 lep.DC1 = function() {
 
     var MIDI_CHANNEL = 5,
-        MIDI_CHANNEL_FOR_PROGRAM_CHANGE = 0,
         NOTE = {
             PUSH_ENCODER_CLICK: 32,
             FIRST_TOP_BUTTON: 0, // ascending left-to-right, top-to-bottom; i.e. second row starting with 4
@@ -52,11 +51,12 @@ lep.DC1 = function() {
         },
         prefs = {
             sendBankMSB: false,
-            resetPresetOnBankChange: true
+            resetPresetOnBankChange: true,
+            midiChannelForProgramChange: 0
         },
         isShiftButtonPressed = false,
         eventDispatcher = lep.MidiEventDispatcher.getInstance(),
-        noteInput = eventDispatcher.createNoteInput('DC-1', MIDI_CHANNEL_FOR_PROGRAM_CHANGE, true),
+        noteInput = eventDispatcher.createNoteInput('DC-1', 0, true),
         pushEncoderTarget = ko.observable(),
         savedSnapshots = ko.observableArray(),
         currentSnapshot = ko.observable(0).extend({notify: 'always'}),
@@ -364,8 +364,10 @@ lep.DC1 = function() {
 
     function initPreferences() {
         var preferences = host.getPreferences(),
-            bankMsbSetting = preferences.getEnumSetting('Send MSB with ProgramChange', 'Preferences', ['YES','NO'], 'NO'),
-            resetPresetSetting = preferences.getEnumSetting('Reset to Preset 0 on BankChange', 'Preferences', ['YES','NO'], 'YES');
+            bankMsbSetting = preferences.getEnumSetting('Send Bank MSB with ProgramChange', 'Preferences', ['YES','NO'], 'NO'),
+            resetPresetSetting = preferences.getEnumSetting('Set Preset 0 on Bank changes', 'Preferences', ['YES','NO'], 'YES'),
+            midiChannelSetting = preferences.getNumberSetting('MIDI channel for bank/program change messages', 'Preferences',
+                0.0, 15.0, 1, '', 0);
 
         bankMsbSetting.addValueObserver(function(useMSB) {
             prefs.sendBankMSB = (useMSB === 'YES');
@@ -374,6 +376,10 @@ lep.DC1 = function() {
         resetPresetSetting.addValueObserver(function(resetPreset) {
             prefs.resetPresetOnBankChange = (resetPreset === 'YES');
             lep.logDebug('Reset Preset on Bank change: {}', prefs.resetPresetOnBankChange);
+        });
+        midiChannelSetting.addValueObserver(16, function(newChannel) {
+            prefs.midiChannelForProgramChange = (newChannel >> 0);
+            lep.logDebug('New MIDI channel for bank/program change messages: {}', prefs.midiChannelForProgramChange);
         });
     }
 
@@ -384,7 +390,8 @@ lep.DC1 = function() {
         ko.computed(function() {
             var snapshot = currentSnapshot(),
                 bankToSend = (snapshot >> 8),
-                presetToSend = (snapshot & 0xFF);
+                presetToSend = (snapshot & 0xFF),
+                channel = prefs.midiChannelForProgramChange;
 
             if (isFirstEvaluation) {
                 // prevent the script from sending program change on start
@@ -392,13 +399,13 @@ lep.DC1 = function() {
                 return;
             }
 
-            lep.logDebug('Changed bank {} preset {}', bankToSend, presetToSend);
+            lep.logDebug('Sending bank {} preset {} to MIDI channel {}', bankToSend, presetToSend, channel);
 
             if (prefs.sendBankMSB) {
-                noteInput.sendRawMidiEvent(0xB0 + MIDI_CHANNEL_FOR_PROGRAM_CHANGE, 0, 0);        // Bank MSB
+                noteInput.sendRawMidiEvent(0xB0 + channel, 0, 0);        // Bank MSB
             }
-            noteInput.sendRawMidiEvent(0xB0 + MIDI_CHANNEL_FOR_PROGRAM_CHANGE, 32, bankToSend);  // Bank LSB
-            noteInput.sendRawMidiEvent(0xC0 + MIDI_CHANNEL_FOR_PROGRAM_CHANGE, presetToSend, 0); // ProgramChange
+            noteInput.sendRawMidiEvent(0xB0 + channel, 32, bankToSend);  // Bank LSB
+            noteInput.sendRawMidiEvent(0xC0 + channel, presetToSend, 0); // ProgramChange
         });
     }
 

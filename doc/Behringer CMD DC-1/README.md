@@ -9,7 +9,7 @@ browse Banks and Presets of Softsynths like Reaktor, Microtonic, Z3TA, Morphine,
   will reset the bank or preset to 0 (depending on the mode).
 * In Snapshot Mode, hold the Shift-Button and one of the 16 pads to save the current bank+program  as a snapshot. 
   (Snapshots are lost when Bitwig is closed).
-* If you hold a mode buttons pressed, the mode will switch back automatically after button release.
+* If you hold a mode button pressed, the mode will switch back automatically when the button is released.
 
 ![](https://raw.githubusercontent.com/justlep/bitwig/master/doc/Behringer%20CMD%20DC-1/img/DC-1-ProgramChange.png)
 
