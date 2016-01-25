@@ -1,4 +1,4 @@
-# LeP's controller scripts for Bitwig
+# LeP's controller scripts for Bitwig [![Build Status](https://travis-ci.org/justlep/bitwig.svg?branch=master)](https://travis-ci.org/justlep/bitwig)
 ##### Available scripts:
 * [LeP's Behringer BCF2000](./doc/Behringer%20BCF2000/)
 * [Arturia Beatstep Pro](./doc/ArturiaBeatstepPro/)
