@@ -26,7 +26,7 @@ module.exports = function (grunt, opts) {
 
     grunt.registerTask('validate', [
         'jshint',
-        'findDeprecatedApiCalls'
+        'findDeprecatedApiCalls:latest'
     ]);
 
     grunt.registerTask('test', [

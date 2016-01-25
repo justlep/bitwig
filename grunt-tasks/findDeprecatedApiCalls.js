@@ -60,7 +60,7 @@ module.exports = function (grunt) {
             grunt.fail.warn('Could not find deprecations list in depreations HTML');
         }
 
-        grunt.log.writeln('Scraping Bitwig HTML documentation...');
+        grunt.log.writeln('Scraping installed Bitwig HTML documentation...');
         html.substr(firstIndex, length).replace(REGEX, function(found, fullNameWithoutSig, sig, idx, foo) {
             var shortName = fullNameWithoutSig.replace(/^[^\.]*\./, ''),
                 fullName = fullNameWithoutSig + sig.replace(/^\s*/,'');
@@ -73,16 +73,84 @@ module.exports = function (grunt) {
             grunt.fail.warn('Found no methods in the HTML documentation. Please check findDeprecatedApiCalls.js.');
         }
 
-        grunt.log.writeln('Bitwig ' + deprecations.bitwigVersion + ' is documenting ' + deprecations.fullNames.length + ' deprecated methods');
+        grunt.log.writeln('Found Bitwig ' + deprecations.bitwigVersion +
+                          ', documenting ' + deprecations.fullNames.length + ' deprecated methods');
 
         return deprecations;
     }
 
+    function getJsonFilename(bitwigVersion) {
+        return './grunt-tasks/.deprecations-'+ bitwigVersion +'.json';
+    }
 
-    grunt.registerTask('findDeprecatedApiCalls', 'Finds usages of deprecated methods in the controller scripts.', function() {
-        var fs = require('fs'),
-            jsSources = grunt.file.expand(['src/**/*.js', '!src/lib/**']),
-            deprecations = parseDeprecationHtml(),
+    function laxVersion(version) {
+        const RE = /^(\d+)\.(\d+)(?:\.(\d+))?/;
+        return {
+            split: RE.test(version||'') ? [parseInt(RegExp.$1,10), parseInt(RegExp.$2,10), parseInt(RegExp.$3||'0',10)] : [0,0,0],
+            spread: function() {
+                return (this.split[0] << 32) + (this.split[1] << 16) + this.split[2];
+            },
+            isBiggerThan: function(v2) {
+                return this.spread() > laxVersion(v2).spread();
+            },
+            isSmallerThan: function(v2) {
+                return this.spread() < laxVersion(v2).spread();
+            }
+        };
+    }
+
+    function getLatestSavedDeprecationsFileVersion() {
+        var highestVersion = null;
+        grunt.file.expand([getJsonFilename('*')]).forEach(function(filename) {
+            var version = filename.match(/\d+\.\d+(?:\.\d+)?/)[0];
+            if (laxVersion(version).isBiggerThan(laxVersion(highestVersion))) {
+                highestVersion = version;
+            }
+        });
+        if (!highestVersion) {
+            grunt.fail.warn('No saved deprecation files found. Try running `grunt findDeprecatedApiCalls:installed` instead.');
+        }
+        return highestVersion;
+    }
+
+    /**
+     * Loads json with API deprecation info either from a local json already generated OR
+     * from the Bitwig version installed on the machine.
+     * @param bitwigVersion (String) version|"latest"|"installed"
+     * @returns (Object)
+     */
+    function getDeprecationJson(bitwigVersion) {
+        var deprecationJson, filename;
+        if (bitwigVersion === 'installed') {
+            // load deprecations of installed Bitwig version and write json file with deprecation info afterwards
+            deprecationJson = parseDeprecationHtml();
+            filename = getJsonFilename(deprecationJson.bitwigVersion);
+            try {
+                grunt.file.write(filename, JSON.stringify(deprecationJson, null, 2));
+                grunt.log.ok('Generated ' + filename + ' --> !!! Remember to git-commit it !!!');
+                bitwigVersion = deprecationJson.bitwigVersion;
+            } catch (e) {
+                grunt.fail.warn('Could not write ' + filename, e);
+            }
+        }
+
+        // load deprecations from existing file
+        bitwigVersion = (bitwigVersion === 'latest') ? getLatestSavedDeprecationsFileVersion() : bitwigVersion;
+        filename = getJsonFilename(bitwigVersion);
+        try {
+            deprecationJson = grunt.file.readJSON(filename);
+        } catch (e) {
+            grunt.fail.warn('No deprecation file found for Bitwig v' + bitwigVersion + '.\n' +
+                            'Try running `grunt findDeprecatedApiCalls:installed` to generate one.');
+        }
+        grunt.log.writeln('Using deprecation info from Bitwig v' + bitwigVersion);
+        return deprecationJson;
+    }
+
+
+    grunt.registerMultiTask('findDeprecatedApiCalls', 'Finds usages of deprecated methods in the controller scripts.', function() {
+        var jsSources = grunt.file.expand(this.options().files),
+            deprecations = getDeprecationJson(this.data.bitwigVersion),
             /**
              * @type (String) If this marker is found in a suspect line or in the line above it,
              *                no deprecation warning will be output
@@ -91,7 +159,6 @@ module.exports = function (grunt) {
             MARKED_BLANK_LINE_REGEX = new RegExp('^[\\t\\s]*\/[*\/][\\s\\t]*' + IGNORE_MARKER + '([^\\d]|$)'),
             MARKED_CODE_LINE_REGEX = new RegExp('\/[*\/][\\s\\t]*' + IGNORE_MARKER + '([^\\d]|$)'),
             suspectLinesCount = 0;
-
 
         grunt.log.writeln('Scanning for usages...');
 

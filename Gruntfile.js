@@ -12,18 +12,19 @@ module.exports = function (grunt) {
         // the Bitwig installation's dir (Windows)
         data.BITWIG_INSTALL_DIR = fs.realpathSync(process.env['ProgramFiles(x86)'] + '/Bitwig Studio');
     } catch (e) {
-        throw 'Unable to determine Bitwig\'s installation directory. Please fix Gruntfile.js.';
+        grunt.log.warn('Unable to determine Bitwig\'s installation directory. Please fix Gruntfile.js.');
     }
     try {
         // The directory where Bitwig stores Controller scripts (in the user's home directory) (Windows)
         data.BITWIG_CS_BASE_PATH = fs.realpathSync(process.env.USERPROFILE + '/Documents/Bitwig Studio/Controller Scripts');
     } catch (e) {
-        throw 'Unable to determine Bitwig\'s controller script directory. Please fix Gruntfile.js.';
+        data.BITWIG_CS_BASE_PATH = '__NOT_FOUND_BITWIG_INSTALL_DIR__';
+        grunt.log.warn('Unable to determine Bitwig\'s controller script directory. Please fix Gruntfile.js.');
     }
 
     data.BITWIG_API_SOURCE_PATHS = [
-        data.BITWIG_INSTALL_DIR + '/resources/doc/control-surface/js-stubs/**/*.js',
-        data.BITWIG_INSTALL_DIR + '/resources/controllers/api/**/*.js'
+        (data.BITWIG_INSTALL_DIR||'__NOT_FOUND_BITWIG_INSTALL_DIR__') + '/resources/doc/control-surface/js-stubs/**/*.js',
+        (data.BITWIG_INSTALL_DIR||'__NOT_FOUND_BITWIG_INSTALL_DIR__') + '/resources/controllers/api/**/*.js'
     ];
 
     data.RELEASE_PATH_IN_BITWIG = data.BITWIG_CS_BASE_PATH + '/' + packageJson.lep.releaseDirectoryName;
