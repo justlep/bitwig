@@ -11,7 +11,8 @@ module.exports = function (grunt) {
      */
     function getDeprecationsHtmlFileLocation() {
         var path = require('path'),
-            bitwigInstallDir = process.env['ProgramFiles(x86)'] + '/Bitwig Studio',
+            programFilesDir = process.env['ProgramFiles(x86)'],
+            bitwigInstallDir = (programFilesDir) ? (programFilesDir + '/Bitwig Studio') : '{Bitwig installation dir}',
             fileLocation = bitwigInstallDir + '/resources/doc/control-surface/api/deprecated.html';
 
         return path.normalize(fileLocation);
@@ -140,10 +141,10 @@ module.exports = function (grunt) {
         try {
             deprecationJson = grunt.file.readJSON(filename);
         } catch (e) {
-            grunt.fail.warn('No deprecation file found for Bitwig v' + bitwigVersion + '.\n' +
+            grunt.fail.warn('No deprecation file found for Bitwig ' + bitwigVersion + '.\n' +
                             'Try running `grunt findDeprecatedApiCalls:installed` to generate one.');
         }
-        grunt.log.writeln('Using deprecation info from Bitwig v' + bitwigVersion);
+        grunt.log.writeln('Using deprecation info file ' + filename + ' --> Bitwig ' + bitwigVersion);
         return deprecationJson;
     }
 
@@ -152,7 +153,7 @@ module.exports = function (grunt) {
         var jsSources = grunt.file.expand(this.options().files),
             deprecations = getDeprecationJson(this.data.bitwigVersion),
             /**
-             * @type (String) If this marker is found in a suspect line or in the line above it,
+             * @type (String) If this marker is found in a suspicious line or in the line above it,
              *                no deprecation warning will be output
              */
             IGNORE_MARKER = '@deprecationChecked:' + deprecations.bitwigVersion,
@@ -160,7 +161,7 @@ module.exports = function (grunt) {
             MARKED_CODE_LINE_REGEX = new RegExp('\/[*\/][\\s\\t]*' + IGNORE_MARKER + '([^\\d]|$)'),
             suspectLinesCount = 0;
 
-        grunt.log.writeln('Scanning for usages...');
+        grunt.log.writeln('Scanning '+ jsSources.length +' files for deprecated API calls...');
 
         jsSources.forEach(function(filename) {
             var jsLines = grunt.file.read(filename).split('\n'),
@@ -181,7 +182,8 @@ module.exports = function (grunt) {
                         return;
                     }
                     if (!matchFound) {
-                        grunt.log.writeln('\n------\n**** ' + filename + ' ****');
+                        grunt.log.writeln('\n------');
+                        grunt.log.writeln( ('Possible deprecation | ' + filename).yellow );
                         matchFound = true;
                         suspectLinesCount++;
                     }
@@ -193,7 +195,7 @@ module.exports = function (grunt) {
         if (suspectLinesCount) {
             grunt.fail.warn(['\n',
                 '***********************************************************************************',
-                'Found suspect lines of code in ' + suspectLinesCount + ' file(s).',
+                'Suspicious code in ' + suspectLinesCount + ' file(s).',
                 'Replace deprecated code or mark it non-deprecated by adding following JS comment:',
                 '   /* '+ IGNORE_MARKER + '*/    or',
                 '   // ' + IGNORE_MARKER,
@@ -205,7 +207,7 @@ module.exports = function (grunt) {
             ].join('\n'));
 
         } else {
-            grunt.log.ok('\nNo usages found.');
+            grunt.log.ok('All looking good.');
         }
     });
 
