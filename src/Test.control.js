@@ -1,7 +1,7 @@
 loadAPI(1);
 load('lep/api.js');
 
-// @deprecationChecked:1.3.5
+// @deprecationChecked:1.3.9
 host.defineController('LeP', 'Test-Script', '1.0', '98eac9c6-68fb-11e5-9d70-feff819cdc9f', 'github@justlep.net');
 host.defineMidiPorts(0, 0);
 
@@ -61,6 +61,17 @@ function init() {
     trackBank.addSendCountObserver(function(sends) {
        lep.logDebug('###### Sends: {}', sends);
     });
+
+
+    cursorDevice.addDirectParameterIdObserver(function(ids) {
+        println('directparametervalues: ' + ids.length);
+        println(ids);
+    });
+
+    cursorDevice.addDirectParameterNameObserver(40, function(id, name) {
+        lep.logDev('Param {} --> {}', id, name);
+    });
+
     println('Init done.');
 }
 

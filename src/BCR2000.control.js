@@ -1,5 +1,5 @@
 /**
- * Bitwig Controller Script for the Behringer BCF2000.
+ * Bitwig Controller Script for the Behringer BCR2000.
  *
  * Author: Lennart Pegel - https://github.com/justlep/bitwig
  * License: LGPLv3 (http://www.gnu.org/licenses/lgpl-3.0.txt)
@@ -9,21 +9,21 @@ loadAPI(1);
 load('lep/api.js');
 
 // @deprecationChecked:1.3.9
-host.defineController('Behringer', 'BCF2000 (LeP)', '1.1', 'd26515a4-571b-11e5-885d-feff819cdc9f', 'Lennart Pegel <github@justlep.net>');
+host.defineController('Behringer', 'BCR2000 (LeP)', '1.1', 'fe5a1578-0fbd-11e6-a148-3e1d05defe78', 'Lennart Pegel <github@justlep.net>');
 host.defineMidiPorts(1, 1);
-host.addDeviceNameBasedDiscoveryPair(['BCF2000'], ['BCF2000']);
-host.addDeviceNameBasedDiscoveryPair(['BCF2000 port 1'], ['BCF2000 port 1']);
-host.addDeviceNameBasedDiscoveryPair(['BCF2000 Port 1'], ['BCF2000 Port 1']);
+host.addDeviceNameBasedDiscoveryPair(['BCR2000'], ['BCR2000']);
+host.addDeviceNameBasedDiscoveryPair(['BCR2000 port 1'], ['BCR2000 port 1']);
+host.addDeviceNameBasedDiscoveryPair(['BCR2000 Port 1'], ['BCR2000 Port 1']);
 
-// host.addDeviceNameBasedDiscoveryPair(['BCF2000 port 2'], ['BCF2000 port 2']);
-// host.addDeviceNameBasedDiscoveryPair(['BCF2000 Port 2'], ['BCF2000 Port 2']);
-// host.addDeviceNameBasedDiscoveryPair(['BCF2000 port 3'], ['BCF2000 port 3']);
-// host.addDeviceNameBasedDiscoveryPair(['BCF2000 Port 3'], ['BCF2000 Port 3']);
+// host.addDeviceNameBasedDiscoveryPair(['BCR2000 port 2'], ['BCR2000 port 2']);
+// host.addDeviceNameBasedDiscoveryPair(['BCR2000 Port 2'], ['BCR2000 Port 2']);
+// host.addDeviceNameBasedDiscoveryPair(['BCR2000 port 3'], ['BCR2000 port 3']);
+// host.addDeviceNameBasedDiscoveryPair(['BCR2000 Port 3'], ['BCR2000 Port 3']);
 
 function init() {
     lep.setLogLevel(lep.LOGLEVEL.INFO);
-    new lep.BCF2000(27, 12);
-    // new lep.BCF2000(28, 13);
+    new lep.BCR2000(27, 12);
+    // new lep.BCR2000(28, 13);
 }
 
 function exit() {
@@ -32,12 +32,13 @@ function exit() {
 /**
  * @constructor
  */
-lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
+lep.BCR2000 = function(bcfPresetNumber, bcfMidiChannel) {
 
-    lep.util.assertNumberInRange(bcfPresetNumber, 0, 31, 'Invalid bcfPresetNumber for BCF2000');
-    lep.util.assertNumberInRange(bcfMidiChannel, 0, 15, 'Invalid bcfMidiChannel for BCF2000');
+    lep.util.assertNumberInRange(bcfPresetNumber, 0, 31, 'Invalid bcfPresetNumber for BCR2000');
+    lep.util.assertNumberInRange(bcfMidiChannel, 0, 15, 'Invalid bcfMidiChannel for BCR2000');
 
-    sendProgramChange(0, bcfPresetNumber);
+    // seems to be ignored by BCR firmware 1.10.. F*CK Behringer!
+    sendProgramChange(13, bcfPresetNumber);
 
     host.getNotificationSettings().getUserNotificationsEnabled().set(true);
 
@@ -560,5 +561,5 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
     initEncoderModeButtons();
     initMorpherButton();
 
-    println('\n-------------\nBCF2000 ready');
+    println('\n-------------\nBCR2000 ready');
 };
