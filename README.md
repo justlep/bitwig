@@ -1,6 +1,7 @@
 # LeP's controller scripts for Bitwig [![Build Status](https://travis-ci.org/justlep/bitwig.svg?branch=master)](https://travis-ci.org/justlep/bitwig)
 ##### Available scripts:
 * [LeP's Behringer BCF2000](./doc/Behringer%20BCF2000/)
+* LeP's Behringer BCR2000 (yet identical to the BCF2000 script with the motor faders replaced by the first row of the lower rotary encoders)
 * [Arturia Beatstep Pro](./doc/ArturiaBeatstepPro/)
 * Roland A-49
 * [Alesis PerformancePad](./doc/Alesis%20PerformancePad/)
