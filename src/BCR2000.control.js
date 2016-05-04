@@ -52,7 +52,8 @@ lep.BCR2000 = function(bcfPresetNumber, bcfMidiChannel) {
         },
         CC = {
             FIRST_ENCODER: 8,
-            FIRST_FADER: 81
+            FIRST_FADER: 81,
+            ENCODER_ROWS_FIRST_ENCODER: [81, 89, 97] // from top to bottom
         },
         NOTE = {
             A1: 65,
@@ -212,8 +213,8 @@ lep.BCR2000 = function(bcfPresetNumber, bcfMidiChannel) {
                     midiChannel: bcfMidiChannel
                 });
             }),
-            FADERS: new lep.ControlSet('Faders', WINDOW_SIZE, function(index) {
-                return new lep.Fader({
+            FADERS: new lep.ControlSet('Faders', 8 * 3, function(index) {
+                return new lep.Encoder({
                     name: 'Fader' + index,
                     valueCC: CC.FIRST_FADER + index,
                     midiChannel: bcfMidiChannel
