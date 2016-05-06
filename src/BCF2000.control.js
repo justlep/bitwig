@@ -20,10 +20,31 @@ host.addDeviceNameBasedDiscoveryPair(['BCF2000 Port 1'], ['BCF2000 Port 1']);
 // host.addDeviceNameBasedDiscoveryPair(['BCF2000 port 3'], ['BCF2000 port 3']);
 // host.addDeviceNameBasedDiscoveryPair(['BCF2000 Port 3'], ['BCF2000 Port 3']);
 
+/**
+ * Switches the BCF2000 into a given preset number.
+ * @param presetNumber (Number) 1-based (!)
+ */
+function switchBcfToPreset(presetNumber) {
+    var digit1 = '' + Math.floor(presetNumber/10),
+        digit2 = '' + presetNumber % 10,
+        sysexLines = [
+            'F0 00 20 32 7F 7F 20 00 00 24 72 65 76 20 46 31 F7',
+            'F0 00 20 32 7F 7F 20 00 01 F7',
+            'F0 00 20 32 7F 7F 20 00 02 24 72 65 63 61 6C 6C 20 3X 3Y F7'.replace('X', digit1).replace('Y', digit2),
+            'F0 00 20 32 7F 7F 20 00 03 F7',
+            'F0 00 20 32 7F 7F 20 00 04 24 65 6E 64 F7'
+        ];
+
+    println('Switching BCF2000 to preset ' + presetNumber);
+
+    // sending the switch command line by line (single line by join(' ') didn't work for whatever reason)
+    sysexLines.forEach(sendSysex);
+}
+
 function init() {
     lep.setLogLevel(lep.LOGLEVEL.INFO);
-    new lep.BCF2000(27, 12);
-    // new lep.BCF2000(28, 13);
+    new lep.BCF2000(28, 12);
+    // new lep.BCF2000(29, 13);
 }
 
 function exit() {
@@ -31,13 +52,15 @@ function exit() {
 
 /**
  * @constructor
+ * @param bcfPresetNumber (Number) 1-based BCF2000 preset
+ * @param bcfMidiChannel (Number) 0-based BCF2000 MIDI channel
  */
 lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
 
-    lep.util.assertNumberInRange(bcfPresetNumber, 0, 31, 'Invalid bcfPresetNumber for BCF2000');
+    lep.util.assertNumberInRange(bcfPresetNumber, 1, 32, 'Invalid bcfPresetNumber for BCF2000');
     lep.util.assertNumberInRange(bcfMidiChannel, 0, 15, 'Invalid bcfMidiChannel for BCF2000');
 
-    sendProgramChange(0, bcfPresetNumber);
+    switchBcfToPreset(bcfPresetNumber);
 
     host.getNotificationSettings().getUserNotificationsEnabled().set(true);
 

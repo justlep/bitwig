@@ -58,7 +58,7 @@ function exit() {
  */
 lep.BCR2000 = function(bcrPresetNumber, bcfMidiChannel) {
 
-    lep.util.assertNumberInRange(bcrPresetNumber, 0, 31, 'Invalid bcrPresetNumber for BCR2000');
+    lep.util.assertNumberInRange(bcrPresetNumber, 1, 32, 'Invalid bcrPresetNumber for BCR2000');
     lep.util.assertNumberInRange(bcfMidiChannel, 0, 15, 'Invalid bcfMidiChannel for BCR2000');
 
     switchBcrToPreset(bcrPresetNumber);

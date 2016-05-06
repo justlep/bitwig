@@ -1,0 +1,24 @@
+
+To make a syx to switch to a specific preset:
+
+1) make a copy of `switch-preset-29-via-sysex.txt`
+
+2) e.g. for Preset XY 
+     -> Search for `32 39`
+     -> Replace with `3X 3Y`
+
+3) Convert the txt file to sysex, e.g. using 
+http://www.bwalk.com.au/MidiUtil/FileConvert.html
+
+(or just make a copy `switch-preset-29-via-sysex.SYX`, open it 
+ in an editor search for `29` and replace it with the desired preset number)
+
+-------------------------------------------------
+
+Plain text command of the sysex is:
+
+$rev F1
+no-op
+.recall N
+no-op
+$end
