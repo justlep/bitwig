@@ -20,25 +20,48 @@ host.addDeviceNameBasedDiscoveryPair(['BCR2000 Port 1'], ['BCR2000 Port 1']);
 // host.addDeviceNameBasedDiscoveryPair(['BCR2000 port 3'], ['BCR2000 port 3']);
 // host.addDeviceNameBasedDiscoveryPair(['BCR2000 Port 3'], ['BCR2000 Port 3']);
 
+/**
+ * Switches the BCR2000 into a given preset number.
+ * @param presetNumber (Number) 1-based (!)
+ */
+function switchBcrToPreset(presetNumber) {
+    var digit1 = '' + Math.floor(presetNumber/10),
+        digit2 = '' + presetNumber % 10,
+        sysexLines = [
+            'F0 00 20 32 7F 7F 20 00 00 24 72 65 76 20 52 31 F7',
+            'F0 00 20 32 7F 7F 20 00 01 F7',
+            'F0 00 20 32 7F 7F 20 00 02 24 72 65 63 61 6C 6C 20 3X 3Y F7'.replace('X', digit1).replace('Y', digit2),
+            'F0 00 20 32 7F 7F 20 00 03 F7',
+            'F0 00 20 32 7F 7F 20 00 04 24 65 6E 64 F7'
+        ];
+
+    println('Switching BCR2000 to preset ' + presetNumber);
+
+    // sending the switch command line by line (single line by join(' ') didn't work for whatever reason)
+    sysexLines.forEach(sendSysex);
+}
+
 function init() {
     lep.setLogLevel(lep.LOGLEVEL.INFO);
-    new lep.BCR2000(27, 12);
-    // new lep.BCR2000(28, 13);
+    //new lep.BCR2000(28, 12);
+    new lep.BCR2000(29, 13);
 }
 
 function exit() {
+    switchBcrToPreset(1);
 }
 
 /**
  * @constructor
+ * @param bcrPresetNumber (Number) 1-based BCR2000 preset
+ * @param bcfMidiChannel (Number) 0-based BCR2000 MIDI channel
  */
-lep.BCR2000 = function(bcfPresetNumber, bcfMidiChannel) {
+lep.BCR2000 = function(bcrPresetNumber, bcfMidiChannel) {
 
-    lep.util.assertNumberInRange(bcfPresetNumber, 0, 31, 'Invalid bcfPresetNumber for BCR2000');
+    lep.util.assertNumberInRange(bcrPresetNumber, 0, 31, 'Invalid bcrPresetNumber for BCR2000');
     lep.util.assertNumberInRange(bcfMidiChannel, 0, 15, 'Invalid bcfMidiChannel for BCR2000');
 
-    // seems to be ignored by BCR firmware 1.10.. F*CK Behringer!
-    sendProgramChange(13, bcfPresetNumber);
+    switchBcrToPreset(bcrPresetNumber);
 
     host.getNotificationSettings().getUserNotificationsEnabled().set(true);
 

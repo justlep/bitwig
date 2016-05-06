@@ -1,4 +1,7 @@
 
+v1.0.12 (06-05-2016)
+ - fixed BCR2000 auto-switch to preset 29 via sysex
+
 v1.0.11a (05-05-2016)
  - changed BCR2000 SysEx + script (all encoders now sending relative values)
 
