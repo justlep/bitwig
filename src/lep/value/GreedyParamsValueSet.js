@@ -4,8 +4,8 @@
 lep.GreedyParamsValueSet = lep.util.extendClass(lep.ValueSet, {
 
     _init: function(primaryCursorDevice, paramPages) {
-        lep.util.assertObject(primaryCursorDevice, 'Invalid primaryCursorDevice for ParamsValueSet');
-        lep.util.assertNumberInRange(paramPages, 1, 12);
+        lep.util.assertObject(primaryCursorDevice, 'Invalid primaryCursorDevice for GreedyParamsValueSet');
+        lep.util.assertNumberInRange(paramPages, 1, 12, 'Invalid paramPages for GreedyParamsValueSet');
 
         var FIX_PARAM_PAGES_COUNT = 2,
             _cursorDevices = [primaryCursorDevice];
