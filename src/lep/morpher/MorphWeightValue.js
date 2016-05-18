@@ -31,6 +31,7 @@ lep.MorphWeightValue = lep.util.extendClass(lep.BaseValue, {
         this.value = newValue;
         this.syncToController();
     },
+    /** @Override */
     onRelativeValueReceived: function(delta, range) {
         lep.logDebug('MorphWeightValue.onRelativeChange({},{})', delta, range);
         var newAbsValueUnchecked = Math.round(this.value + ((delta * 128) / range)),
