@@ -104,7 +104,7 @@ module.exports = function (grunt) {
         var highestVersion = null;
         grunt.file.expand([getJsonFilename('*')]).forEach(function(filename) {
             var version = filename.match(/\d+\.\d+(?:\.\d+)?/)[0];
-            if (laxVersion(version).isBiggerThan(laxVersion(highestVersion))) {
+            if (laxVersion(version).isBiggerThan(highestVersion)) {
                 highestVersion = version;
             }
         });
