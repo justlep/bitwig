@@ -13,7 +13,7 @@
 
 loadAPI(1);
 
-// @deprecationChecked:1.3.9
+// @deprecationChecked:1.3.12
 host.defineController('Alesis', 'PerformancePad', '1.1', 'c6cc8a34-a36e-11e5-bf7f-feff819cdc9f', 'Lennart Pegel <github@justlep.net>');
 host.defineMidiPorts(1, 0);
 
