@@ -1,18 +1,23 @@
 
-v1.0.12 (06-05-2016)
+v1.0.13 (04-Aug-2016)
+ - Params mode now recalls the last selected parameter page per device
+ - BCR2000: Params mode on the lower 3 knob rows allows controlling 3*8 parameters simultaneously (even for non-fixed parameter pages)
+ - BCR2000 + BCF2000: Morpher for Params mode will now morph parameters of ALL pages (i.e. up to 12*8 parameters simultaneously)
+
+v1.0.12 (06-May-2016)
  - fixed BCR2000 auto-switch to preset 29 via sysex
  - BCF2000 script sending sysex instead of ProgramChange to switch device into preset 28
 
-v1.0.11a (05-05-2016)
+v1.0.11a (05-May-2016)
  - changed BCR2000 SysEx + script (all encoders now sending relative values)
 
-v1.0.11 (02-05-2016)
+v1.0.11 (02-May-2016)
  - added Behringer BCR2000 script, identical to BCF2000 script but faders represented by the first of the three lower encoder rows
 
-v1.0.10 (24-01-2016)
+v1.0.10 (24-Jan-2016)
  - DC-1 script: made MIDI channel for program/bank change messages configurable
 
-v1.0.9 (23-01-2016)
+v1.0.9 (23-Jan-2016)
  - added Behringer CMD DC-1 script for generating ProgramChange messages
 
 v1.0.8 (08-Jan-2016)
