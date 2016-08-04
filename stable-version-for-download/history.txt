@@ -1,8 +1,9 @@
 
 v1.0.13 (04-Aug-2016)
- - Params mode now recalls the last selected parameter page per device
- - BCR2000: Params mode on the lower 3 knob rows allows controlling 3*8 parameters simultaneously (even for non-fixed parameter pages)
- - BCR2000 + BCF2000: Morpher for Params mode will now morph parameters of ALL pages (i.e. up to 12*8 parameters simultaneously)
+ - BCR2000: the lower 3 encoder rows in PARAM mode now allow controlling 3*8 parameters simultaneously (incl. non-fixed parameter pages)
+ - BCR2000 + BCF2000: PARAM mode now recalls the last selected parameter page per device
+ - BCR2000 + BCF2000: Morpher for PARAM mode will now morph parameters of ALL pages (i.e. up to 12*8 parameters) simultaneously
+ - BCF2000 + BCF2000: Morpher for PARAM and MACRO mode will recall snapshots per device
 
 v1.0.12 (06-May-2016)
  - fixed BCR2000 auto-switch to preset 29 via sysex

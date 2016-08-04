@@ -13,8 +13,13 @@ lep.MacroValueSet = lep.util.extendClass(lep.ValueSet, {
 
         this.deviceName = ko.observable('');
 
-        cursorDevice.addNameObserver(40, 'unknown device', function(deviceName) {
+        cursorDevice.addNameObserver(50, 'unknown device', function(deviceName) {
             self.deviceName(deviceName);
+        });
+
+        /** @Override */
+        this.dynamicId = ko.computed(function() {
+            return '' + self.id + '_' + self.name + '__' + self.deviceName();
         });
     }
 
