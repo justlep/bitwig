@@ -66,7 +66,7 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
 
     var WINDOW_SIZE = 8,
         SENDS_NUMBER = 6,
-        PARAM_PAGES_NUMBER = 6,
+        PARAM_PAGES_NUMBER = 12,
         USER_CONTROL_PAGES = 6,
         MAX_MORPHABLE_PARAMS_NUMBER = (WINDOW_SIZE * Math.max(SENDS_NUMBER, PARAM_PAGES_NUMBER, USER_CONTROL_PAGES)),
         prefs = {
@@ -147,7 +147,7 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
             PAN:    lep.ValueSet.createPanValueSet(trackBank, WINDOW_SIZE),
             SEND:   lep.ValueSet.createSendsValueSet(trackBank, SENDS_NUMBER, WINDOW_SIZE),
             MACRO:  new lep.MacroValueSet(cursorDevice),
-            PARAM:  new lep.ParamsValueSet(cursorDevice),
+            PARAM:  new lep.GreedyParamsValueSet(cursorDevice, PARAM_PAGES_NUMBER),
             USERCONTROL: lep.ValueSet.createUserControlsValueSet(USER_CONTROL_PAGES, WINDOW_SIZE, 'BCF-UC-{}-{}'),
             SOLO:   lep.ValueSet.createSoloValueSet(trackBank, WINDOW_SIZE, prefs),
             ARM:    lep.ValueSet.createArmValueSet(trackBank, WINDOW_SIZE),
