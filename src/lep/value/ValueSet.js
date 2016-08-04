@@ -49,6 +49,13 @@ lep.ValueSet.prototype = {
      */
     isControlled: function() {
         return !!lep.ControlSet.instanceByValueSetId[this.id];
+    },
+    /**
+     * Returns this valueSet's id which may not necessarily be constant.
+     * To be overridden by derived device-specific ValueSet (see {@link ParamsValueSet} and {@link GreedyParamsValueSet}.
+     */
+    dynamicId: function() {
+        return this.id + '_' + this.name;
     }
 };
 

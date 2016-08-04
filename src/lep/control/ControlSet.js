@@ -57,13 +57,16 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
                     self.controls[i].detachValue();
                 }
                 _valueSet(null);
-                // self.valuePage(0);
+
                 return;
             }
 
             lep.ControlSet.instanceByValueSetId[newValueSet.id] = self;
+            if (newValueSet instanceof lep.ParamsValueSet) {
+                lep.util.assert(self.controls.length === 8,
+                    'ParamsValueSet requires a ControlSet of size 8, actual size is {}', self.controls.length);
+            }
             _valueSet(newValueSet);
-            self.recallSelectedPage();
         }
     });
 
@@ -97,21 +100,28 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
     });
 
     this.lastValuePage = ko.computed(function() {
-        return (!_valueSet()) ? 0 : (self.hasParamsValueSet()) ? _valueSet().lastPage() :
-            Math.max(0, Math.ceil(_valueSet().values.length / numberOfControls) - 1);
+        var valueSet = _valueSet(),
+            hasGreedyParamsValueSet = (valueSet instanceof lep.GreedyParamsValueSet),
+            totalValidValues = hasGreedyParamsValueSet ? (valueSet.lastValidValueIndex() + 1) : (valueSet && valueSet.values.length);
+
+        return !valueSet ? 0 : self.hasParamsValueSet() ? valueSet.lastPage() : Math.max(0, Math.ceil(totalValidValues / numberOfControls) - 1);
     });
+
     this.hasPrevValuePage = ko.computed(function() {
         return !!self.valuePage();
     });
+
     this.hasNextValuePage = ko.computed(function() {
         return self.valuePage() < self.lastValuePage();
     });
+
     this.nextValuePage = function() {
         if (self.hasNextValuePage()) {
             self.valuePage(self.valuePage()+1);
             lep.logDebug('Switch to next page {} of {}', self.valuePage(), self.name);
         }
     };
+
     this.prevValuePage = function() {
         if (self.hasPrevValuePage()) {
             self.valuePage(self.valuePage()-1);
@@ -120,8 +130,22 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
     };
 
     ko.computed(function() {
+        var valueSet = _valueSet(),
+            dynamicId = valueSet && valueSet.dynamicId();
+
+        if (dynamicId) {
+            host.scheduleTask(function() {
+                self.recallSelectedPage();
+            }, null, 1);
+            // self.recallSelectedPage(); // don't do this as it will create subscriptions to whatever happens in there
+        }
+        return dynamicId;
+    });
+
+    ko.computed(function() {
         if (!_valueSet()) return;
         var valueOffset = self.hasParamsValueSet() ? _valueSet().currentPageValueOffset() : (self.valuePage() * numberOfControls);
+
         lep.logDebug('new value offset: {}', valueOffset);
         for (var i = 0, value, control; i < numberOfControls; i++) {
             value = _valueSet().values[valueOffset + i];
@@ -151,15 +175,19 @@ lep.ControlSet.prototype = {
      * Saves the currently selected page number of the current valueSet for later recall.
      */
     saveSelectedPage: function() {
-        if (this.valueSet()) {
-            lep.ControlSet.lastSelectedPageByValueSetId[this.valueSet().id] = this.valuePage();
+        var valueSet = this.valueSet();
+        if (valueSet) {
+            lep.ControlSet.lastSelectedPageByValueSetId[valueSet.dynamicId()] = this.valuePage();
         }
     },
     /**
      * Restores the page number last saved for the current valueSet.
      */
     recallSelectedPage: function() {
-        this.valuePage(lep.ControlSet.lastSelectedPageByValueSetId[this.valueSet().id] || 0);
+        var dynamicId = this.valueSet().dynamicId(),
+            page = lep.ControlSet.lastSelectedPageByValueSetId[dynamicId] || 0;
+        lep.logDebug('Recalling selected page {} for {}', page, dynamicId);
+        this.valuePage(page);
     },
     /**
      * Removes any values and/or valueSets attached to this ControlSets and its controls.

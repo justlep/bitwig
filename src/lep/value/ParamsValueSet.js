@@ -1,4 +1,10 @@
 /**
+ * Represents a ValueSet of parameters from the Device Panel Mappings.
+ * (!) Compatible only with ControlSets of size 8 due to the Bitwig API implementation
+ *     where only ONE of the non-fixed parameter pages is accessible at a time.
+ *
+ * Use {@link GreedyParamsValueSet} for ControlSets of different sizes instead.
+ *
  * @constructor
  */
 lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
@@ -37,6 +43,11 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
 
         this.deviceName = ko.observable('');
 
+        /** @Override */
+        this.dynamicId = ko.computed(function() {
+            return '' + self.id + '_' + self.name + '__' + self.deviceName();
+        });
+
         this.currentPage = ko.computed({
             read: _currentPage,
             write: function(proposedNewPage) {
@@ -62,8 +73,9 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
             }
         });
 
+        /** 0-based index of the last selectable value page */
         this.lastPage = ko.computed(function() {
-            return _numberOfCustomParameterPages() + NUMBER_OF_FIX_PARAM_PAGES - 1;
+            return NUMBER_OF_FIX_PARAM_PAGES + _numberOfCustomParameterPages() - 1;
         });
         this.lastPage.subscribe(function(newLastPage) {
             lep.logDebug('lastPage changed: {}, fixing old currentPage: {}', newLastPage, self.currentPage());

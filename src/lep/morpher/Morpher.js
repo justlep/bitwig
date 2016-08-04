@@ -69,7 +69,7 @@ lep.Morpher = (function() {
             targetValueSetObservable = null,
             isTargetValueSetReady = false,
             targetValueSet = null,
-            deviceAwareTargetValueSetId = null,
+            dynamicValueSetId = null,
             targetSize = 0,
             self = this,
             currentReferenceValues = null;
@@ -80,13 +80,17 @@ lep.Morpher = (function() {
             if (!_isActive()) return;
             targetValueSet = targetValueSetObservable();
             isTargetValueSetReady = (targetValueSet instanceof lep.ValueSet);
+
             if (!isTargetValueSetReady) {
                 lep.logDebug('Morpher waiting for new targetValueSet...');
                 return;
             }
-            deviceAwareTargetValueSetId = '' + targetValueSet.id + '_' + (targetValueSet.deviceName||lep.util.NOP)();
-            lep.logDebug('deviceAwareTargetValueSetId changed: {}', deviceAwareTargetValueSetId);
-            targetSize = targetValueSet.values.length;
+
+            dynamicValueSetId = targetValueSet.dynamicId();
+
+            targetSize = (targetValueSet.lastValidValueIndex) ? (targetValueSet.lastValidValueIndex() + 1) : targetValueSet.values.length;
+
+            lep.logDebug('Number of morphable values: {}', targetSize);
 
             resetWeightValues();
             recallSnapshotsForValueSet();
@@ -94,8 +98,9 @@ lep.Morpher = (function() {
         });
 
         function recallSnapshotsForValueSet() {
+            lep.logDebug('Recalling snapshots for dynamicValueSetId: "{}"', dynamicValueSetId);
             for (var i= 0; i<numberOfSnapshots; i++) {
-                snapshotObservables[i]( (savedSnapshotsByValueSetId[deviceAwareTargetValueSetId]||[])[i] );
+                snapshotObservables[i]( (savedSnapshotsByValueSetId[dynamicValueSetId]||[])[i] );
             }
             currentReferenceValues = null;
         }
@@ -107,10 +112,10 @@ lep.Morpher = (function() {
                 rawValues[i] = targetValueSet.values[i].value || 0;
             }
             snapshotObservables[snapshotIndex](rawValues);
-            if (!savedSnapshotsByValueSetId[deviceAwareTargetValueSetId]) {
-                savedSnapshotsByValueSetId[deviceAwareTargetValueSetId] = [];
+            if (!savedSnapshotsByValueSetId[dynamicValueSetId]) {
+                savedSnapshotsByValueSetId[dynamicValueSetId] = [];
             }
-            savedSnapshotsByValueSetId[deviceAwareTargetValueSetId][snapshotIndex] = rawValues;
+            savedSnapshotsByValueSetId[dynamicValueSetId][snapshotIndex] = rawValues;
             lep.logDebug('Saved snapshot in slot {}', snapshotIndex);
         }
 
@@ -119,7 +124,8 @@ lep.Morpher = (function() {
             if (rawValues) {
                 currentReferenceValues = rawValues;
                 lep.util.startTimer(self.id);
-                for (var i = targetSize- 1; i >= 0; i--) {
+                // (!) no reverse-iteration since targetSize may change anytime
+                for (var i = 0; i < targetSize; i++) {
                     targetValueSet.values[i].setValue(rawValues[i]);
                 }
                 lep.logDebug('Snapshot{} loaded within {} millis', snapshotIndex, lep.util.stopTimer(self.id));
@@ -158,7 +164,6 @@ lep.Morpher = (function() {
                 weight,
                 normalizationFactor,
                 valueIndex,
-                useValue = true, // TODO implement later: enable/disable per parameter whether its being morphed or not
                 weightValue;
 
             for (snapshotIndex = numberOfSnapshots-1; snapshotIndex >= 0; snapshotIndex--) {
@@ -176,7 +181,6 @@ lep.Morpher = (function() {
                 snapshotValues;
 
             for (var i = snapshotIndexesToVisit.length-1; i >= 0; i--) {
-                if (!useValue) continue;
                 snapshotIndex = snapshotIndexesToVisit[i];
                 weight = weightByIndexMap[snapshotIndex];
                 normalizationFactor = (weight / totalWeight) * (weight / 127);
@@ -188,7 +192,6 @@ lep.Morpher = (function() {
             }
 
             for (valueIndex = referenceValues.length-1; valueIndex >= 0; valueIndex--) {
-                if (!useValue) continue;
                 var morphedValue = referenceValues[valueIndex] + Math.round(diffs[valueIndex]);
                 targetValueSet.values[valueIndex].setValue(morphedValue);
             }
