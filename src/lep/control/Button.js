@@ -8,7 +8,7 @@ lep.Button = lep.util.extendClass(lep.BaseControl, {
     _init: function(opts) {
         this._super(opts);
 
-        lep.util.assertNumber(opts.clickNote, 'Missing/invalid clickNote for Button');
+        lep.util.assertNumber(opts.clickNote, 'Missing/invalid clickNote for Button {}', this.name);
         this.resyncOnClickRelease = (opts.resyncOnClickRelease !== false);
 
         var self = this;

@@ -8,7 +8,7 @@ lep.ClickEncoder = lep.util.extendClass(lep.BaseControl, {
     _init: function(opts) {
         this._super(opts);
 
-        lep.util.assertNumber(opts.clickNote, 'Missing/invalid clickNote for ClickEncoder');
+        lep.util.assertNumber(opts.clickNote, 'Missing/invalid clickNote for ClickEncoder {}', this.name);
 
         this.resyncOnClickRelease = (opts.resyncOnClickRelease!==false);
         this.sendsDiffValues = (opts.sendsDiffValues!==false);
