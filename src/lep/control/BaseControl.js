@@ -9,17 +9,32 @@
  */
 lep.BaseControl = function(opts) {
     lep.util.assertString(opts.name, 'Missing name for BaseControl');
-    lep.util.assert((!!opts.valueNote ^ !!opts.valueCC) || opts.clickNote, 'Missing (valueCC xor valueNote) or clickNote for {}', this.name);
+
+    this.name = opts.name;
+
+    this.useValueNote = (typeof opts.valueNote === 'number');
+    this.useValueCC = (typeof opts.valueCC === 'number');
+    this.useClickNote = (typeof opts.clickNote === 'number');
+
+    this.valueNote = this.useValueNote ? opts.valueNote : null;
+    this.valueCC = this.useValueCC ? opts.valueCC : null;
+    this.clickNote = this.useClickNote ? opts.clickNote : null;
+
+    lep.util.assert((this.useValueNote !== this.useValueCC) || (!this.useValueNote && !this.useValueCC && this.useClickNote),
+        'Invalid combination of valueNote|valueCC|clickNote for {}\nGiven: valueNote={}, valueCC={}, clickNote={}',
+        this.name, this.valueNote, this.valueCC, this.clickNote);
+
+    lep.util.assertNumberInRangeOrEmpty(this.valueNote, 0, 127, 'Invalid valueNote {} for {}', this.valueNote, this.name);
+    lep.util.assertNumberInRangeOrEmpty(this.valueCC,   0, 127, 'Invalid valueCC {} for {}', this.valueCC, this.name);
+    lep.util.assertNumberInRangeOrEmpty(this.clickNote, 0, 127, 'Invalid clickNote {} for {}', this.clickNote, this.name);
 
     this.midiInPort = lep.util.limitToRange(opts.midiInPort||0, 0, 10);
     this.midiChannel = lep.util.limitToRange(opts.midiChannel||0, 0, 15);
     this.listeningMidiChannel = ((typeof opts.midiChannel === 'number') || null) && this.midiChannel;
 
-    this.name = opts.name;
     this.value = null; // the BaseValue currently attached to this control (NOT the numerical midi value)
 
-    this.valueNote = opts.valueNote || null;
-    this.valueCC = opts.valueCC || null;
+    this.isClicked = false;
 
     this.sendsDiffValues = !!opts.sendsDiffValues;
     this.diffValueRange = opts.diffValueRange || lep.BaseControl.DIFF_VALUE_RANGE.NORMAL;
@@ -32,9 +47,6 @@ lep.BaseControl = function(opts) {
     this.minFeedbackValue = opts.minFeedbackValue || 0;
     this.maxFeedbackValue = opts.maxFeedbackValue || 0;
     this.feedbackValueCorrectionMultiplier = (this.maxFeedbackValue - this.minFeedbackValue) / 127;
-
-    this.clickNote = opts.clickNote || null;
-    this.isClicked = false;
 
     this.isMuted = !!opts.isMuted;
 
@@ -92,12 +104,12 @@ lep.BaseControl.prototype = {
             value = this.minFeedbackValue + Math.round(value * this.feedbackValueCorrectionMultiplier);
         }
 
-        if (this.valueNote) {
+        if (this.useValueNote) {
             sendNoteOn(this.midiChannel, this.valueNote, value);
-        } else if (this.valueCC) {
+        } else if (this.useValueCC) {
             sendChannelController(this.midiChannel, this.valueCC, value);
         }
-        if (this.clickNote && !this.valueNote && !this.valueCC) {
+        if (this.useClickNote && !this.useValueNote && !this.useValueCC) {
             // sending click note status only makes sense for LED-buttons, not for ClickEncoders
             sendNoteOn(this.midiChannel, this.clickNote, value);
         }
@@ -123,14 +135,14 @@ lep.BaseControl.prototype = {
     },
     bindMidiValueListener: function() {
         var eventDispatcher = lep.MidiEventDispatcher.getInstance({midiInPort: this.midiInPort});
-        if (this.valueNote) {
+        if (this.useValueNote) {
             eventDispatcher.onNote(this.valueNote, this.onValueReceived, this, this.listeningMidiChannel);
             lep.logDebug('MIDI bound: {} -> note {} channel {}', this.name, this.valueNote, this.listeningMidiChannel);
-        } else if (this.valueCC) {
+        } else if (this.useValueCC) {
             eventDispatcher.onCC(this.valueCC, this.onValueReceived, this, this.listeningMidiChannel);
             lep.logDebug('MIDI bound: {} -> CC {} channel {}', this.name, this.valueCC, this.listeningMidiChannel);
         }
-        if (this.clickNote) {
+        if (this.useClickNote) {
             eventDispatcher.onNote(this.clickNote, this.onClickNoteReceived, this, this.listeningMidiChannel);
             lep.logDebug('MIDI clickNote bound: {} -> note {} channel {}', this.name, this.clickNote, this.listeningMidiChannel);
         }
