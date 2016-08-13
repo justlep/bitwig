@@ -1,4 +1,7 @@
 
+v1.0.14 (13-Aug-2016)
+ - no changes in controller scripts (only using more lightweight JS library (knockout-stripped v2))
+
 v1.0.13 (04-Aug-2016)
  - BCR2000: the lower 3 encoder rows in PARAM mode now allow controlling 3*8 parameters simultaneously (incl. non-fixed parameter pages)
  - BCR2000 + BCF2000: PARAM mode now recalls the last selected parameter page per device
