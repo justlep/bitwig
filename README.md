@@ -7,6 +7,6 @@
 * [Alesis PerformancePad](./doc/Alesis%20PerformancePad/)
 * [Behringer CMD DC-1](./doc/Behringer%20CMD%20DC-1) (as Program Change generator)
 
-### Installation 
-Go to the [stable-version-for-download](./stable-version-for-download/)-directory and get the latest release there.  
+### Download & Installation
+Go to the [stable-version-for-download](./stable-version-for-download/)-directory and follow the instructions there.  
 Do *NOT* use the "Download ZIP" button on top of this page.
