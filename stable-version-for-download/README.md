@@ -1,5 +1,4 @@
-## Stable version download
-#### How to install:
+## Stable Versions: Download & Installation
 
 1.  Download the latest ZIP file (click the file, then **View Raw** -> the download dialog should appear)
 2.  Unpack that ZIP file to your Bitwig Controller Scripts folder:
