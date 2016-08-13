@@ -1,11 +1,11 @@
 # LeP's BCF2000 controller script for Bitwig
 
-## How to use
+### How to use
 
 See the [documentation in the Wiki][wikiLink].
 
 ---
-## Required BCF Preset
+### Required BCF Preset
 You need a special preset installed on your BCF for the script to work.
 It is contained in this SysEx-file: [**BCF2000-Bitwig-Preset28(CH13)-29(CH14).syx**][sysexfile]
 (The file contains two presets: Preset 28  will be used by default, Preset 29 is an alternative).
@@ -15,7 +15,7 @@ or a similar tool. When Bitwig loads the controller script, it will try to switc
 _(* The presets 28/29 are saved permanently on your BCF, so the sysex file needs to be transmitted only ONCE ever. )_
 
 ---
-## Download & Installation
+### Download & Installation
 
 1.  Download the latest ZIP file from the [stable-versions-for-download/][stableFolder] directory and extract it to your Bitwig controller scripts folder:
     * **Windows:** ~Documents\Bitwig Studio\Controller Scripts
