@@ -38,6 +38,7 @@ lep.DC1 = function() {
             BANK_MODE: NOTE.FIRST_TOP_BUTTON + 4,
             PRESET_MODE: NOTE.FIRST_TOP_BUTTON + 5,
             SNAPSHOT_MODE: NOTE.FIRST_TOP_BUTTON + 6,
+            APP_MODE: NOTE.FIRST_TOP_BUTTON + 1,
             SHIFT: NOTE.FIRST_TOP_BUTTON + 7
         },
         /**
@@ -54,13 +55,17 @@ lep.DC1 = function() {
             resetPresetOnBankChange: true,
             midiChannelForProgramChange: 0
         },
+        application = host.createApplication(),
         isShiftButtonPressed = false,
         eventDispatcher = lep.MidiEventDispatcher.getInstance(),
         noteInput = eventDispatcher.createNoteInput('DC-1', 0, true),
         pushEncoderTarget = ko.observable(),
+        isPushEncoderPressed = false,
         savedSnapshots = ko.observableArray(),
         currentSnapshot = ko.observable(0).extend({notify: 'always'}),
         lastClickedSnapshotIndex = 0,
+        appModeButton,
+        transport = host.createTransport(),
         currentBank = ko.computed({
             read: ko.computed(function() {
                 return currentSnapshot() >> 8;
@@ -87,6 +92,9 @@ lep.DC1 = function() {
         }),
         isSnapshotMode = ko.computed(function() {
             return (pushEncoderTarget() === savedSnapshots);
+        }),
+        isAppMode = ko.computed(function() {
+            return (pushEncoderTarget() === application);
         }),
 
         displayedBankPage = ko.observable(0),
@@ -283,6 +291,19 @@ lep.DC1 = function() {
             })
         });
 
+        appModeButton = new lep.Button({
+            name: 'AppModeButton',
+            clickNote: NOTE_ACTION.APP_MODE,
+            midiChannel: MIDI_CHANNEL,
+            valueToAttach: new lep.KnockoutSyncedValue({
+                name: 'AppModeValue',
+                ownValue: application,
+                refObservable: pushEncoderTarget,
+                restoreRefAfterLongClick: true,
+                velocityValueOn: COLOR.BLUE,
+                velocityValueOff: COLOR.ORANGE
+            })
+        });
 
         eventDispatcher.onNote(NOTE_ACTION.SHIFT, function(note, value, channel) {
             isShiftButtonPressed = !!value;
@@ -321,11 +342,17 @@ lep.DC1 = function() {
 
     function initPushEncoder() {
         // 'clicking' the push encoder resets the bank and/or preset..
-        eventDispatcher.onNotePressed(NOTE.PUSH_ENCODER_CLICK, function(note, value, channel) {
-            if (isBankMode()) {
-                currentBank(0);
-            } else if (isPresetMode()) {
-                currentPreset(0);
+        eventDispatcher.onNote(NOTE.PUSH_ENCODER_CLICK, function(note, value, channel) {
+            isPushEncoderPressed = !!value;
+
+            if (isPushEncoderPressed) {
+                if (isBankMode()) {
+                    currentBank(0);
+                } else if (isPresetMode()) {
+                    currentPreset(0);
+                } else if (isAppMode()) {
+                    application.zoomToFit();
+                }
             }
         });
 
@@ -339,6 +366,20 @@ lep.DC1 = function() {
                 targetObservable(newBankOrPreset);
             } else if (isSnapshotMode() && diff) {
                 loadNextOrPrevSnapshot(diff);
+            } else if (isAppMode()) {
+                if (diff < 0) {
+                    if (appModeButton.isClicked) {
+                        application.zoomOut();
+                    } else {
+                        transport.incPosition(-1, true);
+                    }
+                } else if (diff > 0) {
+                    if (appModeButton.isClicked) {
+                        application.zoomIn();
+                    } else {
+                        transport.incPosition(1, true);
+                    }
+                }
             }
         });
 
