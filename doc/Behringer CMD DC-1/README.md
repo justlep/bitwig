@@ -1,13 +1,13 @@
 # Behringer CMD DC-1 controller script for Bitwig
 
-Written for generating Program Change (and Bank change) messages, enabling you to quickly 
-browse Banks and Presets of Softsynths like Reaktor, Microtonic, Z3TA, Morphine, Toxic Biohazard etc.
+Written for generating MIDI Program Change (and Bank Change) messages, enabling you to quickly 
+browse Banks and Presets of Softsynths like Reaktor, Microtonic, Z3TA, Morphine, Toxic Biohazard etc. which allow their current preset to be switched via MIDI. Here is a [demo video on YouTube](https://www.youtube.com/watch?v=wEv_WVzOC5k).
 
-* Three modes: Bank Mode, Preset Mode, Snapshot Mode ("snapshot" meaning a saved combination of bank+preset). 
+* Three modes: **Bank Mode**, **Preset Mode**, **Snapshot Mode** ("snapshot" meaning a saved combination of bank+preset). 
 * In each mode, you have 8 pages (numeric buttons) à 16 pads, hence 128 banks, 128 programs, 128 snapshots in total. 
 * To switch a bank/preset/snapshot, you can either press the pads OR twist the big Push-Encoder on top. Clicking the Push-Encoder 
   will reset the bank or preset to 0 (depending on the mode).
-* In Snapshot Mode, hold the Shift-Button and one of the 16 pads to save the current bank+program  as a snapshot. 
+* In Snapshot Mode, hold the Shift-Button and one of the 16 pads to save the current combination of bank+preset as a snapshot. 
   (Snapshots are lost when Bitwig is closed).
 * If you hold a mode button pressed, the mode will switch back automatically when the button is released.
 
