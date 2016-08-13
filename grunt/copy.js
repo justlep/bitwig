@@ -36,6 +36,16 @@ module.exports = function (grunt, opts) {
                 }
             ]
         },
+        testScriptToBitwig: {
+            files: [
+                {
+                    cwd: './src',
+                    src: ['**/Test.control.js'],
+                    dest: opts.RELEASE_PATH_IN_BITWIG,
+                    expand: true
+                }
+            ]
+        },
         'apiSourcesFromBitwig': {
             files: [
                 {
