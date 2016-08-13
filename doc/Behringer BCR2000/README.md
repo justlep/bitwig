@@ -1,11 +1,11 @@
 # LeP's BCR2000 controller script for Bitwig
 
-#### How to use
+## How to use
 
 Most identical with the BCF2000 (see the [documentation in the Wiki][wikiLink]).
 
 ---
-#### Required BCR Preset
+## Required BCR Preset
 You need a special preset installed on your BCR for the script to work.
 It is contained in this SysEx-file: [**BCR2000-Bitwig-Preset28(CH13)-29(CH14).syx**][sysexfile]
 (The file contains two presets: Preset 29  will be used by default, Preset 28 is an alternative).
@@ -15,7 +15,7 @@ or a similar tool. When Bitwig loads the controller script, it will try to switc
 _(* The presets 28/29 are saved permanently on your BCR, so the sysex file needs to be transmitted only ONCE ever. )_
 
 ---
-#### Download & Installation
+## Download & Installation
 
 1.  Download the latest ZIP file from the [stable-versions-for-download/][stableFolder] directory and extract it to your Bitwig controller scripts folder:
     * **Windows:** ~Documents\Bitwig Studio\Controller Scripts
