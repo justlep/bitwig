@@ -8,7 +8,7 @@
 loadAPI(1);
 load('lep/api.js');
 
-// @deprecationChecked:1.3.12
+// @deprecationChecked:1.3.14
 host.defineController('Behringer', 'BCR2000 (LeP)', '1.1', 'fe5a1578-0fbd-11e6-a148-3e1d05defe78', 'Lennart Pegel <github@justlep.net>');
 host.defineMidiPorts(1, 1);
 host.addDeviceNameBasedDiscoveryPair(['BCR2000'], ['BCR2000']);

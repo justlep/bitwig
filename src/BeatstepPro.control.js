@@ -24,7 +24,7 @@ loadAPI(1);
 load('lep/api.js');
 load('beatsteppro/BeatstepPro.js');
 
-// @deprecationChecked:1.3.12
+// @deprecationChecked:1.3.14
 host.defineController("Arturia Beatstep Pro", "BSP", "1.2", "6ae51a34-3310-11e5-a151-feff819cdc9f", "github@justlep.net");
 host.addDeviceNameBasedDiscoveryPair(["Arturia BeatStep Pro"], ["Arturia BeatStep Pro"]);
 host.defineMidiPorts(1, 1);
