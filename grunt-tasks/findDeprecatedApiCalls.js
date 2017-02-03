@@ -1,8 +1,17 @@
+
+/**
+ * The values for the `referenceApi` property in the grunt config file for this task.
+ */
+const REFERENCE_API = {
+          LATEST_IN_REPO: 'latestInRepo',
+          LOCAL_BITWIG_INSTALLATION: 'localBitwigInstallation'
+      };
+
 /**
  * Parses the API documentation deprecations list and searches for possible usages
  * within the controller scripts.
  */
-module.exports = function (grunt) {
+module.exports = function(grunt) {
     'use strict';
 
     /**
@@ -117,26 +126,41 @@ module.exports = function (grunt) {
     /**
      * Loads json with API deprecation info either from a local json already generated OR
      * from the Bitwig version installed on the machine.
-     * @param bitwigVersion (String) version|"latest"|"installed"
+     * @param referenceApi (String) version|"latest"|"installed"
      * @returns (Object)
      */
-    function getDeprecationJson(bitwigVersion) {
-        var deprecationJson, filename;
-        if (bitwigVersion === 'installed') {
-            // load deprecations of installed Bitwig version and write json file with deprecation info afterwards
-            deprecationJson = parseDeprecationHtml();
-            filename = getJsonFilename(deprecationJson.bitwigVersion);
-            try {
-                grunt.file.write(filename, JSON.stringify(deprecationJson, null, 2));
-                grunt.log.ok('Generated ' + filename + ' --> !!! Remember to git-commit it !!!');
-                bitwigVersion = deprecationJson.bitwigVersion;
-            } catch (e) {
-                grunt.fail.warn('Could not write ' + filename, e);
-            }
+    function getDeprecationJson(referenceApi) {
+        var deprecationJson,
+            filename,
+            bitwigVersion;
+
+        switch (referenceApi) {
+            case REFERENCE_API.LATEST_IN_REPO:
+                bitwigVersion = getLatestSavedDeprecationsFileVersion();
+                break;
+
+            case REFERENCE_API.LOCAL_BITWIG_INSTALLATION:
+                // load deprecations of installed Bitwig version and write json file with deprecation info afterwards
+                deprecationJson = parseDeprecationHtml();
+                filename = getJsonFilename(deprecationJson.bitwigVersion);
+                try {
+                    grunt.file.write(filename, JSON.stringify(deprecationJson, null, 2));
+                    grunt.log.ok('Generated ' + filename + ' --> !!! Remember to git-commit it !!!');
+                    bitwigVersion = deprecationJson.bitwigVersion;
+                } catch (e) {
+                    grunt.fail.warn('Could not write ' + filename, e);
+                }
+                break;
+
+            default:
+                grunt.fail.fatal('Invalid referenceApi parameters: ' + referenceApi, 1);
+        }
+
+        if (!bitwigVersion) {
+            grunt.fail.warn('Unable to determine bitwigVersion to find decrecations for.');
         }
 
         // load deprecations from existing file
-        bitwigVersion = (bitwigVersion === 'latest') ? getLatestSavedDeprecationsFileVersion() : bitwigVersion;
         filename = getJsonFilename(bitwigVersion);
         try {
             deprecationJson = grunt.file.readJSON(filename);
@@ -148,10 +172,9 @@ module.exports = function (grunt) {
         return deprecationJson;
     }
 
-
     grunt.registerMultiTask('findDeprecatedApiCalls', 'Finds usages of deprecated methods in the controller scripts.', function() {
         var jsSources = grunt.file.expand(this.options().files),
-            deprecations = getDeprecationJson(this.data.bitwigVersion),
+            deprecations = getDeprecationJson(this.data.referenceApi),
             /**
              * @type (String) If this marker is found in a suspicious line or in the line above it,
              *                no deprecation warning will be output
@@ -212,3 +235,5 @@ module.exports = function (grunt) {
     });
 
 };
+
+module.exports.REFERENCE_API = REFERENCE_API;
