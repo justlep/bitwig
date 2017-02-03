@@ -9,7 +9,7 @@
 
 loadAPI(1);
 
-// @deprecationChecked:1.3.14
+// @deprecationChecked:1.3.15
 host.defineController('Generic', 'Pads', '1.0', 'c5bb3af6-9c15-11e5-8994-feff819cdc9f', 'Lennart Pegel <github@justlep.net>');
 host.defineMidiPorts(1, 0);
 
