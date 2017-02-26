@@ -95,7 +95,10 @@ lep.StandardRangedValue.createParamValue = function(cursorDevice, paramIndex) {
         rangedValue: cursorDevice.getParameter(paramIndex)
     });
 };
-/** @static */
+/**
+ * @deprecated as of Bitwig2
+ * @static
+ **/
 lep.StandardRangedValue.createCommonParamValue = function(cursorDevice, paramIndex) {
     lep.util.assertObject(cursorDevice, 'Invalid cursorDevice for StandardRangedValue.createCommonParamValue');
     lep.util.assertNumber(paramIndex, 'Invalid paramIndex for StandardRangedValue.createCommonParamValue');
@@ -104,7 +107,10 @@ lep.StandardRangedValue.createCommonParamValue = function(cursorDevice, paramInd
         rangedValue: cursorDevice.getCommonParameter(paramIndex)
     });
 };
-/** @static */
+/**
+ * @deprecated as of Bitwig2
+ * @static
+ **/
 lep.StandardRangedValue.createEnvelopeParamValue = function(cursorDevice, paramIndex) {
     lep.util.assertObject(cursorDevice, 'Invalid cursorDevice for StandardRangedValue.createEnvelopeParamValue');
     lep.util.assertNumber(paramIndex, 'Invalid paramIndex for StandardRangedValue.createEnvelopeParamValue');

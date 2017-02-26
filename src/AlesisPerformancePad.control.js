@@ -11,7 +11,7 @@
  * License: LGPLv3 (http://www.gnu.org/licenses/lgpl-3.0.txt)
  */
 
-loadAPI(1);
+loadAPI(2);
 
 // @deprecationChecked:1.3.15
 host.defineController('Alesis', 'PerformancePad', '1.1', 'c6cc8a34-a36e-11e5-bf7f-feff819cdc9f', 'Lennart Pegel <github@justlep.net>');

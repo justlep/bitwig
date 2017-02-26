@@ -5,7 +5,7 @@
  * License: LGPLv3 (http://www.gnu.org/licenses/lgpl-3.0.txt)
  */
 
-loadAPI(1);
+loadAPI(2);
 
 // @deprecationChecked:1.3.15
 host.defineController('Roland', 'A-49', '1.0', '381d879c-9a0a-11e5-8994-feff819cdc9f', 'Lennart Pegel <github@justlep.net>');

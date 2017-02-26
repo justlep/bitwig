@@ -2,29 +2,40 @@
  * Author: Lennart Pegel - https://github.com/justlep
  * License: LGPLv3 (http://www.gnu.org/licenses/lgpl-3.0.txt)
  *
+ * Represents one of the toggleable transport values, like isPlaying, metronome enable etc.
+ * (!) Use {@link lep.ToggledTransportValue.create} for instantiation.
+ *
  * @constructor
  */
 lep.ToggledTransportValue = lep.util.extendClass(lep.BaseValue, {
-
     _init: function(opts) {
         this._super(opts);
 
-        lep.util.assertString(opts.togglingMethodName, 'Missing togglingMethodName for ToggledTransportValue {}', this.name);
-        lep.util.assertString(opts.observerAdderMethodName, 'Missing observerAdderMethodName for ToggledTransportValue {}', this.name);
-
         var self = this,
             transport = lep.util.getTransport(),
-            togglingMethod = transport[opts.togglingMethodName],
-            observerAdderMethod = transport[opts.observerAdderMethodName];
+            settableBooleanProperty = transport[opts.booleanPropertyName],
+            settableBoolean;
 
-        lep.util.assertFunction(togglingMethod, 'Missing Bitwig API method: Transport.{}', opts.togglingMethodName);
-        lep.util.assertFunction(observerAdderMethod, 'Missing Bitwig API method: Transport.{}', opts.observerAdderMethodName);
+        lep.util.assertFunction(settableBooleanProperty, 'Missing settableBooleanProperty {} in Transport for {}',
+            opts.booleanPropertyName, this.name);
 
-        this.togglingMethod = lep.util.bind(togglingMethod, transport);
+        //println('typeof settableBooleanProperty: ' + typeof settableBooleanProperty);
+        //println('typeof settableBooleanProperty.call: ' + typeof settableBooleanProperty.call);
+        //println('typeof settableBooleanProperty.apply' + typeof settableBooleanProperty.apply);
+
+        // TODO this crashes currently with a weird error:
+        // Error starting driver: This cannot be called when specifying required API version 1:
+
+        settableBoolean = settableBooleanProperty();
+
         this.toggleOnPressed = (opts.toggleOnPressed !== false);
 
-        observerAdderMethod.call(transport, function(on) {
-            self.value = on ? 127 : 0;
+        this.togglingMethod = function() {
+            settableBoolean.toggle();
+        };
+
+        settableBoolean.addValueObserver(function(isOn) {
+            self.value = isOn ? 127 : 0;
             self.syncToController();
         });
     },
@@ -36,29 +47,28 @@ lep.ToggledTransportValue = lep.util.extendClass(lep.BaseValue, {
 });
 
 /** @static */
-lep.ToggledTransportValue.NAME_TO_TRANSPORT_METHODS_MAP = {
-    Metronome: ['toggleClick','addClickObserver'],
-    Play: ['togglePlay','addIsPlayingObserver'],
-    Record: ['record','addIsRecordingObserver'],
-    PunchIn: ['togglePunchIn', 'addPunchInObserver'],
-    PunchOut: ['togglePunchOut', 'addPunchOutObserver'],
-    Overdub: ['toggleOverdub', 'addOverdubObserver'],
-    Loop: ['toggleLoop', 'addIsLoopActiveObserver'],
-    ArrangerAutomation: ['toggleWriteArrangerAutomation','addIsWritingArrangerAutomationObserver']
+lep.ToggledTransportValue.NAME_TO_SETTABLE_BOOLEAN_NAME_MAP = {
+    Metronome: 'isMetronomeTickPlaybackEnabled',
+    Play: 'isPlaying',
+    Record: 'isArrangerRecordEnabled',
+    PunchIn: 'isPunchInEnabled',
+    PunchOut: 'isPunchOutEnabled',
+    Overdub: 'isArrangerOverdubEnabled',
+    Loop: 'isArrangerLoopEnabled',
+    ArrangerAutomation: 'isArrangerAutomationWriteEnabled'
 };
 
 /**
  * @static
- * Creates a new ToggledTransportValue for one of the types defined in {@link #NAME_TO_TRANSPORT_METHODS_MAP}
- * @param name (String) one of the keys of {@link #NAME_TO_TRANSPORT_METHODS_MAP}
+ * Creates a new ToggledTransportValue for one of the types defined in {@link #NAME_TO_SETTABLE_BOOLEAN_NAME_MAP}
+ * @param name (String) one of the keys of {@link #NAME_TO_SETTABLE_BOOLEAN_NAME_MAP}
  * @returns {lep.ToggledTransportValue}
  */
 lep.ToggledTransportValue.create = function(name) {
-    lep.util.assertArray(lep.ToggledTransportValue.NAME_TO_TRANSPORT_METHODS_MAP[name],
-                         'Unsupported name for ToggledTransportValue: ' + name);
+    var booleanPropertyName = lep.ToggledTransportValue.NAME_TO_SETTABLE_BOOLEAN_NAME_MAP[name];
+    lep.util.assertString(booleanPropertyName, 'Unsupported name for ToggledTransportValue: ' + name);
     return new lep.ToggledTransportValue({
         name: name,
-        togglingMethodName: lep.ToggledTransportValue.NAME_TO_TRANSPORT_METHODS_MAP[name][0],
-        observerAdderMethodName: lep.ToggledTransportValue.NAME_TO_TRANSPORT_METHODS_MAP[name][1]
+        booleanPropertyName: booleanPropertyName
     });
 };

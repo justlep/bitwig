@@ -5,7 +5,7 @@
  * License: LGPLv3 (http://www.gnu.org/licenses/lgpl-3.0.txt)
  */
 
-loadAPI(1);
+loadAPI(2);
 load('lep/api.js');
 
 // @deprecationChecked:1.3.15

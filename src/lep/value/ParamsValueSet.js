@@ -1,9 +1,8 @@
 /**
  * Represents a ValueSet of parameters from the Device Panel Mappings.
  * (!) Compatible only with ControlSets of size 8 due to the Bitwig API implementation
- *     where only ONE of the non-fixed parameter pages is accessible at a time.
  *
- * Use {@link GreedyParamsValueSet} for ControlSets of different sizes instead.
+ * Use {@link ParamsValueSet} for ControlSets of different sizes instead.
  *
  * @constructor
  */
@@ -11,21 +10,16 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
 
     _init: function(cursorDevice) {
         lep.util.assertObject(cursorDevice, 'Invalid cursorDevice for ParamsValueSet');
-        this._super('ParamsValueSet', 3, 8, function(groupIndex, paramIndex) {
-            switch(groupIndex) {
-                case 0: return lep.StandardRangedValue.createCommonParamValue(cursorDevice, paramIndex);
-                case 1: return lep.StandardRangedValue.createEnvelopeParamValue(cursorDevice, paramIndex);
-                case 2: return lep.StandardRangedValue.createParamValue(cursorDevice, paramIndex);
-            }
+        this._super('ParamsValueSet', 1, 8, function(paramIndex) {
+            return lep.StandardRangedValue.createParamValue(cursorDevice, paramIndex);
         });
 
         var self = this,
-            NUMBER_OF_FIX_PARAM_PAGES = 2,
             PARAMS_PER_PAGE = 8,
-            _numberOfCustomParameterPages = ko.observable(0),
+            _parameterPagesCount = ko.observable(0),
             _currentPage = ko.observable(0),
             _savedPageByDeviceName = {},
-            _paramPageNames = ['Common', 'Envelope'],
+            _paramPageNames = [],
             hasDeviceChanged = false,
             saveParamPageForCurrentDevice = function() {
                 _savedPageByDeviceName[self.deviceName()] = _currentPage();
@@ -50,23 +44,21 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
 
         this.currentPage = ko.computed({
             read: _currentPage,
-            write: function(proposedNewPage) {
+            write: function(proposedNewPageIndex) {
                 if (hasDeviceChanged) {
                     // If the device has changed, recallParamPageForDevice() is the only function allowed to
                     // set the new page, as it will be invoked LAST after lastPage() is determined, too
                     lep.logDebug('Skipped setting new page of ParamValueSet due to prior device change');
                     return;
                 }
-                var effectiveNewPage = lep.util.limitToRange(proposedNewPage, 0, self.lastPage()),
-                    newCustomParameterPageIndex = (effectiveNewPage - NUMBER_OF_FIX_PARAM_PAGES),
-                    newParameterPageName = _paramPageNames[effectiveNewPage];
+                var newPageIndex = lep.util.limitToRange(proposedNewPageIndex, 0, self.lastPage()),
+                    newParameterPageName = _paramPageNames[newPageIndex] || '-default-';
 
-                lep.logDebug('New page for {} -> proposed: {}, effective: {}', self.name, proposedNewPage, effectiveNewPage);
-                if (newCustomParameterPageIndex >= 0) {
-                    lep.logDebug('setParameterPage({})', newCustomParameterPageIndex);
-                    cursorDevice.setParameterPage(newCustomParameterPageIndex);
-                }
-                _currentPage(effectiveNewPage);
+                lep.logDebug('New page for {} -> proposed: {}, effective: {}', self.name, proposedNewPageIndex, newPageIndex);
+                lep.logDebug('setParameterPage({})', newPageIndex);
+                cursorDevice.setParameterPage(newPageIndex);
+
+                _currentPage(newPageIndex);
                 lep.logDebug('Selected parameter page: {}', newParameterPageName);
                 popupNotification('Parameter Page: ' + newParameterPageName);
                 saveParamPageForCurrentDevice();
@@ -75,8 +67,9 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
 
         /** 0-based index of the last selectable value page */
         this.lastPage = ko.computed(function() {
-            return NUMBER_OF_FIX_PARAM_PAGES + _numberOfCustomParameterPages() - 1;
+            return _parameterPagesCount() - 1;
         });
+
         this.lastPage.subscribe(function(newLastPage) {
             lep.logDebug('lastPage changed: {}, fixing old currentPage: {}', newLastPage, self.currentPage());
             if (newLastPage < self.currentPage()) {
@@ -85,7 +78,7 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
         });
 
         this.currentPageValueOffset = ko.computed(function() {
-            return lep.util.limitToRange(self.currentPage(), 0, NUMBER_OF_FIX_PARAM_PAGES) * PARAMS_PER_PAGE;
+            return self.currentPage() * PARAMS_PER_PAGE;
         });
 
         cursorDevice.addPageNamesObserver(function(/*...*/pageNames) {
@@ -98,12 +91,11 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
                 lep.logWarn('(!) API bug probably fixed for cursorDevice.addPageNamesObserver()');
             }
 
-            for (var i = pageNamesCollection.length - 1, nameIndex; i >= 0; i--) {
-                nameIndex = (NUMBER_OF_FIX_PARAM_PAGES + i);
-                _paramPageNames[nameIndex] = pageNamesCollection[i];
+            for (var nameIndex = pageNamesCollection.length - 1; nameIndex >= 0; nameIndex--) {
+                _paramPageNames[nameIndex] = pageNamesCollection[nameIndex];
             }
 
-            _numberOfCustomParameterPages(arguments.length);
+            _parameterPagesCount(arguments.length);
             recallParamPageForDevice();
         });
 

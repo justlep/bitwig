@@ -5,7 +5,7 @@
  * License: LGPLv3 (http://www.gnu.org/licenses/lgpl-3.0.txt)
  */
 
-loadAPI(1);
+loadAPI(2);
 load('lep/api.js');
 
 // @deprecationChecked:1.3.15
@@ -147,7 +147,7 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
             PAN:    lep.ValueSet.createPanValueSet(trackBank, WINDOW_SIZE),
             SEND:   lep.ValueSet.createSendsValueSet(trackBank, SENDS_NUMBER, WINDOW_SIZE),
             MACRO:  new lep.MacroValueSet(cursorDevice),
-            PARAM:  new lep.GreedyParamsValueSet(cursorDevice, PARAM_PAGES_NUMBER),
+            PARAM:  new lep.ParamsValueSet(cursorDevice, PARAM_PAGES_NUMBER),
             USERCONTROL: lep.ValueSet.createUserControlsValueSet(USER_CONTROL_PAGES, WINDOW_SIZE, 'BCF-UC-{}-{}'),
             SOLO:   lep.ValueSet.createSoloValueSet(trackBank, WINDOW_SIZE, prefs),
             ARM:    lep.ValueSet.createArmValueSet(trackBank, WINDOW_SIZE),

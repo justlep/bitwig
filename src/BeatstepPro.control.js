@@ -20,7 +20,7 @@
  *          => reply from Arturia saying BSP's values cannot be updated via CC messages ;-(
  */
 
-loadAPI(1);
+loadAPI(2);
 load('lep/api.js');
 load('beatsteppro/BeatstepPro.js');
 
