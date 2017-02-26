@@ -494,14 +494,14 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
             });
         },
         TRANSPORT_VALUE = {
-            PLAY: lep.ToggledTransportValue.create('Play'),
-            RECORD: lep.ToggledTransportValue.create('Record'),
-            ARRANGER_AUTOMATION: lep.ToggledTransportValue.create('ArrangerAutomation'),
-            LOOP: lep.ToggledTransportValue.create('Loop'),
-            METRONOME: lep.ToggledTransportValue.create('Metronome'),
-            OVERDUB: lep.ToggledTransportValue.create('Overdub'),
-            PUNCH_IN: lep.ToggledTransportValue.create('PunchIn'),
-            PUNCH_OUT: lep.ToggledTransportValue.create('PunchOut'),
+            PLAY: lep.ToggledTransportValue.getPlayInstance(),
+            RECORD: lep.ToggledTransportValue.getRecordInstance(),
+            ARRANGER_AUTOMATION: lep.ToggledTransportValue.getArrangerAutomationInstance(),
+            LOOP: lep.ToggledTransportValue.getLoopInstance(),
+            METRONOME: lep.ToggledTransportValue.getMetronomeInstance(),
+            OVERDUB: lep.ToggledTransportValue.getOverdubInstance(),
+            PUNCH_IN: lep.ToggledTransportValue.getPunchInInstance(),
+            PUNCH_OUT: lep.ToggledTransportValue.getPunchOutInstance(),
             CLEAR_PUNCH_ON_STOP: new lep.KnockoutSyncedValue({
                 name: 'ClearPunchInOutOnStop',
                 ownValue: true,
