@@ -1,6 +1,5 @@
 /**
  * Bitwig Controller Script for the Arturia Beatstep Pro
- * v1.2
  *
  * Author: Lennart Pegel - https://github.com/justlep/bitwig
  * License: LGPLv3 (http://www.gnu.org/licenses/lgpl-3.0.txt)
@@ -11,8 +10,8 @@
  *     (Names are only sensible if you use Beatstep's default settings where Sequencer1 is using MIDI channel 1,
  *     Sequencer2 using channel 2 and Drum sequencer on MIDI channel 10)
  *   - The other MIDI channels are added as selectable MIDI inputs, too: "BSP-3" to "BSP-9" and "BSP-11" to "BSP-16"
- *   - Sends Bitwig's MIDI clock to the Beatstep, so Beatstep can be switched to "USB" sync mode and, thus,
- *     will start/stop/run synchronously with Bitwig.
+ *   - Since Bitwig 2, the user himself must enable CLOCK for this script,
+ *     so Beatstep can start/stop synchronously with Bitwig if it is switched to "USB" sync mode
  *   - Knobs in control mode are mappable. However, as Beatstep Pro doesn't seem to receive CC messages,
  *     value changes made manually in the Bitwig GUI won't update the value of the mapped Beatstep encoder :(.
  *
@@ -25,7 +24,7 @@ load('lep/api.js');
 load('beatsteppro/BeatstepPro.js');
 
 // @deprecationChecked:1.3.15
-host.defineController("Arturia Beatstep Pro (All channels)", "BSP", "1.2", "6ae51caa-3310-11e5-a151-feff819cdc9f", "github@justlep.net");
+host.defineController("Arturia Beatstep Pro (All channels)", "BSP", "2.0", "6ae51caa-3310-11e5-a151-feff819cdc9f", "github@justlep.net");
 // host.addDeviceNameBasedDiscoveryPair(["Arturia BeatStep Pro"], ["Arturia BeatStep Pro"]);
 host.defineMidiPorts(1, 1);
 

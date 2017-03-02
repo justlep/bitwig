@@ -23,8 +23,6 @@ function BeatstepPro(mainChannelsOnly) {
         ORDERED_CHANNELS = mainChannelsOnly ? [1, 2, 10, null] : [1, 2, 10, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, null],
         USER_CONTROL_CHANNELS = [1];
 
-    host.getMidiOutPort(0).setShouldSendMidiBeatClock(true);
-
     // create note inputs..
     for (var i = 0, noteChannel, zeroBasedNoteChannel, inputName; i < ORDERED_CHANNELS.length; i++) {
         noteChannel = ORDERED_CHANNELS[i];
