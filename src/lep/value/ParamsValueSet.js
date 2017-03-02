@@ -1,22 +1,28 @@
 /**
- * Represents a ValueSet of parameters from the Device Panel Mappings.
- * (!) Compatible only with ControlSets of size 8 due to the Bitwig API implementation
- *
- * Use {@link ParamsValueSet} for ControlSets of different sizes instead.
+ * Represents a ValueSet of parameters from the Device Pages.
+ * Since Bitwig 2, access is unified over the CursorRemoteControlsPage,
+ * deprecating old fixed pages (Common, Envelope, Modulation Source) and Macros.
  *
  * @constructor
  */
 lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
-
-    _init: function(cursorDevice) {
+    /**
+     * @param cursorDevice (CursorDevice)
+     * @param [optParamsPerPage] (number) optional number of parameters per page (default: 8),
+     */
+    _init: function(cursorDevice, optParamsPerPage) {
         lep.util.assertObject(cursorDevice, 'Invalid cursorDevice for ParamsValueSet');
+        lep.util.assertNumberInRangeOrEmpty(optParamsPerPage, 1, 8);
+
+        var PARAMS_PER_PAGE = lep.util.limitToRange(optParamsPerPage || 8, 1, 8),
+            remoteControlsPage = cursorDevice.createCursorRemoteControlsPage(PARAMS_PER_PAGE),
+            self = this;
+
         this._super('ParamsValueSet', 1, 8, function(paramIndex) {
-            return lep.StandardRangedValue.createParamValue(cursorDevice, paramIndex);
+            return lep.StandardRangedValue.createRemoteControlValue(remoteControlsPage, paramIndex);
         });
 
-        var self = this,
-            PARAMS_PER_PAGE = 8,
-            _parameterPagesCount = ko.observable(0),
+        var _parameterPagesCount = ko.observable(0),
             _currentPage = ko.observable(0),
             _savedPageByDeviceName = {},
             _paramPageNames = [],
@@ -29,8 +35,8 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
                 self.currentPage(_savedPageByDeviceName[self.deviceName()] || 0);
             },
             popupNotification = function(message) {
-                var isValueSetActive = !!self.values[self.currentPageValueOffset()].controller;
-                if (isValueSetActive) {
+                var isValueSetAttached = self.values[0].controller;
+                if (isValueSetAttached) {
                     host.showPopupNotification(message);
                 }
             };
@@ -56,7 +62,7 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
 
                 lep.logDebug('New page for {} -> proposed: {}, effective: {}', self.name, proposedNewPageIndex, newPageIndex);
                 lep.logDebug('setParameterPage({})', newPageIndex);
-                cursorDevice.setParameterPage(newPageIndex);
+                remoteControlsPage.selectedPageIndex().set(newPageIndex);
 
                 _currentPage(newPageIndex);
                 lep.logDebug('Selected parameter page: {}', newParameterPageName);
@@ -77,25 +83,14 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
             }
         });
 
-        this.currentPageValueOffset = ko.computed(function() {
-            return self.currentPage() * PARAMS_PER_PAGE;
-        });
+        remoteControlsPage.pageNames().addValueObserver(function(pageNamesArrayValue) {
+            _paramPageNames = [];
 
-        cursorDevice.addPageNamesObserver(function(/*...*/pageNames) {
-            // (!) Bitwig Bug: API documentation says pageNames is an array, actual type is a rest-parameter of Strings
-            var isPageNamesString = (arguments.length && typeof pageNames === 'string'),
-                pageNamesCollection = !arguments.length ? [] : isPageNamesString ? arguments : pageNames;
-
-            if (arguments.length && !isPageNamesString) {
-                // TODO remove this once Bitwig has fixed the API or the documentation
-                lep.logWarn('(!) API bug probably fixed for cursorDevice.addPageNamesObserver()');
+            for (var nameIndex in pageNamesArrayValue) {
+                _paramPageNames.push(pageNamesArrayValue[nameIndex]);
             }
+            _parameterPagesCount(_paramPageNames.length);
 
-            for (var nameIndex = pageNamesCollection.length - 1; nameIndex >= 0; nameIndex--) {
-                _paramPageNames[nameIndex] = pageNamesCollection[nameIndex];
-            }
-
-            _parameterPagesCount(arguments.length);
             recallParamPageForDevice();
         });
 
@@ -105,9 +100,6 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
             hasDeviceChanged = true;
         });
 
-        //cursorDevice.addSelectedPageObserver(-1, function(paramPage) {
-        //    lep.logDebug('Selected paramsPage observer reports: {}', paramPage);
-        //});
     }
 
 });

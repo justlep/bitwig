@@ -23,8 +23,10 @@ lep.ChannelSelectValue = lep.util.extendClass(lep.BaseValue, {
     },
     /** @Override */
     onAbsoluteValueReceived: function(absoluteValue) {
-        if (this.toggleOnPressed ^ !!absoluteValue) return;
-        this.channel.selectInMixer();
+        var isPressed = !!absoluteValue;
+        if (this.toggleOnPressed === isPressed) {
+            this.channel.selectInMixer();
+        }
     },
 
     velocityValueOn: 127,

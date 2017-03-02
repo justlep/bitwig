@@ -105,8 +105,8 @@ lep.BCR2000 = function(bcrPresetNumber, bcfMidiChannel) {
         },
 
         transport = lep.util.getTransport(),
-        trackBank = host.createTrackBank(WINDOW_SIZE, SENDS_NUMBER, 0),
-        cursorDevice = host.createEditorCursorDevice(),
+        trackBank = host.createMainTrackBank(WINDOW_SIZE, SENDS_NUMBER, 0),
+        cursorDevice = host.createEditorCursorDevice(SENDS_NUMBER),
         eventDispatcher = lep.MidiEventDispatcher.getInstance(),
 
         isShiftPressed = ko.observable(false),
@@ -135,10 +135,10 @@ lep.BCR2000 = function(bcrPresetNumber, bcfMidiChannel) {
             PLAYING_STATUS_CHANGED: function(isPlaying) {
                 if (!isPlaying && clearPunchOnStop()) {
                     if (TRANSPORT_VALUE.PUNCH_IN.value) {
-                        transport.togglePunchIn();
+                        transport.isPunchInEnabled().toggle();
                     }
                     if (TRANSPORT_VALUE.PUNCH_OUT.value) {
-                        transport.togglePunchOut();
+                        transport.isPunchOutEnabled().toggle();
                     }
                 }
             }
@@ -148,9 +148,9 @@ lep.BCR2000 = function(bcrPresetNumber, bcfMidiChannel) {
             VOLUME: lep.ValueSet.createVolumeValueSet(trackBank, WINDOW_SIZE),
             PAN:    lep.ValueSet.createPanValueSet(trackBank, WINDOW_SIZE),
             SEND:   lep.ValueSet.createSendsValueSet(trackBank, SENDS_NUMBER, WINDOW_SIZE),
-            MACRO:  new lep.MacroValueSet(cursorDevice),
-            PARAM:  new lep.GreedyParamsValueSet(cursorDevice, PARAM_PAGES_NUMBER),
-            USERCONTROL: lep.ValueSet.createUserControlsValueSet(USER_CONTROL_PAGES, WINDOW_SIZE, 'BCF-UC-{}-{}'),
+            SEND2:   lep.ValueSet.createSendsValueSet(trackBank, SENDS_NUMBER, WINDOW_SIZE, true),
+            PARAM:  new lep.ParamsValueSet(cursorDevice, WINDOW_SIZE),
+            USERCONTROL: lep.ValueSet.createUserControlsValueSet(USER_CONTROL_PAGES, WINDOW_SIZE, 'BCR-UC-{}-{}'),
             SOLO:   lep.ValueSet.createSoloValueSet(trackBank, WINDOW_SIZE, prefs),
             ARM:    lep.ValueSet.createArmValueSet(trackBank, WINDOW_SIZE),
             MUTE:   lep.ValueSet.createMuteValueSet(trackBank, WINDOW_SIZE),
@@ -161,7 +161,7 @@ lep.BCR2000 = function(bcrPresetNumber, bcfMidiChannel) {
             VALUESET.VOLUME,
             VALUESET.PAN,
             VALUESET.SEND,
-            VALUESET.MACRO,
+            VALUESET.SEND2,
             VALUESET.PARAM,
             VALUESET.USERCONTROL
         ],
@@ -267,7 +267,8 @@ lep.BCR2000 = function(bcrPresetNumber, bcfMidiChannel) {
             _assertion: lep.util.assert(SWITCHABLE_VALUESETS.length <= WINDOW_SIZE-2, 'There are more value types than encoder buttons!'),
             FOR_ENCODERS: new lep.ValueSet('EncoderValueTypeSelect', 1, WINDOW_SIZE, function(index) {
                 var isPrevPageIndex = (index === WINDOW_SIZE-2),
-                    isNextPageBtn = (index === WINDOW_SIZE-1);
+                    isNextPageBtn = (index === WINDOW_SIZE-1),
+                    switchableValueSet = !isPrevPageIndex && !isNextPageBtn && SWITCHABLE_VALUESETS[index];
 
                 if (isPrevPageIndex) {
                     return new lep.KnockoutSyncedValue({
@@ -285,10 +286,10 @@ lep.BCR2000 = function(bcrPresetNumber, bcfMidiChannel) {
                         onClick: CONTROLSET.ENCODERS.nextValuePage
                     });
                 }
-                if (SWITCHABLE_VALUESETS[index]) {
+                if (switchableValueSet) {
                     return new lep.KnockoutSyncedValue({
-                        name: 'EncoderValueTypeSelect-' + SWITCHABLE_VALUESETS[index].name,
-                        ownValue: SWITCHABLE_VALUESETS[index],
+                        name: 'EncoderValueTypeSelect-' + switchableValueSet.name,
+                        ownValue: switchableValueSet,
                         refObservable: currentEncoderValueSetObservable
                     });
                 }
@@ -296,7 +297,8 @@ lep.BCR2000 = function(bcrPresetNumber, bcfMidiChannel) {
             FOR_FADERS: new lep.ValueSet('FaderValueTypeSelect', 1, WINDOW_SIZE, function(index) {
                 lep.util.assert(SWITCHABLE_VALUESETS.length);
                 var isPrevPageIndex = (index === WINDOW_SIZE-2),
-                    isNextPageBtn = (index === WINDOW_SIZE-1);
+                    isNextPageBtn = (index === WINDOW_SIZE-1),
+                    switchableValueSet = !isPrevPageIndex && !isNextPageBtn && SWITCHABLE_VALUESETS[index];
 
                 if (isPrevPageIndex) {
                     return new lep.KnockoutSyncedValue({
@@ -314,10 +316,10 @@ lep.BCR2000 = function(bcrPresetNumber, bcfMidiChannel) {
                         onClick: CONTROLSET.FADERS.nextValuePage
                     });
                 }
-                if (SWITCHABLE_VALUESETS[index]) {
+                if (switchableValueSet) {
                     return new lep.KnockoutSyncedValue({
-                        name: 'FaderValueTypeSelect-' + SWITCHABLE_VALUESETS[index].name,
-                        ownValue: SWITCHABLE_VALUESETS[index],
+                        name: 'FaderValueTypeSelect-' + switchableValueSet.name,
+                        ownValue: switchableValueSet,
                         refObservable: currentFaderValueSetObservable
                     });
                 }
@@ -358,6 +360,7 @@ lep.BCR2000 = function(bcrPresetNumber, bcfMidiChannel) {
         },
 
         /**
+         * @deprecated
          * Create the button and attachend value that toggle the Morpher on/off
          */
         initMorpherButton = function() {

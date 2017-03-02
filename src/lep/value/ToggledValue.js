@@ -27,11 +27,13 @@ lep.ToggledValue = lep.util.extendClass(lep.BaseValue, {
     },
     /** @Override */
     onAbsoluteValueReceived: function(absoluteValue) {
-        if (this.toggleOnPressed ^ !!absoluteValue) return;
-        if (this.prefs && (typeof this.prefs.soloExclusive !== 'undefined')) {
-            this.togglableValue.toggle(!!this.prefs.soloExclusive);
-        } else {
-            this.togglableValue.toggle();
+        var isPressed = !!absoluteValue;
+        if (this.toggleOnPressed === isPressed) {
+            if (this.prefs && (typeof this.prefs.soloExclusive !== 'undefined')) {
+                this.togglableValue.toggle(!!this.prefs.soloExclusive);
+            } else {
+                this.togglableValue.toggle();
+            }
         }
     },
     setInstanceVelocityValues: function(onValueOrEmpty, offValueOrEmpty) {

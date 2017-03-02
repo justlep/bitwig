@@ -1,16 +1,31 @@
-loadAPI('foo');
+loadAPI(2);
 
 // @deprecationChecked:1.3.15
-host.defineController('LeP', 'Test-Script', '2.0', '98eac9c6-68fb-11e5-9d70-feff819cd999', 'meme');
+host.defineController('bla', 'testtest', '2.1', '98eac9c6-68fb-11e5-9d70-feff819cd123', 'meme');
 host.defineMidiPorts(0, 0);
 
 function init() {
 
-    println('trying...');
+    var cursorDevice = host.createEditorCursorDevice(0),
+        remoteControlsPage = cursorDevice.createCursorRemoteControlsPage(8);
 
-    var someSettableBoolean = host.createTransport().isPlaying();
+    remoteControlsPage.pageNames().addValueObserver(function(pageNamesArrayValue) {
+        println('----');
+        println('arguments.length: ' + arguments.length);
+        println('typeof arguments: ' + typeof arguments);
+        println('typeof arguments[0]: ' + typeof arguments[0]);
+        println('typeof pageNamesArrayValue.length: ' + pageNamesArrayValue.length);
+        if (pageNamesArrayValue.length > 0) {
+            println('typeof pageNamesArrayValue[0]: ' + pageNamesArrayValue[0]);
+        }
 
-    println('done');
+        for (var i in pageNamesArrayValue) {
+            println(i);
+        }
+        println('----');
+    });
+
+    println('---');
 }
 
 function exit() {}

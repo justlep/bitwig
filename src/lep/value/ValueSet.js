@@ -14,7 +14,7 @@
  */
 lep.ValueSet = function(name, rows, valuesPerRow, valueCreationFn) {
     lep.util.assertString(name, 'Invalid name for ValueSet');
-    lep.util.assert(!lep.ValueSet.instancesByName[name], 'ValueSet with name "{}" already exists', name);
+    lep.util.assert(!lep.ValueSet.exists(name), 'ValueSet with name "{}" already exists', name);
     lep.util.assertNumber(rows, 'Invalids rows for ValueSet: {}', rows);
     lep.util.assertNumber(valuesPerRow, 'Invalid valuesPerRow for ValueSet: {}', valuesPerRow);
     lep.util.assertNumberInRange(rows * valuesPerRow, 1, lep.ValueSet.MAX_SIZE, 'Invalid size for ValueSet (actual: {}, max: {})',
@@ -41,6 +41,11 @@ lep.ValueSet = function(name, rows, valuesPerRow, valueCreationFn) {
 lep.ValueSet.instancesByName = {};
 
 /** @static */
+lep.ValueSet.exists = function(name) {
+    return !!lep.ValueSet.instancesByName[name];
+};
+
+/** @static */
 lep.ValueSet.MAX_SIZE = 100;
 
 lep.ValueSet.prototype = {
@@ -52,7 +57,7 @@ lep.ValueSet.prototype = {
     },
     /**
      * Returns this valueSet's id which may not necessarily be constant.
-     * To be overridden by derived device-specific ValueSet (see {@link ParamsValueSet} and {@link GreedyParamsValueSet}.
+     * To be overridden by derived device-specific ValueSet (see {@link ParamsValueSet}.
      */
     dynamicId: function() {
         return this.id + '_' + this.name;
@@ -122,12 +127,14 @@ lep.ValueSet.createPanValueSet = function(trackBank, windowSize) {
 };
 
 /** @static */
-lep.ValueSet.createSendsValueSet = function(trackBank, numberOfSends, windowSize) {
+lep.ValueSet.createSendsValueSet = function(trackBank, numberOfSends, windowSize, allowSecondInstance) {
     lep.util.assertObject(trackBank, 'Invalid trackBank for ValueSet.createSendsValueSet');
     lep.util.assertNumberInRange(numberOfSends, 1, 20, 'Invalid numberOfSends {} for ValueSet.createSendsValueSet', numberOfSends);
     lep.util.assertNumberInRange(windowSize, 1, 1000, 'Invalid windowSize {} for ValueSet.createSendsValueSet', windowSize);
 
-    return new lep.ValueSet('Sends', numberOfSends, windowSize, function(sendIndex, channelIndex) {
+    var name = (lep.ValueSet.exists('Sends') && allowSecondInstance) ? 'Sends2' : 'Sends';
+
+    return new lep.ValueSet(name, numberOfSends, windowSize, function(sendIndex, channelIndex) {
         return lep.StandardRangedValue.createSendValue(trackBank, channelIndex, sendIndex);
     });
 };

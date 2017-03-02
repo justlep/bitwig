@@ -76,17 +76,10 @@ lep.StandardRangedValue.createSendValue = function(channelBank, channelIndex, se
     });
 };
 
-/** @static */
-lep.StandardRangedValue.createMacroValue = function(cursorDevice, macroIndex) {
-    lep.util.assertObject(cursorDevice, 'Invalid cursorDevice for StandardRangedValue.createMacroValue');
-    lep.util.assertNumber(macroIndex, 'Invalid macroIndex for StandardRangedValue.createMacroValue');
-    return new lep.StandardRangedValue({
-        name: lep.util.formatString('Macro{}', macroIndex),
-        rangedValue: cursorDevice.getMacro(macroIndex).getAmount()
-    });
-};
-
-/** @static */
+/**
+ * @deprecated
+ * @static
+ **/
 lep.StandardRangedValue.createParamValue = function(cursorDevice, paramIndex) {
     lep.util.assertObject(cursorDevice, 'Invalid cursorDevice for StandardRangedValue.createParamValue');
     lep.util.assertNumber(paramIndex, 'Invalid paramIndex for StandardRangedValue.createParamValue');
@@ -95,30 +88,17 @@ lep.StandardRangedValue.createParamValue = function(cursorDevice, paramIndex) {
         rangedValue: cursorDevice.getParameter(paramIndex)
     });
 };
-/**
- * @deprecated as of Bitwig2
- * @static
- **/
-lep.StandardRangedValue.createCommonParamValue = function(cursorDevice, paramIndex) {
-    lep.util.assertObject(cursorDevice, 'Invalid cursorDevice for StandardRangedValue.createCommonParamValue');
-    lep.util.assertNumber(paramIndex, 'Invalid paramIndex for StandardRangedValue.createCommonParamValue');
+
+/** @static **/
+lep.StandardRangedValue.createRemoteControlValue = function(remoteControlsPage, paramIndex) {
+    lep.util.assertObject(remoteControlsPage, 'Invalid remoteControlsPage for StandardRangedValue.createRemoteControlValue');
+    lep.util.assertNumber(paramIndex, 'Invalid paramIndex for StandardRangedValue.createRemoteControlValue');
     return new lep.StandardRangedValue({
-        name: lep.util.formatString('CommonParam{}', paramIndex),
-        rangedValue: cursorDevice.getCommonParameter(paramIndex)
+        name: lep.util.formatString('Param{}', paramIndex),
+        rangedValue: remoteControlsPage.getParameter(paramIndex)
     });
 };
-/**
- * @deprecated as of Bitwig2
- * @static
- **/
-lep.StandardRangedValue.createEnvelopeParamValue = function(cursorDevice, paramIndex) {
-    lep.util.assertObject(cursorDevice, 'Invalid cursorDevice for StandardRangedValue.createEnvelopeParamValue');
-    lep.util.assertNumber(paramIndex, 'Invalid paramIndex for StandardRangedValue.createEnvelopeParamValue');
-    return new lep.StandardRangedValue({
-        name: lep.util.formatString('EnvParam{}', paramIndex),
-        rangedValue: cursorDevice.getEnvelopeParameter(paramIndex)
-    });
-};
+
 /** @static */
 lep.StandardRangedValue.createUserControlValue = function(userControlBank, controlIndex, label) {
     lep.util.assertObject(userControlBank, 'Invalid userControlBank for StandardRangedValue.createUserControlValue');

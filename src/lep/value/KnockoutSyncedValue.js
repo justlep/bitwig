@@ -98,7 +98,9 @@ lep.KnockoutSyncedValue = lep.util.extendClass(lep.BaseValue, {
             return this.skipRestore();
         }
 
-        if (this.toggleOnPressed ^ isPressed) return;
+        if (this.toggleOnPressed !== isPressed) {
+            return;
+        }
 
         // from here we have the "toggle-now!" case
 

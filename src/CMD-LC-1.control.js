@@ -66,7 +66,7 @@ lep.LC1 = function() {
         WINDOW_SIZE = 4,
         trackBank = host.createTrackBank(WINDOW_SIZE, SENDS_NUMBER, SCENES_NUMBER),
 
-        cursorDevice = host.createEditorCursorDevice(),
+        cursorDevice = host.createEditorCursorDevice(SENDS_NUMBER),
         eventDispatcher = lep.MidiEventDispatcher.getInstance(),
         isShiftPressed = ko.observable(false),
 
@@ -135,7 +135,6 @@ lep.LC1 = function() {
             VOLUME: lep.ValueSet.createVolumeValueSet(trackBank, WINDOW_SIZE),
             PAN: lep.ValueSet.createPanValueSet(trackBank, WINDOW_SIZE),
             SEND: lep.ValueSet.createSendsValueSet(trackBank, SENDS_NUMBER, WINDOW_SIZE),
-            MACRO: new lep.MacroValueSet(cursorDevice),
             PARAM: new lep.ParamsValueSet(cursorDevice),
             USERCONTROL: lep.ValueSet.createUserControlsValueSet(USER_CONTROL_PAGES, WINDOW_SIZE, 'LC1-UC-{}-{}'),
             CLIP_MATRIX: new lep.ValueSet('ClipMatrixValues', WINDOW_SIZE, SCENES_NUMBER, function(trackIndex, sceneIndex) {

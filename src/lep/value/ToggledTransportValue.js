@@ -11,25 +11,15 @@ lep.ToggledTransportValue = lep.util.extendClass(lep.BaseValue, {
     _init: function(opts) {
         this._super(opts);
 
-        util.assert(!lep.ToggledTransportValue._instances[this.name], 'Must use lep.ToggledTransportValue.getXXXXInstance');
+        lep.util.assert(!lep.ToggledTransportValue._instances[this.name], 'Must use lep.ToggledTransportValue.getXXXXInstance');
         lep.ToggledTransportValue._instances[this.name] = this;
 
         var self = this,
             transport = lep.util.getTransport(),
-            settableBooleanProperty = transport[opts.booleanPropertyName],
-            settableBoolean;
+            settableBoolean = transport[opts.booleanPropertyName]();
 
-        lep.util.assertFunction(settableBooleanProperty, 'Missing settableBooleanProperty {} in Transport for {}',
+        lep.util.assert(settableBoolean, 'Invalid settableBoolean {} in Transport for {}',
             opts.booleanPropertyName, this.name);
-
-        //println('typeof settableBooleanProperty: ' + typeof settableBooleanProperty);
-        //println('typeof settableBooleanProperty.call: ' + typeof settableBooleanProperty.call);
-        //println('typeof settableBooleanProperty.apply' + typeof settableBooleanProperty.apply);
-
-        // TODO this crashes currently with a weird error:
-        // Error starting driver: This cannot be called when specifying required API version 1:
-
-        settableBoolean = settableBooleanProperty();
 
         this.toggleOnPressed = (opts.toggleOnPressed !== false);
 
@@ -44,8 +34,10 @@ lep.ToggledTransportValue = lep.util.extendClass(lep.BaseValue, {
     },
     /** @Override */
     onAbsoluteValueReceived: function(absoluteValue) {
-        if (this.toggleOnPressed ^ !!absoluteValue) return;
-        this.togglingMethod();
+        var isPressed = !!absoluteValue;
+        if (this.toggleOnPressed === isPressed) {
+            this.togglingMethod();
+        }
     }
 });
 
@@ -56,7 +48,7 @@ lep.ToggledTransportValue._instances = {};
 (function(makeInstanceGetter) {
 
     lep.ToggledTransportValue.getPlayInstance = makeInstanceGetter('Play', 'isPlaying');
-    lep.ToggledTransportValue.getMetronomeInstance = makeInstanceGetter('Metronome', 'isMetronomeTickPlaybackEnabled');
+    lep.ToggledTransportValue.getMetronomeInstance = makeInstanceGetter('Metronome', 'isMetronomeEnabled');
     lep.ToggledTransportValue.getRecordInstance = makeInstanceGetter('Record', 'isArrangerRecordEnabled');
     lep.ToggledTransportValue.getPunchInInstance = makeInstanceGetter('PunchIn', 'isPunchInEnabled');
     lep.ToggledTransportValue.getPunchOutInstance = makeInstanceGetter('PunchOut', 'isPunchOutEnabled');
@@ -65,7 +57,8 @@ lep.ToggledTransportValue._instances = {};
     lep.ToggledTransportValue.getArrangerAutomationInstance = makeInstanceGetter('ArrangerAutomation', 'isArrangerAutomationWriteEnabled');
 
 })(function _makeInstanceGetter(instanceName, transportBooleanPropertyName) {
-    lep.util.assertString(instanceName && transportBooleanPropertyName, 'Bad call of _makeInstanceGetter for ToggledTransportValue', instanceName);
+    lep.util.assertString(instanceName && transportBooleanPropertyName,
+        'Bad call of _makeInstanceGetter for ToggledTransportValue, instanceName = {}', instanceName);
 
     return function() {
         return lep.ToggledTransportValue._instances[instanceName] || new lep.ToggledTransportValue({
