@@ -10,7 +10,7 @@
 loadAPI(2);
 
 // @deprecationChecked:1.3.15
-host.defineController('Generic', 'Pads', '1.0', 'c5bb3af6-9c15-11e5-8994-feff819cdc9f', 'Lennart Pegel <github@justlep.net>');
+host.defineController('Generic', 'Pads', '2.0', 'c5bb3af6-9c15-11e5-8994-feff819cdc9f', 'Lennart Pegel <github@justlep.net>');
 host.defineMidiPorts(1, 0);
 
 var MIDI_CHANNEL_MASK = '?',// by default, all channels are used; replace with single channel if needed

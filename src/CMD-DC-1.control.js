@@ -5,11 +5,11 @@
  * License: LGPLv3 (http://www.gnu.org/licenses/lgpl-3.0.txt)
  */
 
-loadAPI(1);
+loadAPI(2);
 load('lep/api.js');
 
 // @deprecationChecked:1.3.15
-host.defineController('Behringer', 'CMD DC-1 (LeP)', '1.2', '047f0d84-8ace-11e5-af63-feff819cdc9f', 'Lennart Pegel <github@justlep.net>');
+host.defineController('Behringer', 'CMD DC-1 (LeP)', '2.0', '047f0d84-8ace-11e5-af63-feff819cdc9f', 'Lennart Pegel <github@justlep.net>');
 host.defineMidiPorts(1, 1);
 host.addDeviceNameBasedDiscoveryPair(['CMD DC-1'], ['CMD DC-1']);
 

@@ -1,7 +1,7 @@
 loadAPI(2);
 
 // @deprecationChecked:1.3.15
-host.defineController('bla', 'testtest', '2.1', '98eac9c6-68fb-11e5-9d70-feff819cd123', 'meme');
+host.defineController('LeP', 'test', '2.1', '98eac9c6-68fb-11e5-9d70-feff819cd123', 'meme');
 host.defineMidiPorts(0, 0);
 
 function init() {
