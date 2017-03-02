@@ -10,14 +10,14 @@ lep.StandardRangedValue = lep.util.extendClass(lep.BaseValue, {
         this._super(opts);
 
         lep.util.assertObject(opts.rangedValue, 'Missing rangedValue for {}', opts.name);
-        lep.util.assertStringOrEmpty(opts.label, 'Invalid label for {}', opts.name);
 
         var self = this;
 
         this.rangedValue = opts.rangedValue;
-        if (opts.label) {
-            this.rangedValue.setLabel(opts.label);
-        }
+        this.indicateableValue = opts.indicateableValue || opts.rangedValue;
+
+        lep.util.assertFunction(this.indicateableValue.setIndication, 'Invalid indicateableValue for {}', this.name);
+
         this.rangedValue.addValueObserver(128, function(newValue) {
             self.value = newValue;
             self.syncToController();
@@ -33,7 +33,7 @@ lep.StandardRangedValue = lep.util.extendClass(lep.BaseValue, {
     /** @Override */
     setIndication: function(on) {
         // lep.logDebug('setIndications({}) for {}', on, this.name);
-        this.rangedValue.setIndication(on);
+        this.indicateableValue.setIndication(on);
     },
     /** @Override */
     onRelativeValueReceived: function(delta, range) {
@@ -99,14 +99,22 @@ lep.StandardRangedValue.createRemoteControlValue = function(remoteControlsPage, 
     });
 };
 
-/** @static */
+/**
+ * @static
+ *
+ * TODO: in Bitwig 2 these values do show NO indication marker + do not get any feedback from the daw
+ **/
 lep.StandardRangedValue.createUserControlValue = function(userControlBank, controlIndex, label) {
     lep.util.assertObject(userControlBank, 'Invalid userControlBank for StandardRangedValue.createUserControlValue');
     lep.util.assertNumberInRange(controlIndex, 0, 127, 'Invalid controlIndex for StandardRangedValue.createUserControlValue');
     lep.util.assertString(label, 'Invalid label for StandardRangedValue.createUserControlValue');
+
+    var userControl = userControlBank.getControl(controlIndex);
+    userControl.setLabel(label);
+
     return new lep.StandardRangedValue({
         name: label,
-        rangedValue: userControlBank.getControl(controlIndex),
-        label: label
+        rangedValue: userControl.value(),
+        indicateableValue: userControl
     });
 };
