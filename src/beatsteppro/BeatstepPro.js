@@ -28,7 +28,7 @@ function BeatstepPro(mainChannelsOnly) {
         noteChannel = ORDERED_CHANNELS[i];
         zeroBasedNoteChannel = (typeof noteChannel === 'number') ? (noteChannel - 1) : null;
         inputName = INPUT_NAMES[noteChannel] || noteChannel;
-        lep.MidiEventDispatcher.getInstance().createNoteInput(inputName, zeroBasedNoteChannel);
+        lep.MidiEventDispatcher.getInstance().createNoteInput(''+inputName, zeroBasedNoteChannel);
     }
 
     // create user controls..
