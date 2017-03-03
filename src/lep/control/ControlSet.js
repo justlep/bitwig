@@ -62,10 +62,10 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
             }
 
             lep.ControlSet.instanceByValueSetId[newValueSet.id] = self;
-            if (newValueSet instanceof lep.ParamsValueSet) {
-                lep.util.assert(self.controls.length === 8,
-                    'ParamsValueSet requires a ControlSet of size 8, actual size is {}', self.controls.length);
-            }
+            // if (newValueSet instanceof lep.ParamsValueSet) {
+            //     lep.util.assert(self.controls.length === 8,
+            //         'ParamsValueSet requires a ControlSet of size 8, actual size is {}', self.controls.length);
+            // }
             _valueSet(newValueSet);
         }
     });
