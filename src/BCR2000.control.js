@@ -360,7 +360,6 @@ lep.BCR2000 = function(bcrPresetNumber, bcfMidiChannel) {
         },
 
         /**
-         * @deprecated
          * Create the button and attachend value that toggle the Morpher on/off
          */
         initMorpherButton = function() {
