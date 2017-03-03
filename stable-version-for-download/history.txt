@@ -1,8 +1,8 @@
 
 v2.0.0-beta6 (03-Mar-2017)
  - larger refactoring of all scripts to work with Bitwig 2 beta 6 (haven't bought the Upgrade yet)
- - BCR2000 + BCF2000 now have a second PAN mode where the Macros used to be,
-   so two pans of each channel can be controller simultaneously using the upper+lower knobs/faders
+ - BCR2000 + BCF2000 now have a second SENDS mode where the Macros used to be,
+   so two sends of each channel (even 4 on the BCR) can be controlled simultaneously using the upper+lower knobs/faders
  - TODO more testing, update documentation, update deprecation-detection-scripts
 
 v1.0.14 (13-Aug-2016)
