@@ -8,11 +8,14 @@
  *
  *  (!) Bug?: Omni is currently not working - channel-specific note inputs seem to 'mask' the Omni.
  *            Vice-versa, if Omni is defined *before* channel-specific inputs, the channel-input are silenced.
+ *
+ * Current verson at:
+ * https://github.com/justlep/bitwig/blob/master/tmp/GenericKeysV2.control.js
  */
 
 loadAPI(2);
 
-host.defineController('Generic', 'Generic Keys v2', '2.0', '4dc7bf18-004d-11e7-93ae-92361f002671', 'justlep');
+host.defineController('Generic', 'Generic Keys v2', '2.0', '4dc7bf18-004d-11e7-93ae-92361f002671', 'github@justlep.net');
 host.defineMidiPorts(1, 1);
 
 var LOWEST_CC = 1,
