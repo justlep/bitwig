@@ -2,7 +2,7 @@
  * Bitwig Controller Script for the Arturia Beatstep Pro
  *
  * Author: Lennart Pegel - https://github.com/justlep/bitwig
- * License: LGPLv3 (http://www.gnu.org/licenses/lgpl-3.0.txt)
+ * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  *
  * What it does:
  *   - Adds Beatstep's three sequencers as selectable MIDI inputs ('BSP-S1', 'BSP-S2' and 'BSP-DRUM'),

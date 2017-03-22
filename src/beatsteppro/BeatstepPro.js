@@ -3,7 +3,7 @@
  * @param [mainChannelsOnly] (boolean) if true, only the main inputs are provided
  *
  * Author: Lennart Pegel - https://github.com/justlep/bitwig
- * License: LGPLv3 (http://www.gnu.org/licenses/lgpl-3.0.txt)
+ * License: MIT (http://www.opensource.org/licenses/mit-license.php)
 
  * @constructor
  */
