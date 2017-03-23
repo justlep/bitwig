@@ -8,17 +8,21 @@
 lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
     /**
      * @param cursorDevice (CursorDevice)
-     * @param [optParamsPerPage] (number) optional number of parameters per page (default: 8),
+     * @param [followsSelectedPage] (boolean) (optional) if true (default), the ValueSet's current page follows the selection in the DAW
+     * @param [optParamsPerPage] (number) (optional, default: 8) number of parameters per page (1-8)
      */
-    _init: function(cursorDevice, optParamsPerPage) {
+    _init: function(cursorDevice, followsSelectedPage, optParamsPerPage) {
         lep.util.assertObject(cursorDevice, 'Invalid cursorDevice for ParamsValueSet');
         lep.util.assertNumberInRangeOrEmpty(optParamsPerPage, 1, 8);
 
-        var PARAMS_PER_PAGE = lep.util.limitToRange(optParamsPerPage || 8, 1, 8),
-            remoteControlsPage = cursorDevice.createCursorRemoteControlsPage(PARAMS_PER_PAGE),
-            self = this;
+        var self = this,
+            paramsPerPage = lep.util.limitToRange(optParamsPerPage || 8, 1, 8),
+            valueSetName = 'ParamsValueSet' + lep.ParamsValueSet.instances.push(this),
+            remoteControlsPage = (followsSelectedPage !== false) ?
+                cursorDevice.createCursorRemoteControlsPage(paramsPerPage) :
+                cursorDevice.createCursorRemoteControlsPage(valueSetName, paramsPerPage, '');
 
-        this._super('ParamsValueSet', 1, 8, function(paramIndex) {
+        this._super(valueSetName, 1, 8, function(paramIndex) {
             return lep.StandardRangedValue.createRemoteControlValue(remoteControlsPage, paramIndex);
         });
 
@@ -103,3 +107,6 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
     }
 
 });
+
+/** @static */
+lep.ParamsValueSet.instances = [];
