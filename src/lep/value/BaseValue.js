@@ -23,7 +23,6 @@ lep.BaseValue = function(opts) {
 lep.BaseValue.prototype = {
     setIndication:   lep.util.NOP,
     syncToDaw:       lep.util.NOP,
-    syncFromDaw:     lep.util.NOP,
 
     syncToController: function() {
         if (this.controller) {
