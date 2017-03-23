@@ -61,19 +61,20 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
                     lep.logDebug('Skipped setting new page of ParamValueSet due to prior device change');
                     return;
                 }
-                var newPageIndex = lep.util.limitToRange(proposedNewPageIndex, 0, self.lastPage()),
-                    newParameterPageName = _paramPageNames[newPageIndex] || '-default-';
-
+                var newPageIndex = lep.util.limitToRange(proposedNewPageIndex, 0, self.lastPage());
                 lep.logDebug('New page for {} -> proposed: {}, effective: {}', self.name, proposedNewPageIndex, newPageIndex);
                 lep.logDebug('setParameterPage({})', newPageIndex);
                 remoteControlsPage.selectedPageIndex().set(newPageIndex);
-
-                _currentPage(newPageIndex);
-                lep.logDebug('Selected parameter page: {}', newParameterPageName);
-                popupNotification('Parameter Page: ' + newParameterPageName);
-                saveParamPageForCurrentDevice();
             }
         });
+
+        remoteControlsPage.selectedPageIndex().addValueObserver(function(newCurrentPage) {
+            _currentPage(newCurrentPage);
+            var newParameterPageName = _paramPageNames[newCurrentPage] || '-default-';
+            lep.logDebug('Selected parameter page: {}', newParameterPageName);
+            popupNotification('Parameter Page: ' + newParameterPageName);
+            saveParamPageForCurrentDevice();
+        }, -1);
 
         /** 0-based index of the last selectable value page */
         this.lastPage = ko.computed(function() {
