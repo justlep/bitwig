@@ -47,8 +47,17 @@ lep.BaseControl = function(opts) {
     this.minFeedbackValue = opts.minFeedbackValue || 0;
     this.maxFeedbackValue = opts.maxFeedbackValue || 0;
     this.feedbackValueCorrectionMultiplier = (this.maxFeedbackValue - this.minFeedbackValue) / 127;
+    lep.util.assertNumberInRange(this.feedbackValueCorrectionMultiplier, 0, 0.999999999,
+        'Invalid feedbackValueCorrectionMultiplier "{}" for {}, based on minFeedbackValue={}, maxFeedbackValue={}',
+        this.feedbackValueCorrectionMultiplier, this.name, this.minFeedbackValue, this.maxFeedbackValue
+    );
 
     this.isMuted = !!opts.isMuted;
+
+    // the latest absolute value received from the controller that might be
+    // skipped (and reset) during the next syncToMidi() if skipFeedbackLoops is not explicitly disabled
+    this.nextFeedbackLoopValue = null;
+    this.skipFeedbackLoops = !this.sendsDiffValues && !this.feedbackValueCorrectionMultiplier && opts.skipFeedbackLoops !== false;
 
     this.bindMidiValueListener();
 };
@@ -68,12 +77,14 @@ lep.BaseControl.prototype = {
     },
     setMuted: function(isMuted) {
         this.isMuted = isMuted;
+        this.nextFeedbackLoopValue = null;
         if (!isMuted) {
             this.syncToMidi();
         }
     },
     attachValue: function(value) {
         lep.util.assertBaseValue(value, 'invalid value for BaseControl<{}>.attachValue()', this.name);
+        this.nextFeedbackLoopValue = null;
         if (value === this.value) {
             return;
         } else if (value.controller && value.controller !== this) {
@@ -85,6 +96,7 @@ lep.BaseControl.prototype = {
         value.onAttach(this);
     },
     detachValue: function() {
+        this.nextFeedbackLoopValue = null;
         if (this.value) {
             this.value.onDetach();
             this.value = null;
@@ -96,22 +108,33 @@ lep.BaseControl.prototype = {
      */
     syncToMidi: function(valueOverride) {
         if (this.isMuted || (!this.value && !arguments.length)) return;
-        if (arguments.length) {
+
+        var useOverride = !!arguments.length,
+            valueToSend = useOverride ? valueOverride : (this.value.value || 0),
+            skipSync = false;
+
+        if (useOverride) {
             lep.util.assertNumberInRange(valueOverride, 0, 127, 'Invalid valueOverride {} for {}', valueOverride, this.name);
+        } else {
+            skipSync = this.skipFeedbackLoops && (this.nextFeedbackLoopValue === valueToSend);
+            this.nextFeedbackLoopValue = null;
+            if (skipSync) {
+                // println('Skipping syncToMidi(' + valueToSend + ') of ' + this.name);
+                return;
+            }
         }
-        var value = (arguments.length) ? valueOverride : (this.value.value || 0);
+
         if (this.feedbackValueCorrectionMultiplier) {
-            value = this.minFeedbackValue + Math.round(value * this.feedbackValueCorrectionMultiplier);
+            valueToSend = this.minFeedbackValue + Math.round(valueToSend * this.feedbackValueCorrectionMultiplier);
         }
 
         if (this.useValueNote) {
-            sendNoteOn(this.midiChannel, this.valueNote, value);
+            sendNoteOn(this.midiChannel, this.valueNote, valueToSend);
         } else if (this.useValueCC) {
-            sendChannelController(this.midiChannel, this.valueCC, value);
-        }
-        if (this.useClickNote && !this.useValueNote && !this.useValueCC) {
+            sendChannelController(this.midiChannel, this.valueCC, valueToSend);
+        } else if (this.useClickNote) {
             // sending click note status only makes sense for LED-buttons, not for ClickEncoders
-            sendNoteOn(this.midiChannel, this.clickNote, value);
+            sendNoteOn(this.midiChannel, this.clickNote, valueToSend);
         }
     },
     onValueReceived: function(noteOrCC, receivedValue) {
@@ -121,6 +144,7 @@ lep.BaseControl.prototype = {
                                                (receivedValue <= 64) ? receivedValue : (-1 * (128 - receivedValue));
             this.value.onRelativeValueReceived(delta, this.diffValueRange);
         } else {
+            this.nextFeedbackLoopValue = receivedValue;
             this.value.onAbsoluteValueReceived(receivedValue);
         }
     },
