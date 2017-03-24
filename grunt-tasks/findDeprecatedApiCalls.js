@@ -21,8 +21,10 @@ module.exports = function(grunt) {
     function getDeprecationsHtmlFileLocation() {
         var path = require('path'),
             programFilesDir = process.env['ProgramFiles(x86)'],
-            bitwigInstallDir = (programFilesDir) ? (programFilesDir + '/Bitwig Studio') : '{Bitwig installation dir}',
-            fileLocation = bitwigInstallDir + '/resources/doc/control-surface/api/deprecated.html';
+            // TODO FIXME
+            //bitwigInstallDir = (programFilesDir) ? (programFilesDir + '/Bitwig Studio') : '{Bitwig installation dir}',
+            bitwigInstallDir = 'C:/Program Files/Bitwig Studio 2/',
+            fileLocation = bitwigInstallDir + '/resources/doc/control-surface/api/a00307.html';
 
         return path.normalize(fileLocation);
     }
