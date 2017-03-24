@@ -2,7 +2,7 @@
   "name": "LePsControllerScripts4Bitwig",
   "title": "LeP's controller scripts for Bitwig",
   "description": "Bitwig controller script for the Behringer BCF2000, Arturia Beatstep Pro and more",
-  "version": "1.0.14",
+  "version": "2.0.0",
   "author": {
     "name": "Lennart Pegel",
     "email": "github@justlep.net",
@@ -16,7 +16,7 @@
     "test": "grunt validate test"
   },
   "main": "Gruntfile.js",
-  "license": "LGPL-3.0",
+  "license": "MIT",
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-spies": "^0.7.1",

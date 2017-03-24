@@ -1,79 +1,30 @@
-loadAPI(1);
-load('lep/api.js');
+loadAPI(2);
 
-// @deprecationChecked:1.3.15
-host.defineController('LeP', 'Test-Script', '1.0', '98eac9c6-68fb-11e5-9d70-feff819cdc9f', 'github@justlep.net');
+host.defineController('LeP', 'test', '2.1', '98eac9c6-68fb-11e5-9d70-feff819cd123', 'meme');
 host.defineMidiPorts(0, 0);
 
 function init() {
-    println('init..');
 
-    var cursorDevice = host.createEditorCursorDevice();
+    var cursorDevice = host.createEditorCursorDevice(0),
+        remoteControlsPage = cursorDevice.createCursorRemoteControlsPage(8);
 
-    cursorDevice.addCanSelectNextObserver(function(hasNext) {
-        lep.logDebug('has next device: {}', hasNext);
-    });
-    cursorDevice.addCanSelectPreviousObserver(function(hasPrev) {
-        lep.logDebug('has prev device: {}', hasPrev);
-    });
-    cursorDevice.addNextParameterPageEnabledObserver(function(hasNext) {
-        lep.logDebug('has next parameter page: {}', hasNext);
-    });
-    cursorDevice.addPreviousParameterPageEnabledObserver(function(hasPrev) {
-        lep.logDebug('has prev parameter page: {}', hasPrev);
-    });
-    cursorDevice.addHasSelectedDeviceObserver(function(device) {
-        lep.logDebug('selected device: {}', device);
-    });
-    cursorDevice.addNameObserver(40, 'unknown device', function(name) {
-        lep.logDebug('device name: "{}"', name);
-    });
-    cursorDevice.addSelectedPageObserver(-1, function(paramPage) {
-        lep.logDebug('param page: {}', paramPage);
-        if (paramPage === 0) {
-            lep.logDebug('Switching to paramPage 1');
-            cursorDevice.nextParameterPage();
+    remoteControlsPage.pageNames().addValueObserver(function(pageNamesArrayValue) {
+        println('----');
+        println('arguments.length: ' + arguments.length);
+        println('typeof arguments: ' + typeof arguments);
+        println('typeof arguments[0]: ' + typeof arguments[0]);
+        println('typeof pageNamesArrayValue.length: ' + pageNamesArrayValue.length);
+        if (pageNamesArrayValue.length > 0) {
+            println('typeof pageNamesArrayValue[0]: ' + pageNamesArrayValue[0]);
         }
-    });
-    cursorDevice.addPageNamesObserver(function(pageNames) {
-        if (!pageNames) {
-            lep.logDebug('No parameter pages.');
-        } else {
-            lep.logDebug('=> {} Parameter pages:', arguments.length);
-            for (var i=0; i<arguments.length; i++) {
-                lep.logDebug('** Parameter page name: {}', arguments[i]);
-            }
+
+        for (var i in pageNamesArrayValue) {
+            println(i);
         }
+        println('----');
     });
 
-    cursorDevice.addSlotsObserver(function(slots) {
-        if (slots) {
-            lep.logDebug('Total Device FX Slots: {}', slots.length);
-            slots.forEach(function(slotName) {
-                lep.logDebug('** Device FX Slot: {}', slotName);
-            });
-        } else {
-            lep.logDebug('Device has no slots');
-        }
-    });
-
-    var trackBank = host.createTrackBank(8, 8, 0);
-    trackBank.addSendCountObserver(function(sends) {
-       lep.logDebug('###### Sends: {}', sends);
-    });
-
-
-    cursorDevice.addDirectParameterIdObserver(function(ids) {
-        println('directparametervalues: ' + ids.length);
-        println(ids);
-    });
-
-    cursorDevice.addDirectParameterNameObserver(40, function(id, name) {
-        lep.logDev('Param {} --> {}', id, name);
-    });
-
-    println('Init done.');
+    println('---');
 }
 
-function exit() {
-}
+function exit() {}

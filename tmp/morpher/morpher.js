@@ -3,7 +3,7 @@
  * and with selectable parameters to be included in the morphing.
  *
  * Author: Lennart Pegel - https://github.com/justlep/bitwig
- * License: LGPLv3 (http://www.gnu.org/licenses/lgpl-3.0.txt)
+ * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  *
  * @constructor
  */

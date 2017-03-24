@@ -5,7 +5,7 @@
  * @param controlCreationFn (function) function creating a control,  e.g. function(index){...; return new BaseControl(..);}
  *
  * Author: Lennart Pegel - https://github.com/justlep
- * License: LGPLv3 (http://www.gnu.org/licenses/lgpl-3.0.txt)
+ * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  *
  * @constructor
  */
@@ -62,10 +62,10 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
             }
 
             lep.ControlSet.instanceByValueSetId[newValueSet.id] = self;
-            if (newValueSet instanceof lep.ParamsValueSet) {
-                lep.util.assert(self.controls.length === 8,
-                    'ParamsValueSet requires a ControlSet of size 8, actual size is {}', self.controls.length);
-            }
+            // if (newValueSet instanceof lep.ParamsValueSet) {
+            //     lep.util.assert(self.controls.length === 8,
+            //         'ParamsValueSet requires a ControlSet of size 8, actual size is {}', self.controls.length);
+            // }
             _valueSet(newValueSet);
         }
     });
@@ -100,11 +100,11 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
     });
 
     this.lastValuePage = ko.computed(function() {
-        var valueSet = _valueSet(),
-            hasGreedyParamsValueSet = (valueSet instanceof lep.GreedyParamsValueSet),
-            totalValidValues = hasGreedyParamsValueSet ? (valueSet.lastValidValueIndex() + 1) : (valueSet && valueSet.values.length);
+        var valueSet = _valueSet();
 
-        return !valueSet ? 0 : self.hasParamsValueSet() ? valueSet.lastPage() : Math.max(0, Math.ceil(totalValidValues / numberOfControls) - 1);
+        return valueSet ? (
+                self.hasParamsValueSet() ? valueSet.lastPage() : Math.max(0, Math.ceil(valueSet.values.length / numberOfControls) - 1)
+            ) : 0;
     });
 
     this.hasPrevValuePage = ko.computed(function() {
@@ -130,7 +130,12 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
     };
 
     ko.computed(function() {
-        var valueSet = _valueSet(),
+        var valueSet = _valueSet();
+        if (!valueSet) {
+            return;
+        }
+
+        var valueOffset = self.hasParamsValueSet() ? 0 : (self.valuePage() * numberOfControls),
             dynamicId = valueSet && valueSet.dynamicId();
 
         if (dynamicId) {
@@ -139,12 +144,6 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
             }, null, 1);
             // self.recallSelectedPage(); // don't do this as it will create subscriptions to whatever happens in there
         }
-        return dynamicId;
-    });
-
-    ko.computed(function() {
-        if (!_valueSet()) return;
-        var valueOffset = self.hasParamsValueSet() ? _valueSet().currentPageValueOffset() : (self.valuePage() * numberOfControls);
 
         lep.logDebug('new value offset: {}', valueOffset);
         for (var i = 0, value, control; i < numberOfControls; i++) {

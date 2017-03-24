@@ -2,14 +2,13 @@
  * Bitwig Controller Script for the Behringer CMD LC-1.
  *
  * Author: Lennart Pegel - https://github.com/justlep/bitwig
- * License: LGPLv3 (http://www.gnu.org/licenses/lgpl-3.0.txt)
+ * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  */
 
-loadAPI(1);
+loadAPI(2);
 load('lep/api.js');
 
-// @deprecationChecked:1.3.15
-host.defineController('Behringer', 'CMD LC-1 (LeP)', '1.0', 'b6ad3828-8a3d-11e5-af63-feff819cdc9f', 'Lennart Pegel <github@justlep.net>');
+host.defineController('Behringer', 'CMD LC-1 (LeP)', '2.0', 'b6ad3828-8a3d-11e5-af63-feff819cdc9f', 'Lennart Pegel <github@justlep.net>');
 host.defineMidiPorts(1, 1);
 host.addDeviceNameBasedDiscoveryPair(['CMD LC-1'], ['CMD LC-1']);
 
@@ -66,7 +65,7 @@ lep.LC1 = function() {
         WINDOW_SIZE = 4,
         trackBank = host.createTrackBank(WINDOW_SIZE, SENDS_NUMBER, SCENES_NUMBER),
 
-        cursorDevice = host.createEditorCursorDevice(),
+        cursorDevice = host.createEditorCursorDevice(SENDS_NUMBER),
         eventDispatcher = lep.MidiEventDispatcher.getInstance(),
         isShiftPressed = ko.observable(false),
 
@@ -135,7 +134,6 @@ lep.LC1 = function() {
             VOLUME: lep.ValueSet.createVolumeValueSet(trackBank, WINDOW_SIZE),
             PAN: lep.ValueSet.createPanValueSet(trackBank, WINDOW_SIZE),
             SEND: lep.ValueSet.createSendsValueSet(trackBank, SENDS_NUMBER, WINDOW_SIZE),
-            MACRO: new lep.MacroValueSet(cursorDevice),
             PARAM: new lep.ParamsValueSet(cursorDevice),
             USERCONTROL: lep.ValueSet.createUserControlsValueSet(USER_CONTROL_PAGES, WINDOW_SIZE, 'LC1-UC-{}-{}'),
             CLIP_MATRIX: new lep.ValueSet('ClipMatrixValues', WINDOW_SIZE, SCENES_NUMBER, function(trackIndex, sceneIndex) {

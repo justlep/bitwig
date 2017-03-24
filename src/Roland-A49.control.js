@@ -2,13 +2,12 @@
  * Bitwig Controller Script for the Roland A-49.
  *
  * Author: Lennart Pegel - https://github.com/justlep/bitwig
- * License: LGPLv3 (http://www.gnu.org/licenses/lgpl-3.0.txt)
+ * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  */
 
-loadAPI(1);
+loadAPI(2);
 
-// @deprecationChecked:1.3.15
-host.defineController('Roland', 'A-49', '1.0', '381d879c-9a0a-11e5-8994-feff819cdc9f', 'Lennart Pegel <github@justlep.net>');
+host.defineController('Roland', 'A-49', '2.0', '381d879c-9a0a-11e5-8994-feff819cdc9f', 'Lennart Pegel <github@justlep.net>');
 host.defineMidiPorts(1, 0);
 host.addDeviceNameBasedDiscoveryPair(['A-Series Keyboard'], []);
 

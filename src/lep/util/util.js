@@ -2,7 +2,7 @@
  * Some useful static helpers..
  *
  * Author: Lennart Pegel - https://github.com/justlep
- * License: LGPLv3 (http://www.gnu.org/licenses/lgpl-3.0.txt)
+ * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  */
 var lep = (typeof lep !== 'undefined') ? lep : {};
 
@@ -22,7 +22,7 @@ lep.util = (function() {
                 messageAndArgumentsArray = Array.prototype.slice.call(assertionArgs, messageOffset),
                 emptySafeMessageAndArgsArray = (messageAndArgumentsArray.length) ? messageAndArgumentsArray : ['Assertion failed'];
 
-            throw lep.util.formatString.apply(null, emptySafeMessageAndArgsArray);
+            throw new Error(lep.util.formatString.apply(null, emptySafeMessageAndArgsArray));
         },
         startTimesById = [];
 
@@ -158,7 +158,7 @@ lep.util = (function() {
          */
         startTimer: function(id) {
             this.assertNumber(id, 'invalid id for lep.util.startTime: ', id);
-            startTimesById[id] = +new Date();
+            startTimesById[id] = Date.now();
         },
         /**
          * @static
@@ -167,7 +167,7 @@ lep.util = (function() {
          * @return (Number) time in millis; -1 if timerStart wasn't called for that id before
          */
         stopTimer: function(id) {
-            var now = +new Date();
+            var now = Date.now();
             return now - (startTimesById[id] || (now + 1));
         },
         /** @static */

@@ -2,14 +2,13 @@
  * Bitwig Controller Script for the Behringer BCF2000.
  *
  * Author: Lennart Pegel - https://github.com/justlep/bitwig
- * License: LGPLv3 (http://www.gnu.org/licenses/lgpl-3.0.txt)
+ * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  */
 
-loadAPI(1);
+loadAPI(2);
 load('lep/api.js');
 
-// @deprecationChecked:1.3.15
-host.defineController('Behringer', 'BCF2000 (LeP)', '1.1', 'd26515a4-571b-11e5-885d-feff819cdc9f', 'Lennart Pegel <github@justlep.net>');
+host.defineController('Behringer', 'BCF2000 (LeP)', '2.0', 'd26515a4-571b-11e5-885d-feff819cdc9f', 'Lennart Pegel <github@justlep.net>');
 host.defineMidiPorts(1, 1);
 host.addDeviceNameBasedDiscoveryPair(['BCF2000'], ['BCF2000']);
 host.addDeviceNameBasedDiscoveryPair(['BCF2000 port 1'], ['BCF2000 port 1']);
@@ -103,8 +102,8 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
         },
 
         transport = lep.util.getTransport(),
-        trackBank = host.createTrackBank(WINDOW_SIZE, SENDS_NUMBER, 0),
-        cursorDevice = host.createEditorCursorDevice(),
+        trackBank = host.createMainTrackBank(WINDOW_SIZE, SENDS_NUMBER, 0),
+        cursorDevice = host.createEditorCursorDevice(SENDS_NUMBER),
         eventDispatcher = lep.MidiEventDispatcher.getInstance(),
 
         isShiftPressed = ko.observable(false),
@@ -133,10 +132,10 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
             PLAYING_STATUS_CHANGED: function(isPlaying) {
                 if (!isPlaying && clearPunchOnStop()) {
                     if (TRANSPORT_VALUE.PUNCH_IN.value) {
-                        transport.togglePunchIn();
+                        transport.isPunchInEnabled().toggle();
                     }
                     if (TRANSPORT_VALUE.PUNCH_OUT.value) {
-                        transport.togglePunchOut();
+                        transport.isPunchOutEnabled().toggle();
                     }
                 }
             }
@@ -146,8 +145,8 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
             VOLUME: lep.ValueSet.createVolumeValueSet(trackBank, WINDOW_SIZE),
             PAN:    lep.ValueSet.createPanValueSet(trackBank, WINDOW_SIZE),
             SEND:   lep.ValueSet.createSendsValueSet(trackBank, SENDS_NUMBER, WINDOW_SIZE),
-            MACRO:  new lep.MacroValueSet(cursorDevice),
-            PARAM:  new lep.GreedyParamsValueSet(cursorDevice, PARAM_PAGES_NUMBER),
+            SEND2:   lep.ValueSet.createSendsValueSet(trackBank, SENDS_NUMBER, WINDOW_SIZE, true),
+            PARAM:  new lep.ParamsValueSet(cursorDevice),
             USERCONTROL: lep.ValueSet.createUserControlsValueSet(USER_CONTROL_PAGES, WINDOW_SIZE, 'BCF-UC-{}-{}'),
             SOLO:   lep.ValueSet.createSoloValueSet(trackBank, WINDOW_SIZE, prefs),
             ARM:    lep.ValueSet.createArmValueSet(trackBank, WINDOW_SIZE),
@@ -159,7 +158,7 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
             VALUESET.VOLUME,
             VALUESET.PAN,
             VALUESET.SEND,
-            VALUESET.MACRO,
+            VALUESET.SEND2,
             VALUESET.PARAM,
             VALUESET.USERCONTROL
         ],
@@ -265,7 +264,8 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
             _assertion: lep.util.assert(SWITCHABLE_VALUESETS.length <= WINDOW_SIZE-2, 'There are more value types than encoder buttons!'),
             FOR_ENCODERS: new lep.ValueSet('EncoderValueTypeSelect', 1, WINDOW_SIZE, function(index) {
                 var isPrevPageIndex = (index === WINDOW_SIZE-2),
-                    isNextPageBtn = (index === WINDOW_SIZE-1);
+                    isNextPageBtn = (index === WINDOW_SIZE-1),
+                    switchableValueSet = !isPrevPageIndex && !isNextPageBtn && SWITCHABLE_VALUESETS[index];
 
                 if (isPrevPageIndex) {
                     return new lep.KnockoutSyncedValue({
@@ -283,10 +283,10 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
                         onClick: CONTROLSET.ENCODERS.nextValuePage
                     });
                 }
-                if (SWITCHABLE_VALUESETS[index]) {
+                if (switchableValueSet) {
                     return new lep.KnockoutSyncedValue({
-                        name: 'EncoderValueTypeSelect-' + SWITCHABLE_VALUESETS[index].name,
-                        ownValue: SWITCHABLE_VALUESETS[index],
+                        name: 'EncoderValueTypeSelect-' + switchableValueSet.name,
+                        ownValue: switchableValueSet,
                         refObservable: currentEncoderValueSetObservable
                     });
                 }
@@ -294,7 +294,8 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
             FOR_FADERS: new lep.ValueSet('FaderValueTypeSelect', 1, WINDOW_SIZE, function(index) {
                 lep.util.assert(SWITCHABLE_VALUESETS.length);
                 var isPrevPageIndex = (index === WINDOW_SIZE-2),
-                    isNextPageBtn = (index === WINDOW_SIZE-1);
+                    isNextPageBtn = (index === WINDOW_SIZE-1),
+                    switchableValueSet = !isPrevPageIndex && !isNextPageBtn && SWITCHABLE_VALUESETS[index];
 
                 if (isPrevPageIndex) {
                     return new lep.KnockoutSyncedValue({
@@ -312,10 +313,10 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
                         onClick: CONTROLSET.FADERS.nextValuePage
                     });
                 }
-                if (SWITCHABLE_VALUESETS[index]) {
+                if (switchableValueSet) {
                     return new lep.KnockoutSyncedValue({
-                        name: 'FaderValueTypeSelect-' + SWITCHABLE_VALUESETS[index].name,
-                        ownValue: SWITCHABLE_VALUESETS[index],
+                        name: 'FaderValueTypeSelect-' + switchableValueSet.name,
+                        ownValue: switchableValueSet,
                         refObservable: currentFaderValueSetObservable
                     });
                 }
@@ -494,14 +495,14 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
             });
         },
         TRANSPORT_VALUE = {
-            PLAY: lep.ToggledTransportValue.create('Play'),
-            RECORD: lep.ToggledTransportValue.create('Record'),
-            ARRANGER_AUTOMATION: lep.ToggledTransportValue.create('ArrangerAutomation'),
-            LOOP: lep.ToggledTransportValue.create('Loop'),
-            METRONOME: lep.ToggledTransportValue.create('Metronome'),
-            OVERDUB: lep.ToggledTransportValue.create('Overdub'),
-            PUNCH_IN: lep.ToggledTransportValue.create('PunchIn'),
-            PUNCH_OUT: lep.ToggledTransportValue.create('PunchOut'),
+            PLAY: lep.ToggledTransportValue.getPlayInstance(),
+            RECORD: lep.ToggledTransportValue.getRecordInstance(),
+            ARRANGER_AUTOMATION: lep.ToggledTransportValue.getArrangerAutomationInstance(),
+            LOOP: lep.ToggledTransportValue.getLoopInstance(),
+            METRONOME: lep.ToggledTransportValue.getMetronomeInstance(),
+            OVERDUB: lep.ToggledTransportValue.getOverdubInstance(),
+            PUNCH_IN: lep.ToggledTransportValue.getPunchInInstance(),
+            PUNCH_OUT: lep.ToggledTransportValue.getPunchOutInstance(),
             CLEAR_PUNCH_ON_STOP: new lep.KnockoutSyncedValue({
                 name: 'ClearPunchInOutOnStop',
                 ownValue: true,

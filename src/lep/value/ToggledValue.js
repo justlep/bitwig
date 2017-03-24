@@ -1,6 +1,6 @@
 /**
  * Author: Lennart Pegel - https://github.com/justlep
- * License: LGPLv3 (http://www.gnu.org/licenses/lgpl-3.0.txt)
+ * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  *
  * @constructor
  */
@@ -27,11 +27,13 @@ lep.ToggledValue = lep.util.extendClass(lep.BaseValue, {
     },
     /** @Override */
     onAbsoluteValueReceived: function(absoluteValue) {
-        if (this.toggleOnPressed ^ !!absoluteValue) return;
-        if (this.prefs && (typeof this.prefs.soloExclusive !== 'undefined')) {
-            this.togglableValue.toggle(!!this.prefs.soloExclusive);
-        } else {
-            this.togglableValue.toggle();
+        var isPressed = !!absoluteValue;
+        if (this.toggleOnPressed === isPressed) {
+            if (this.prefs && (typeof this.prefs.soloExclusive !== 'undefined')) {
+                this.togglableValue.toggle(!!this.prefs.soloExclusive);
+            } else {
+                this.togglableValue.toggle();
+            }
         }
     },
     setInstanceVelocityValues: function(onValueOrEmpty, offValueOrEmpty) {

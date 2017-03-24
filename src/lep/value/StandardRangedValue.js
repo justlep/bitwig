@@ -1,6 +1,6 @@
 /**
  * Author: Lennart Pegel - https://github.com/justlep
- * License: LGPLv3 (http://www.gnu.org/licenses/lgpl-3.0.txt)
+ * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  *
  * @constructor
  */
@@ -10,14 +10,14 @@ lep.StandardRangedValue = lep.util.extendClass(lep.BaseValue, {
         this._super(opts);
 
         lep.util.assertObject(opts.rangedValue, 'Missing rangedValue for {}', opts.name);
-        lep.util.assertStringOrEmpty(opts.label, 'Invalid label for {}', opts.name);
 
         var self = this;
 
         this.rangedValue = opts.rangedValue;
-        if (opts.label) {
-            this.rangedValue.setLabel(opts.label);
-        }
+        this.indicateableValue = opts.indicateableValue || opts.rangedValue;
+
+        lep.util.assertFunction(this.indicateableValue.setIndication, 'Invalid indicateableValue for {}', this.name);
+
         this.rangedValue.addValueObserver(128, function(newValue) {
             self.value = newValue;
             self.syncToController();
@@ -33,7 +33,7 @@ lep.StandardRangedValue = lep.util.extendClass(lep.BaseValue, {
     /** @Override */
     setIndication: function(on) {
         // lep.logDebug('setIndications({}) for {}', on, this.name);
-        this.rangedValue.setIndication(on);
+        this.indicateableValue.setIndication(on);
     },
     /** @Override */
     onRelativeValueReceived: function(delta, range) {
@@ -76,17 +76,10 @@ lep.StandardRangedValue.createSendValue = function(channelBank, channelIndex, se
     });
 };
 
-/** @static */
-lep.StandardRangedValue.createMacroValue = function(cursorDevice, macroIndex) {
-    lep.util.assertObject(cursorDevice, 'Invalid cursorDevice for StandardRangedValue.createMacroValue');
-    lep.util.assertNumber(macroIndex, 'Invalid macroIndex for StandardRangedValue.createMacroValue');
-    return new lep.StandardRangedValue({
-        name: lep.util.formatString('Macro{}', macroIndex),
-        rangedValue: cursorDevice.getMacro(macroIndex).getAmount()
-    });
-};
-
-/** @static */
+/**
+ * @deprecated
+ * @static
+ **/
 lep.StandardRangedValue.createParamValue = function(cursorDevice, paramIndex) {
     lep.util.assertObject(cursorDevice, 'Invalid cursorDevice for StandardRangedValue.createParamValue');
     lep.util.assertNumber(paramIndex, 'Invalid paramIndex for StandardRangedValue.createParamValue');
@@ -95,32 +88,33 @@ lep.StandardRangedValue.createParamValue = function(cursorDevice, paramIndex) {
         rangedValue: cursorDevice.getParameter(paramIndex)
     });
 };
-/** @static */
-lep.StandardRangedValue.createCommonParamValue = function(cursorDevice, paramIndex) {
-    lep.util.assertObject(cursorDevice, 'Invalid cursorDevice for StandardRangedValue.createCommonParamValue');
-    lep.util.assertNumber(paramIndex, 'Invalid paramIndex for StandardRangedValue.createCommonParamValue');
+
+/** @static **/
+lep.StandardRangedValue.createRemoteControlValue = function(remoteControlsPage, paramIndex) {
+    lep.util.assertObject(remoteControlsPage, 'Invalid remoteControlsPage for StandardRangedValue.createRemoteControlValue');
+    lep.util.assertNumber(paramIndex, 'Invalid paramIndex for StandardRangedValue.createRemoteControlValue');
     return new lep.StandardRangedValue({
-        name: lep.util.formatString('CommonParam{}', paramIndex),
-        rangedValue: cursorDevice.getCommonParameter(paramIndex)
+        name: lep.util.formatString('Param{}', paramIndex),
+        rangedValue: remoteControlsPage.getParameter(paramIndex)
     });
 };
-/** @static */
-lep.StandardRangedValue.createEnvelopeParamValue = function(cursorDevice, paramIndex) {
-    lep.util.assertObject(cursorDevice, 'Invalid cursorDevice for StandardRangedValue.createEnvelopeParamValue');
-    lep.util.assertNumber(paramIndex, 'Invalid paramIndex for StandardRangedValue.createEnvelopeParamValue');
-    return new lep.StandardRangedValue({
-        name: lep.util.formatString('EnvParam{}', paramIndex),
-        rangedValue: cursorDevice.getEnvelopeParameter(paramIndex)
-    });
-};
-/** @static */
+
+/**
+ * @static
+ *
+ * TODO: in Bitwig 2 these values do show NO indication marker + do not get any feedback from the daw
+ **/
 lep.StandardRangedValue.createUserControlValue = function(userControlBank, controlIndex, label) {
     lep.util.assertObject(userControlBank, 'Invalid userControlBank for StandardRangedValue.createUserControlValue');
     lep.util.assertNumberInRange(controlIndex, 0, 127, 'Invalid controlIndex for StandardRangedValue.createUserControlValue');
     lep.util.assertString(label, 'Invalid label for StandardRangedValue.createUserControlValue');
+
+    var userControl = userControlBank.getControl(controlIndex);
+    userControl.setLabel(label);
+
     return new lep.StandardRangedValue({
         name: label,
-        rangedValue: userControlBank.getControl(controlIndex),
-        label: label
+        rangedValue: userControl.value(),
+        indicateableValue: userControl
     });
 };

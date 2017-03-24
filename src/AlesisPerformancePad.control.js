@@ -8,13 +8,12 @@
  * - Velocity curves can be chosen via preferences (normal, fixed values, lift+20, Gamma2, Gamma3, Gamma4)
  *
  * Author: Lennart Pegel - https://github.com/justlep/bitwig
- * License: LGPLv3 (http://www.gnu.org/licenses/lgpl-3.0.txt)
+ * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  */
 
-loadAPI(1);
+loadAPI(2);
 
-// @deprecationChecked:1.3.15
-host.defineController('Alesis', 'PerformancePad', '1.1', 'c6cc8a34-a36e-11e5-bf7f-feff819cdc9f', 'Lennart Pegel <github@justlep.net>');
+host.defineController('Alesis', 'PerformancePad', '2.0', 'c6cc8a34-a36e-11e5-bf7f-feff819cdc9f', 'Lennart Pegel <github@justlep.net>');
 host.defineMidiPorts(1, 0);
 
 var NOTE_MAPPING = {

@@ -25,8 +25,8 @@ module.exports = function (grunt, opts) {
     ]);
 
     grunt.registerTask('validate', [
-        'jshint',
-        'findDeprecatedApiCalls:latestInRepo'
+        'jshint'
+        //'findDeprecatedApiCalls:latestInRepo'
     ]);
 
     grunt.registerTask('updateDeprecationsInfo', [

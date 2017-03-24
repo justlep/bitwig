@@ -2,7 +2,7 @@
  * Loads all lep-API files in the right order.
  *
  * Author: Lennart Pegel - https://github.com/justlep
- * License: LGPLv3 (http://www.gnu.org/licenses/lgpl-3.0.txt)
+ * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  */
 
 var lep = {};
@@ -24,9 +24,7 @@ load('control/ControlSet.js');
 load('value/BaseValue.js');
 load('value/StandardRangedValue.js');
 load('value/ValueSet.js');
-load('value/MacroValueSet.js');
 load('value/ParamsValueSet.js');
-load('value/GreedyParamsValueSet.js');
 load('value/ToggledValue.js');
 load('value/ChannelSelectValue.js');
 load('value/ToggledTransportValue.js');

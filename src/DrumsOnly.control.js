@@ -4,13 +4,12 @@
  * An additional input passes all of the notes mentioned above.
  *
  * Author: Lennart Pegel - https://github.com/justlep/bitwig
- * License: LGPLv3 (http://www.gnu.org/licenses/lgpl-3.0.txt)
+ * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  */
 
-loadAPI(1);
+loadAPI(2);
 
-// @deprecationChecked:1.3.15
-host.defineController('Generic', 'Pads', '1.0', 'c5bb3af6-9c15-11e5-8994-feff819cdc9f', 'Lennart Pegel <github@justlep.net>');
+host.defineController('Generic', 'Pads', '2.0', 'c5bb3af6-9c15-11e5-8994-feff819cdc9f', 'Lennart Pegel <github@justlep.net>');
 host.defineMidiPorts(1, 0);
 
 var MIDI_CHANNEL_MASK = '?',// by default, all channels are used; replace with single channel if needed

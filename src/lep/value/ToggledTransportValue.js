@@ -1,64 +1,69 @@
 /**
  * Author: Lennart Pegel - https://github.com/justlep
- * License: LGPLv3 (http://www.gnu.org/licenses/lgpl-3.0.txt)
+ * License: MIT (http://www.opensource.org/licenses/mit-license.php)
+ *
+ * Represents one of the toggleable transport values, like isPlaying, metronome enable etc.
+ * (!) Use the lep.ToggledTransportValue.getXXXXInstance getters to obtain instances
  *
  * @constructor
  */
 lep.ToggledTransportValue = lep.util.extendClass(lep.BaseValue, {
-
     _init: function(opts) {
         this._super(opts);
 
-        lep.util.assertString(opts.togglingMethodName, 'Missing togglingMethodName for ToggledTransportValue {}', this.name);
-        lep.util.assertString(opts.observerAdderMethodName, 'Missing observerAdderMethodName for ToggledTransportValue {}', this.name);
+        lep.util.assert(!lep.ToggledTransportValue._instances[this.name], 'Must use lep.ToggledTransportValue.getXXXXInstance');
+        lep.ToggledTransportValue._instances[this.name] = this;
 
         var self = this,
             transport = lep.util.getTransport(),
-            togglingMethod = transport[opts.togglingMethodName],
-            observerAdderMethod = transport[opts.observerAdderMethodName];
+            settableBoolean = transport[opts.booleanPropertyName]();
 
-        lep.util.assertFunction(togglingMethod, 'Missing Bitwig API method: Transport.{}', opts.togglingMethodName);
-        lep.util.assertFunction(observerAdderMethod, 'Missing Bitwig API method: Transport.{}', opts.observerAdderMethodName);
+        lep.util.assert(settableBoolean, 'Invalid settableBoolean {} in Transport for {}',
+            opts.booleanPropertyName, this.name);
 
-        this.togglingMethod = lep.util.bind(togglingMethod, transport);
         this.toggleOnPressed = (opts.toggleOnPressed !== false);
 
-        observerAdderMethod.call(transport, function(on) {
-            self.value = on ? 127 : 0;
+        this.togglingMethod = function() {
+            settableBoolean.toggle();
+        };
+
+        settableBoolean.addValueObserver(function(isOn) {
+            self.value = isOn ? 127 : 0;
             self.syncToController();
         });
     },
     /** @Override */
     onAbsoluteValueReceived: function(absoluteValue) {
-        if (this.toggleOnPressed ^ !!absoluteValue) return;
-        this.togglingMethod();
+        var isPressed = !!absoluteValue;
+        if (this.toggleOnPressed === isPressed) {
+            this.togglingMethod();
+        }
     }
 });
 
 /** @static */
-lep.ToggledTransportValue.NAME_TO_TRANSPORT_METHODS_MAP = {
-    Metronome: ['toggleClick','addClickObserver'],
-    Play: ['togglePlay','addIsPlayingObserver'],
-    Record: ['record','addIsRecordingObserver'],
-    PunchIn: ['togglePunchIn', 'addPunchInObserver'],
-    PunchOut: ['togglePunchOut', 'addPunchOutObserver'],
-    Overdub: ['toggleOverdub', 'addOverdubObserver'],
-    Loop: ['toggleLoop', 'addIsLoopActiveObserver'],
-    ArrangerAutomation: ['toggleWriteArrangerAutomation','addIsWritingArrangerAutomationObserver']
-};
+lep.ToggledTransportValue._instances = {};
 
-/**
- * @static
- * Creates a new ToggledTransportValue for one of the types defined in {@link #NAME_TO_TRANSPORT_METHODS_MAP}
- * @param name (String) one of the keys of {@link #NAME_TO_TRANSPORT_METHODS_MAP}
- * @returns {lep.ToggledTransportValue}
- */
-lep.ToggledTransportValue.create = function(name) {
-    lep.util.assertArray(lep.ToggledTransportValue.NAME_TO_TRANSPORT_METHODS_MAP[name],
-                         'Unsupported name for ToggledTransportValue: ' + name);
-    return new lep.ToggledTransportValue({
-        name: name,
-        togglingMethodName: lep.ToggledTransportValue.NAME_TO_TRANSPORT_METHODS_MAP[name][0],
-        observerAdderMethodName: lep.ToggledTransportValue.NAME_TO_TRANSPORT_METHODS_MAP[name][1]
-    });
-};
+// add static lep.ToggledTransportValue.getXXXInstance() methods...
+(function(makeInstanceGetter) {
+
+    lep.ToggledTransportValue.getPlayInstance = makeInstanceGetter('Play', 'isPlaying');
+    lep.ToggledTransportValue.getMetronomeInstance = makeInstanceGetter('Metronome', 'isMetronomeEnabled');
+    lep.ToggledTransportValue.getRecordInstance = makeInstanceGetter('Record', 'isArrangerRecordEnabled');
+    lep.ToggledTransportValue.getPunchInInstance = makeInstanceGetter('PunchIn', 'isPunchInEnabled');
+    lep.ToggledTransportValue.getPunchOutInstance = makeInstanceGetter('PunchOut', 'isPunchOutEnabled');
+    lep.ToggledTransportValue.getOverdubInstance = makeInstanceGetter('Overdub', 'isArrangerOverdubEnabled');
+    lep.ToggledTransportValue.getLoopInstance = makeInstanceGetter('Loop', 'isArrangerLoopEnabled');
+    lep.ToggledTransportValue.getArrangerAutomationInstance = makeInstanceGetter('ArrangerAutomation', 'isArrangerAutomationWriteEnabled');
+
+})(function _makeInstanceGetter(instanceName, transportBooleanPropertyName) {
+    lep.util.assertString(instanceName && transportBooleanPropertyName,
+        'Bad call of _makeInstanceGetter for ToggledTransportValue, instanceName = {}', instanceName);
+
+    return function() {
+        return lep.ToggledTransportValue._instances[instanceName] || new lep.ToggledTransportValue({
+            name: instanceName,
+            booleanPropertyName: transportBooleanPropertyName
+        });
+    };
+});
