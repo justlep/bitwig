@@ -1,4 +1,9 @@
 
+v2.0.0 (24-Mar-2017)
+ - finished refactorings for final Bitwig 2.0 (demo version)
+ - Params mode on BCR/BCF2000 now only controls the currently selected remote controls page + follows page-selection from the DAW
+ - Known bug: OMNI inputs of the BeatstepPro not working due to https://github.com/justlep/bitwig/issues/6 (report sent)
+
 v2.0.0-beta6 (03-Mar-2017)
  - larger refactoring of all scripts to work with Bitwig 2 beta 6 (haven't bought the Upgrade yet)
  - BCR2000 + BCF2000 now have a second SENDS mode where the Macros used to be,
