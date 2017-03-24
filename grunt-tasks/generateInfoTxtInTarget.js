@@ -16,7 +16,7 @@ module.exports = function (grunt, opts) {
                 'Version ' + packageJson.version,
                 'Written by ' + packageJson.author.name + ' <'+ packageJson.author.email +'>',
                 'URL: ' + packageJson.repository.url,
-                'Licensed under LGPLv3 - http://www.gnu.org/licenses/lgpl-3.0.txt',
+                'Licensed under MIT - http://www.opensource.org/licenses/mit-license.php',
                 'Check the doc folder for documentation.'
             ];
 
