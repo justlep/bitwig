@@ -7,7 +7,6 @@
 
 loadAPI(2);
 
-// @deprecationChecked:1.3.15
 host.defineController('Roland', 'A-49', '2.0', '381d879c-9a0a-11e5-8994-feff819cdc9f', 'Lennart Pegel <github@justlep.net>');
 host.defineMidiPorts(1, 0);
 host.addDeviceNameBasedDiscoveryPair(['A-Series Keyboard'], []);
