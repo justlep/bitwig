@@ -8,16 +8,11 @@
 loadAPI(2);
 load('lep/api.js');
 
-host.defineController('Behringer', 'BCF2000 (LeP)', '2.0', 'd26515a4-571b-11e5-885d-feff819cdc9f', 'Lennart Pegel <github@justlep.net>');
+host.defineController('Behringer', 'BCF2000', '2.1', 'd26515a4-571b-11e5-885d-feff819cdc9f', 'Lennart Pegel');
 host.defineMidiPorts(1, 1);
 host.addDeviceNameBasedDiscoveryPair(['BCF2000'], ['BCF2000']);
 host.addDeviceNameBasedDiscoveryPair(['BCF2000 port 1'], ['BCF2000 port 1']);
 host.addDeviceNameBasedDiscoveryPair(['BCF2000 Port 1'], ['BCF2000 Port 1']);
-
-// host.addDeviceNameBasedDiscoveryPair(['BCF2000 port 2'], ['BCF2000 port 2']);
-// host.addDeviceNameBasedDiscoveryPair(['BCF2000 Port 2'], ['BCF2000 Port 2']);
-// host.addDeviceNameBasedDiscoveryPair(['BCF2000 port 3'], ['BCF2000 port 3']);
-// host.addDeviceNameBasedDiscoveryPair(['BCF2000 Port 3'], ['BCF2000 Port 3']);
 
 /**
  * Switches the BCF2000 into a given preset number.

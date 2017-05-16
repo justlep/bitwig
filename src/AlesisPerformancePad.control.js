@@ -13,7 +13,7 @@
 
 loadAPI(2);
 
-host.defineController('Alesis', 'PerformancePad', '2.0', 'c6cc8a34-a36e-11e5-bf7f-feff819cdc9f', 'Lennart Pegel <github@justlep.net>');
+host.defineController('Alesis', 'PerformancePad', '2.1', 'c6cc8a34-a36e-11e5-bf7f-feff819cdc9f', 'Lennart Pegel');
 host.defineMidiPorts(1, 0);
 
 var NOTE_MAPPING = {

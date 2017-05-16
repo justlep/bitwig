@@ -8,7 +8,7 @@
 loadAPI(2);
 load('lep/api.js');
 
-host.defineController('Behringer', 'CMD LC-1 (LeP)', '2.0', 'b6ad3828-8a3d-11e5-af63-feff819cdc9f', 'Lennart Pegel <github@justlep.net>');
+host.defineController('Behringer', 'CMD LC-1', '2.1', 'b6ad3828-8a3d-11e5-af63-feff819cdc9f', 'Lennart Pegel');
 host.defineMidiPorts(1, 1);
 host.addDeviceNameBasedDiscoveryPair(['CMD LC-1'], ['CMD LC-1']);
 
