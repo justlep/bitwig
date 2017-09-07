@@ -15,7 +15,7 @@ module.exports = function (grunt, opts) {
     grunt.registerTask('generateJshintrcWithBitwigGlobals', 'Copies an altered .jshintrc to the api path.',
         function() {
             var jshintrcJSON = grunt.file.readJSON('.jshintrc.in'),
-                apiSources = grunt.file.expand(['bitwigApiStubs/**/*.js', '!src/**/*.control.js', '!src/lib/**']);
+                apiSources = grunt.file.expand(['bitwigApiStubs/**/*.js']);
 
             // grunt.log.writeln(apiSources);
             grunt.log.writeln('Generating bitwig-API-compatible .jshintrc ...');

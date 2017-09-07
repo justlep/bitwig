@@ -10,7 +10,7 @@
     "rhino": false,
     "couch": false,
     "wsh": true,
-
+    "esnext": true,
     "jquery": false,
     "prototypejs": false,
     "mootools": false,

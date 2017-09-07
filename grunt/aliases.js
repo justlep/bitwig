@@ -2,8 +2,7 @@ module.exports = function (grunt, opts) {
     'use strict';
 
     grunt.registerTask('default', [
-        'clean:bitwigApiSources',
-        'copy:apiSourcesFromBitwig'
+        'updateApiStubs'
     ]);
 
     grunt.registerTask('buildStableRelease', [
@@ -16,6 +15,12 @@ module.exports = function (grunt, opts) {
         'generateInfoTxtInTarget',
         'compress:zipTargetToRelease',
         'clean:target'
+    ]);
+
+    grunt.registerTask('updateApiStubs', [
+        'clean:bitwigApiSources',
+        'copy:apiSourcesFromBitwig',
+        'purgePackagesFromApiStubs'
     ]);
 
     grunt.registerTask('copyToBitwigForTest', [

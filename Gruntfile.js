@@ -4,13 +4,13 @@ module.exports = function (grunt) {
     require('time-grunt')(grunt);
 
     var fs = require('fs'),
-        packageJson = grunt.file.readJSON('package.json'),
+        packageJson = require('./package.json'),
         // provided as 'opts' parameter to the task files in grunt/*.js
         data = {};
 
     try {
         // the Bitwig installation's dir (Windows)
-        data.BITWIG_INSTALL_DIR = fs.realpathSync(process.env['ProgramFiles'] + '/Bitwig Studio');
+        data.BITWIG_INSTALL_DIR = fs.realpathSync(process.env.ProgramFiles + '/Bitwig Studio');
     } catch (e) {
         grunt.log.writeln('Unable to determine Bitwig\'s installation dir. If this is unexpected, change Gruntfile.js.'.magenta);
     }
