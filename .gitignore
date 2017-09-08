@@ -1,3 +1,2 @@
-bitwigApiStubs/**/*.js
 node_modules
-tmp/target/**
+tmp/target

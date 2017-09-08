@@ -42,6 +42,8 @@ module.exports = function (grunt, opts) {
             });
         });
 
+        jshintrc.predef = jshintrc.predef.concat(globalClasses.sort(), globalFunctions.sort());
+
         let numbersSummary = `API version ${foundApiVersion || '???'} | ${apiStubFiles.length} files | `+
                              `${globalClasses.length} classes | ${globalFunctions.length} global functions`,
             separator = '*'.repeat(numbersSummary.length),
@@ -54,7 +56,6 @@ module.exports = function (grunt, opts) {
                 `Global classes: \n - ${globalClasses.join('\n - ')}`
             ];
 
-        jshintrc.predef = jshintrc.predef.concat(globalClasses.sort(), globalFunctions.sort());
         grunt.log.ok(numbersSummary);
         grunt.file.write(TARGET_JSHINTRC, JSON.stringify(jshintrc, null, 2));
         grunt.log.ok('\nWritten ' + TARGET_JSHINTRC);
