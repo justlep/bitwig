@@ -25,6 +25,22 @@ module.exports = function (grunt, opts) {
                     src: ['**/*.*', '!.git', '!.svn']
                 }
             ]
+        },
+        unmodifiedApiStubs: {
+            options: {
+                mode: 'zip',
+                level: 1,
+                pretty: true,
+                archive: 'bitwigApiStubs/!unmodifiedApiStubs.zip',
+                comment: 'Original API stubs from the Bitwig installation'
+            },
+            files: [
+                {
+                    expand: true,
+                    cwd: 'bitwigApiStubs/',
+                    src: ['*.js']
+                }
+            ]
         }
     };
 };

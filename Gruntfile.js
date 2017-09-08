@@ -35,5 +35,5 @@ module.exports = function (grunt) {
         data: data
     });
 
-    grunt.loadTasks('grunt-tasks');
+    grunt.loadTasks('grunt/custom-tasks');
 };

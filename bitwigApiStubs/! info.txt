@@ -1,8 +1,12 @@
-For better code completion (in IntelliJ), this folder is filled on project start with the Bitwig API stuff
-by calling the grunt default task in the project root folder:
 
-$ grunt
+This directory contains slightly modified copies of the Bitwig's API .js files (stubs and helpers)
+taken from the Bitwig installation directory.
 
-Bitwig's API .js files (stubs and helpers) will be copied from the Bitwig installation folder
-which is determined automatically (currently tested on Windows only).
-If paths need adjustments for your machine, see /Gruntfile.js.
+All fully qualified (Java) class names are stripped down to pure class names,
+i.e. the `com.bitwig.extension...` package part removed, for easier code completion in Webstorm.
+
+Auto-update these files via:
+
+$ grunt updateApiStubs
+
+(Update requires Bitwig installation on this machine. Tested on Windows, adjust paths in Grunfile.js for other OS)

@@ -5,12 +5,10 @@
 module.exports = function (grunt, opts) {
     'use strict';
 
-    var packageJson = grunt.file.readJSON('package.json'),
-        TARGET_TXT_PATH = 'tmp/target/' + packageJson.lep.releaseDirectoryName + '/info.txt';
-
-    grunt.registerTask('generateInfoTxtInTarget', 'Generates an info.txt file for the ZIP archive',
-    function() {
-        var info = [
+    grunt.registerTask('generateInfoTxtInTarget', 'Generates an info.txt file for the ZIP archive', () => {
+        let packageJson = grunt.file.readJSON('package.json'),
+            TARGET_TXT_PATH = 'tmp/target/' + packageJson.lep.releaseDirectoryName + '/info.txt',
+            info = [
                 packageJson.title,
                 packageJson.description,
                 'Version ' + packageJson.version,
@@ -22,6 +20,6 @@ module.exports = function (grunt, opts) {
 
         grunt.file.write(TARGET_TXT_PATH, info.join('\n\n'));
 
-        grunt.log.writeln('\nGenerated info.txt in ' + TARGET_TXT_PATH);
+        grunt.log.ok('\nWritten ' + TARGET_TXT_PATH);
     });
 };

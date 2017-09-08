@@ -2,7 +2,7 @@ module.exports = function (grunt, opts) {
     'use strict';
 
     grunt.registerTask('default', [
-        'updateApiStubs'
+        'validate'
     ]);
 
     grunt.registerTask('buildStableRelease', [
@@ -20,7 +20,9 @@ module.exports = function (grunt, opts) {
     grunt.registerTask('updateApiStubs', [
         'clean:bitwigApiSources',
         'copy:apiSourcesFromBitwig',
-        'purgePackagesFromApiStubs'
+        'compress:unmodifiedApiStubs',
+        'purgePackagesFromApiStubs',
+        'generateJshintConfig'
     ]);
 
     grunt.registerTask('copyToBitwigForTest', [
@@ -31,11 +33,6 @@ module.exports = function (grunt, opts) {
 
     grunt.registerTask('validate', [
         'jshint'
-        //'findDeprecatedApiCalls:latestInRepo'
-    ]);
-
-    grunt.registerTask('updateDeprecationsInfo', [
-        'findDeprecatedApiCalls:localBitwig'
     ]);
 
     grunt.registerTask('test', [
