@@ -27,17 +27,12 @@ lep.util = (function() {
         startTimesById = [];
 
     return {
-
-        /** @static */
         NOP: function(){},
-
-        /** @static */
         nextId: function() {
             return ++idsCounter;
         },
 
         /**
-         * @static
          * @return (Transport) single, reused instance of Bitwig's transport object
          */
         getTransport: function() {
@@ -51,7 +46,6 @@ lep.util = (function() {
          * Contained placeholders '{}' will be replaced with additional parameters in the respective order.
          * @param s (mixed) what to print
          * @params (mixed*) (optional) any number of values replacing the placeholders in s
-         * @static
          */
         formatString: function(s) {
             var out = '' + s;
@@ -60,81 +54,65 @@ lep.util = (function() {
             }
             return out;
         },
-        /** @static */
         assert: function(expr) {
             expr || throwError(arguments);
         },
-        /** @static */
         assertDefined: function(expr) {
             (typeof expr !== 'undefined') || throwError(arguments);
         },
-        /** @static */
         assertObservable: function(expr) {
             (ko.isObservable(expr)) || throwError(arguments);
         },
-        /** @static */
         assertBoolean: function(expr) {
             (typeof expr === 'boolean') || throwError(arguments);
         },
-        /** @static */
         assertString: function(expr) {
             (typeof expr === 'string') || throwError(arguments);
         },
-        /** @static */
+        assertNonEmptyString: function(expr) {
+            (!!expr && (typeof expr === 'string')) || throwError(arguments);
+        },
         assertStringOrEmpty: function(expr) {
             (!expr || typeof expr === 'string') || throwError(arguments);
         },
-        /** @static */
         assertNumber: function(expr) {
             (typeof expr === 'number') || throwError(arguments);
         },
-        /** @static */
         assertNumberInRange: function(expr, min, max) {
             (typeof expr === 'number' && expr >= min && expr <= max) || throwError(arguments, 3);
         },
-        /** @static */
         assertNumberInRangeOrEmpty: function(expr, min, max) {
             (!expr || (typeof expr === 'number' && expr >= min && expr <= max)) || throwError(arguments, 3);
         },
-        /** @static */
         assertFunction: function(expr) {
             (typeof expr === 'function') || throwError(arguments);
         },
-        /** @static */
         assertFunctionOrEmpty: function(expr) {
             (!expr || (typeof expr === 'function')) || throwError(arguments);
         },
-        /** @static */
         assertObject: function(expr) {
             (expr && typeof expr === 'object') || throwError(arguments);
         },
-        /** @static */
         assertObjectOrEmpty: function(expr) {
             (!expr || (typeof expr === 'object')) || throwError(arguments);
         },
-        /** @static */
         assertArray: function(expr) {
             (expr && expr instanceof Array) || throwError(arguments);
         },
-        /** @static */
         assertBaseValue: function(expr) {
             (expr && expr instanceof lep.BaseValue) || throwError(arguments);
         },
-        /** @static */
         assertBaseControl: function(expr) {
             (expr && expr instanceof lep.BaseControl) || throwError(arguments);
         },
-        /** @static */
         assertControlSet: function(expr) {
             (expr && expr instanceof lep.ControlSet) || throwError(arguments);
         },
-        /** @static */
         assertValueSet: function(expr) {
             (expr && expr instanceof lep.ValueSet) || throwError(arguments);
         },
         /**
          * Return a given number restricted to a min+max value.
-         * @static
          */
         limitToRange: function(val, min, max) {
             return Math.max(min, Math.min(val, max));
@@ -143,7 +121,6 @@ lep.util = (function() {
          * Binds a method to a given context.
          * @param fn (function)
          * @param context (Object) this-context to preserve for invocations
-         * @static
          */
         bind: function(fn, context) {
             return function() {
@@ -151,7 +128,6 @@ lep.util = (function() {
             };
         },
         /**
-         * @static
          * Memorizes the current time under a given id.
          * A subsequent call of {@link #stopTimer} will then return the time difference in millis.
          * @param id (Number) some id
@@ -161,7 +137,6 @@ lep.util = (function() {
             startTimesById[id] = Date.now();
         },
         /**
-         * @static
          * Returns the time in milliseconds that passed between now and the last call of {@link #startTimer} for a given id.
          * @param id (Number) some id
          * @return (Number) time in millis; -1 if timerStart wasn't called for that id before
@@ -170,14 +145,39 @@ lep.util = (function() {
             var now = Date.now();
             return now - (startTimesById[id] || (now + 1));
         },
-        /** @static */
-        generateArray: function(size, initialValue) {
-            var arr = new Array(size);
-            for (var i=size-1; i>=0; i--) arr[i] = initialValue;
+        /**
+         * Returns an array of the given size, filled with either a fixed value or a value generated by a given function
+         * @param size
+         * @param valueOrFn {mixed} a fix value OR a function whose return-value is used, e.g. function(i){return i*i}
+         * @returns {Array}
+         */
+        generateArray: function(size, valueOrFn) {
+            var arr = [], i = size;
+            if (typeof valueOrFn === 'function') {
+                while (--i >= 0) arr[i] = valueOrFn(i);
+            } else {
+                while (--i >= 0) arr[i] = valueOrFn;
+            }
             return arr;
         },
         /**
-         * @static
+         * Returns a one-dimensional array based on cols and rows size, populated by a createFunction
+         * @param cols {Number}
+         * @param rows {Number}
+         * @param creatorFn {function} e.g. function (colIndex, rowIndex, absoluteIndex){..}
+         * @returns {Array}
+         */
+        generateArrayTableBased: function(cols, rows, creatorFn) {
+            var arr = [], index = 0;
+            for (var row = 0; row < rows; row++) {
+                for (var col = 0; col < cols; col++) {
+                    arr[index] = creatorFn(col, row, index);
+                    index++;
+                }
+            }
+            return arr;
+        },
+        /**
          * Extends a given object with one or more others.
          * @param target (Object)
          * @params any number of objects whose properties to copy to target
@@ -202,7 +202,6 @@ lep.util = (function() {
          * @param proto (object) the derived class' prototype
          *            - _init (function) constructor of the new class (can call this._super(..) to invoke parent constructor)
          *            - any number of properties and methods
-         * @static
          */
         extendClass: function(superClass, proto) {
             this.assertFunction(superClass, 'Expected a constructor function for lep.util.extendClass superClass');

@@ -180,6 +180,36 @@ describe('util.js', function() {
         assert.isUndefined(a[20]);
     });
 
+    it('generates arrays using a creator function', function() {
+        var s = 'abcdefgh',
+            len = s.length,
+            firstCharCode = s.charCodeAt(0),
+            creatorFn = function(i) {
+                return String.fromCharCode(firstCharCode + i);
+            },
+            a = lep.util.generateArray(len, creatorFn);
+
+        assert.isArray(a);
+        assert.strictEqual(a.length, len);
+        assert.strictEqual(a[0], s[0]);
+        assert.strictEqual(a.join(''), s);
+    });
+
+    it('generates 1d-arrays based on cols+rows using a creator function', function() {
+        var cols = 3,
+            rows = 2,
+            creatorFn = function(col, row, index) {
+                return `${index}__${col}*${row}=${col*row}`;
+            },
+            a = lep.util.generateArrayTableBased(cols, rows, creatorFn),
+            expected = ['0__0*0=0', '1__1*0=0', '2__2*0=0',
+                        '3__0*1=0', '4__1*1=1', '5__2*1=2'];
+
+        assert.isArray(a);
+        assert.strictEqual(a.length, 6);
+        assert.deepEqual(a, expected);
+    });
+
     it('extends objects using extend()', function() {
         var o1 = {a: 1, b: {c: 3}, getA: function(){return this.a}},
             o2 = {a: 5, x: 666};
