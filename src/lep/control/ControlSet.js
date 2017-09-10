@@ -12,7 +12,7 @@
 lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
     lep.util.assertString(name, 'Invalid name for ControlSet');
     lep.util.assert(!lep.ControlSet.instancesByName[name], 'ControlSet with name "{}" already exists', name);
-    lep.util.assertNumberInRange(numberOfControls, 1, 32, 'Invalid numberOfControls {} for ControlSet {}', numberOfControls, name);
+    lep.util.assertNumberInRange(numberOfControls, 1, 64, 'Invalid numberOfControls {} for ControlSet {}', numberOfControls, name);
     lep.util.assertFunction(controlCreationFn, 'Invalid controlCreationFn for ControlSet {}', name);
 
     var self = this,
