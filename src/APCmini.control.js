@@ -25,8 +25,8 @@ function init() {
  */
 function ApcMini() {
     const MIDI_CHANNEL = 0,
-        CLIP_MATRIX_TRACKS = 8,
-        CLIP_MATRIX_SCENES = 8,
+        MATRIX_TRACKS = 8,
+        MATRIX_SCENES = 8,
         NOTE = {
             START_NOTE_BY_ROW: [56, 48, 40, 32, 24, 16, 8, 0],
             FIRST_SIDE_BUTTON: 82,
@@ -53,7 +53,7 @@ function ApcMini() {
         };
 
     var eventDispatcher = lep.MidiEventDispatcher.getInstance(),
-        clipWindow = lep.ClipWindow.createMain(CLIP_MATRIX_TRACKS, 0, CLIP_MATRIX_SCENES),
+        matrixWindow = lep.MatrixWindow.createMain(MATRIX_TRACKS, 0, MATRIX_SCENES),
         isShiftPressed = ko.observable(false).updatedBy(function() {
             eventDispatcher.onNote(NOTE.SHIFT_BUTTON, function(note, value) {
                 isShiftPressed(!!value);
@@ -61,7 +61,7 @@ function ApcMini() {
             });
         }),
         CONTROLSET = {
-            MATRIX: clipWindow.createMatrixControlSet(function(colIndex, rowIndex, absoluteIndex) {
+            MATRIX: matrixWindow.createMatrixControlSet(function(colIndex, rowIndex, absoluteIndex) {
                 return new lep.Button({
                     name: lep.util.formatString('MatrixBtn {}:{}', colIndex, rowIndex),
                     clickNote: NOTE.START_NOTE_BY_ROW[rowIndex] + colIndex
@@ -69,7 +69,7 @@ function ApcMini() {
             })
         },
         VALUESET = {
-            LAUNCHER_SLOTS: clipWindow.createLauncherSlotValueSet(function(launcherSlot) {
+            LAUNCHER_SLOTS: matrixWindow.createLauncherSlotValueSet(function(launcherSlot) {
                 return new lep.KnockoutSyncedValue({
                     name: lep.util.formatString('{}Value', launcherSlot.name),
                     ownValue: true,
@@ -93,7 +93,8 @@ function ApcMini() {
                     })
                 });
             })
-        };
+        },
+        VALUE = {};
 
     function initScrollButtons() {
         new lep.Button({
@@ -103,8 +104,8 @@ function ApcMini() {
             valueToAttach: new lep.KnockoutSyncedValue({
                 name: 'MatrixUp',
                 ownValue: true,
-                refObservable: clipWindow.canMoveSceneBack,
-                onClick: clipWindow.moveSceneBack,
+                refObservable: matrixWindow.canMoveSceneBack,
+                onClick: matrixWindow.moveSceneBack,
                 velocityValueOn: COLOR.GREEN,
                 velocityValueOff: COLOR.OFF
             })
@@ -116,8 +117,8 @@ function ApcMini() {
             valueToAttach: new lep.KnockoutSyncedValue({
                 name: 'MatrixDown',
                 ownValue: true,
-                refObservable: clipWindow.canMoveSceneForth,
-                onClick: clipWindow.moveSceneForth,
+                refObservable: matrixWindow.canMoveSceneForth,
+                onClick: matrixWindow.moveSceneForth,
                 velocityValueOn: COLOR.GREEN,
                 velocityValueOff: COLOR.OFF
             })
@@ -129,8 +130,8 @@ function ApcMini() {
             valueToAttach: new lep.KnockoutSyncedValue({
                 name: 'MatrixLeft',
                 ownValue: true,
-                refObservable: clipWindow.canMoveChannelBack,
-                onClick: clipWindow.moveChannelBack,
+                refObservable: matrixWindow.canMoveChannelBack,
+                onClick: matrixWindow.moveChannelBack,
                 velocityValueOn: COLOR.GREEN,
                 velocityValueOff: COLOR.OFF
             })
@@ -142,8 +143,8 @@ function ApcMini() {
             valueToAttach: new lep.KnockoutSyncedValue({
                 name: 'MatrixRight',
                 ownValue: true,
-                refObservable: clipWindow.canMoveChannelForth,
-                onClick: clipWindow.moveChannelForth,
+                refObservable: matrixWindow.canMoveChannelForth,
+                onClick: matrixWindow.moveChannelForth,
                 velocityValueOn: COLOR.GREEN,
                 velocityValueOff: COLOR.OFF
             })

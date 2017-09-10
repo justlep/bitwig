@@ -33,7 +33,7 @@ load('value/KnockoutSyncedValue.js');
 
 load('window/TrackWindow.js');
 load('window/LauncherSlot.js');
-load('window/ClipWindow.js');
+load('window/MatrixWindow.js');
 
 load('morpher/MorphWeightValue.js');
 load('morpher/Morpher.js');
