@@ -195,6 +195,12 @@ describe('util.js', function() {
         assert.strictEqual(a.join(''), s);
     });
 
+    it('generates simple maps using createMap', function() {
+        var m = lep.util.createMap('bli',555,'bla',666,'blubs',777);
+        assert.isObject(m);
+        assert.deepEqual(m, {bli:555, bla:666, blubs:777});
+    });
+
     it('generates 1d-arrays based on cols+rows using a creator function', function() {
         var cols = 3,
             rows = 2,

@@ -178,6 +178,17 @@ lep.util = (function() {
             return arr;
         },
         /**
+         * Creates a map using two consecutive arguments as key, value
+         */
+        createMap: function(/* key, value, key, value ...*/) {
+            var argsLen = arguments.length,
+                map = {};
+            for (var i = 1; i < argsLen; i += 2) {
+                map[''+arguments[i-1]] = arguments[i];
+            }
+            return map;
+        },
+        /**
          * Extends a given object with one or more others.
          * @param target (Object)
          * @params any number of objects whose properties to copy to target
