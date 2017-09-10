@@ -11,6 +11,7 @@ load('../lib/knockout-stripped.js');
 
 load('util/log.js');
 load('util/util.js');
+load('util/ko-extensions.js');
 
 load('midi/MidiEventDispatcher.js');
 
@@ -29,6 +30,10 @@ load('value/ToggledValue.js');
 load('value/ChannelSelectValue.js');
 load('value/ToggledTransportValue.js');
 load('value/KnockoutSyncedValue.js');
+
+load('window/TrackWindow.js');
+load('window/LauncherSlot.js');
+load('window/ClipWindow.js');
 
 load('morpher/MorphWeightValue.js');
 load('morpher/Morpher.js');
