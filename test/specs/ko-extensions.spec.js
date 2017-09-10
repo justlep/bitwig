@@ -1,7 +1,7 @@
 var assert = require('chai').assert;
 
 // load lep-API and mocks into this context..
-require('lepApiAndMocksLoader');
+require('./../loadApiAndMocks');
 
 lep.setLogLevel(lep.LOGLEVEL.WARN);
 

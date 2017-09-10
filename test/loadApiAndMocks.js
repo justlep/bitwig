@@ -8,7 +8,7 @@
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  *
  * Example:
- * $ require('lepApiAndMocksLoader');
+ * $ require('./../loadApiAndMocks');
  * $ lep.util.formatString('hallo {}', 'du');
  *
  * (Used Mocha to avoid the overhead of PhantomJS-based test runners like Karma & co)
@@ -20,9 +20,9 @@ let vm = require('vm'),
     path = require('path'),
     fs = require('fs'),
     grunt = require('grunt'),
-    projectRootPath = path.resolve(__dirname, '../../..'),
+    projectRootPath = path.resolve(__dirname, '..'),
     getApiPath = function(relativePath) {
-        return path.resolve(__dirname, '../../../src/lep/', relativePath);
+        return path.resolve(__dirname, '../src/lep/', relativePath);
     },
     apiLoaderSource = fs.readFileSync(getApiPath('api.js'), 'utf8'),
     filesToExecute = grunt.file.expand({

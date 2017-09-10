@@ -4,7 +4,7 @@ var chai = require('chai'),
     expect = chai.expect;
 
 // load lep-API and mocks into this context..
-require('lepApiAndMocksLoader');
+require('./../loadApiAndMocks');
 
 chai.use(spies);
 
