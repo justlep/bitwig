@@ -17,7 +17,7 @@ lep.Button = lep.util.extendClass(lep.BaseControl, {
             if (ko.isObservable(opts.valueToAttach)) {
                 this.attachValue(opts.valueToAttach());
                 opts.valueToAttach.subscribe(function(newValueToAttach) {
-                    lep.util.assertBaseValue(newValueToAttach, 'Invalid newValueToAttach in observable of Button {}', this.name);
+                    lep.util.assertBaseValue(newValueToAttach, 'Invalid newValueToAttach in observable of Button {}', self.name);
                     self.attachValue(newValueToAttach);
                 });
             } else {
