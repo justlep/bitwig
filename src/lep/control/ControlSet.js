@@ -207,7 +207,7 @@ lep.ControlSet.prototype = {
     },
 
     setValueSet: function(newValueSet) {
-        lep.util.assertValueSet(newValueSet, 'invalid ValueSet for ControlSet.attachValueSet');
+        lep.util.assertValueSet(newValueSet, 'Invalid newValueSet "{}" for attachValueSet on ControlSet {}', newValueSet, this.name);
         if (newValueSet === this.valueSet()) return;
 
         var oldControlSet = lep.ControlSet.instanceByValueSetId[newValueSet.id];
