@@ -47,10 +47,6 @@ lep.TrackWindow = function(name, numTracks, numSends, numScenes, trackBank) {
     this.moveChannelPageBack = function() {
         self.trackBank.scrollChannelsPageUp();
     };
-
-    this.isRotatable = function() {
-        return numTracks === numScenes;
-    };
 };
 
 /** @static */

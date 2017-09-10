@@ -14,7 +14,7 @@
  */
 lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
     _init: function(name, numTracks, numSends, numScenes, trackBank) {
-        lep.util.assertNumberInRange(numScenes, 1, lep.TrackWindow.MAX_SCENES, 'Invalid numScenes={} for MatrixWindow {}', numScenes, name);
+        lep.util.assertNumberInRange(numScenes, 2, lep.TrackWindow.MAX_SCENES, 'Invalid numScenes={} for MatrixWindow {}', numScenes, name);
         this._super.apply(this, arguments);
 
         var self = this,
@@ -31,31 +31,47 @@ lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
             totalSelectableScenes = ko.observable(1000), // FIXME it is even possible to determine this number?
             maxScrollPosition = ko.computed(function() {
                 return totalSelectableScenes() - numScenes;
-            });
+            }),
+            _slotLauncherValueSets = {
+                tracksByScenes: ko.observable(null),
+                scenesByTracks: ko.observable(null)
+            };
 
-        // init play
+        // init state observers for slots
         slotBanksByTrack.forEach(function(slotBank, trackIndex) {
-            slotBank.addPlaybackStateObserver(function(sceneIndex, slotState, isQueued) {
-                const STATE = lep.LauncherSlot.STATE;
-                var launcherSlotIndex = ((sceneIndex * numTracks) + trackIndex),
-                    launcherSlot = launcherSlots[launcherSlotIndex],
-                    newState =
-                    (slotState === 0) ? (isQueued ? STATE.STOP_QUEUED : STATE.STOPPED) :
-                    (slotState === 1) ? (isQueued ? STATE.PLAY_QUEUED : STATE.PLAYING) :
-                    (slotState === 2) ? (isQueued ? STATE.RECORD_QUEUED : STATE.RECORDING) : STATE.OTHER;
-
-                // lep.logDebug('New state for {} -> {}', launcherSlot.name, newState);
-                launcherSlot.state(newState);
-            });
-
+            // has-content-state
             slotBank.addHasContentObserver(function(sceneIndex, hasContent) {
-                var launcherSlotIndex = ((sceneIndex * numTracks) + trackIndex),
-                    launcherSlot = launcherSlots[launcherSlotIndex];
-
-                // lep.logDebug('New hasContent for {} -> {}', launcherSlot.name, hasContent);
+                var launcherSlot = launcherSlots[ (sceneIndex * numTracks) + trackIndex ];
+                // lep.logDev('New hasContent for {} -> {}', launcherSlot.name, hasContent);
                 launcherSlot.hasContent(hasContent);
             });
+
+            // playback-state
+            slotBank.addPlaybackStateObserver(function(sceneIndex, slotState, isQueued) {
+                var launcherSlot = launcherSlots[ (sceneIndex * numTracks) + trackIndex ],
+                    isStop = (slotState === 0),
+                    isPlay = (slotState === 1),
+                    isRecord = (slotState === 2);
+
+                launcherSlot.updatePlayStateByFlags(isStop, isPlay, isRecord, isQueued);
+            });
         });
+
+        this.canRotate = ko.computed(function() {
+            return (numTracks === numScenes);
+        });
+
+        this.isOrientationTracksByScenes = (function(_obs) {
+            return ko.computed({
+                read: _obs,
+                write: function(newVal) {
+                    lep.util.assert(self.canRotate(), 'Cannot change orientation of asymmetrical {}', self.name);
+                    _obs(newVal);
+                }
+            });
+        })( ko.observable(true) ).extend({toggleable: true});
+
+        this.rotate = this.isOrientationTracksByScenes.toggle;
 
         this.sceneScrollPosition = ko.observable(0).updatedBy(function(obs) {
             self.trackBank.addSceneScrollPositionObserver(obs, 0);
@@ -81,6 +97,32 @@ lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
             self.trackBank.scrollToScene(newScenePos);
         };
 
+        this.canMoveMatrixUp = ko.computed(function(){
+            return self.isOrientationTracksByScenes() ? self.canMoveSceneBack() : self.canMoveChannelBack();
+        });
+        this.canMoveMatrixDown = ko.computed(function(){
+            return self.isOrientationTracksByScenes() ? self.canMoveSceneForth() : self.canMoveChannelForth();
+        });
+        this.canMoveMatrixLeft = ko.computed(function(){
+            return self.isOrientationTracksByScenes() ? self.canMoveChannelBack() : self.canMoveSceneBack();
+        });
+        this.canMoveMatrixRight = ko.computed(function(){
+            return self.isOrientationTracksByScenes() ? self.canMoveChannelForth() : self.canMoveSceneForth();
+        });
+
+        this.moveMatrixUp = function() {
+            void( self.isOrientationTracksByScenes() ? self.moveSceneBack() : self.moveChannelBack() );
+        };
+        this.moveMatrixDown = function() {
+            void( self.isOrientationTracksByScenes() ? self.moveSceneForth() : self.moveChannelForth() );
+        };
+        this.moveMatrixLeft = function() {
+            void( self.isOrientationTracksByScenes() ? self.moveChannelBack() : self.moveSceneBack() );
+        };
+        this.moveMatrixRight = function() {
+            void( self.isOrientationTracksByScenes() ? self.moveChannelForth() : self.moveSceneForth() );
+        };
+
         /**
          * Generates a ControlSet instance that fits all launcherSlots of this MatrixWindow.
          * @param controlCreatorFn {function} a function that creates the controls, e.g. function(colIndex, rowIndex, absoluteIndex){}
@@ -96,16 +138,51 @@ lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
         };
 
         /**
-         * Generates a ValueSet instance fill with values generated by a given `valueCreatorFn`.
+         * Returns one of the LauncherSlot valuesets which have been prepared by {@link prepareLauncherSlotValueSets}.
+         * The returned set depends on the current orientation.
+         * @returns {ValueSet}
+         */
+        this.launcherSlotValueSet = ko.computed(function() {
+            var isTracksByScenes = self.isOrientationTracksByScenes(),
+                valueSet = isTracksByScenes ? _slotLauncherValueSets.tracksByScenes() : _slotLauncherValueSets.scenesByTracks();
+
+            if (!valueSet) {
+                lep.logWarn('MatrixWindow.prepareLauncherSlotValueSets() should be called prior to launcherSlotValueSet');
+            }
+            host.showPopupNotification('APCmini axis: ' + (isTracksByScenes ? '↓ Scenes · Tracks →' : '↓ Tracks · Scenes →'));
+            return valueSet;
+        });
+
+        /**
+         * Generates a ValueSet (or two) containing `BaseValue` instances for all LauncherSlots of the matrix.
+         * The BaseValue instances are generated by the given `valueCreatorFn`.
+         * If the matrix is rotatable, the second Valueset (for the alternative orientation)
+         * will SHARE the first ValueSet's values.
+         * The generated ValueSets can later be obtained via the
          *
          * @param valueCreatorFn {function} a function supposed to return the {@link BaseValue} instances for the set,
          *                                  e.g. function(launcherSlot) { return new BaseValue(..) }
-         * @returns {lep.ValueSet}
          */
-        this.createLauncherSlotValueSet = function(valueCreatorFn) {
-            return new lep.ValueSet('LauncherSlotValues', totalLauncherSlots, 1, function(launcherSlotIndex) {
-                return valueCreatorFn( launcherSlots[launcherSlotIndex] );
-            });
+        this.prepareLauncherSlotValueSets = function(valueCreatorFn) {
+            lep.util.assert(!_slotLauncherValueSets.tracksByScenes() && !_slotLauncherValueSets.scenesByTracks(),
+                            'Multiple call of MatrixWindow.prepareLauncherSlotValueSets');
+            var tracksByScenesValueSet = new lep.ValueSet('LauncherSlotValues(TbS)', totalLauncherSlots, 1, function(launcherSlotIndex) {
+                    return valueCreatorFn( launcherSlots[launcherSlotIndex] );
+                }),
+                scenesByTrackValueSet = null;
+
+            lep.logDev('Prepared ValueSet: {}', tracksByScenesValueSet.name);
+
+            if (self.canRotate()) {
+                // generate a swapped-axis version of the `tracksByScenesValueSet`
+                scenesByTrackValueSet = new lep.ValueSet('LauncherSlotValues(SbT)', numScenes, numTracks, function(sceneIndex, trackIndex) {
+                    var sourceValueIndex = (trackIndex * numTracks) + sceneIndex;
+                    return tracksByScenesValueSet.values[sourceValueIndex];
+                });
+                lep.logDev('Prepared ValueSet: {}', scenesByTrackValueSet.name);
+            }
+            _slotLauncherValueSets.tracksByScenes(tracksByScenesValueSet);
+            _slotLauncherValueSets.scenesByTracks(scenesByTrackValueSet);
         };
     }
 });

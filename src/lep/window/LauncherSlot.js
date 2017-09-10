@@ -15,7 +15,13 @@ lep.LauncherSlot = function(trackIndex, sceneIndex, sceneBank) {
     this.sceneIndex = sceneIndex;
     this.sceneBank = sceneBank;
     this.hasContent = ko.observable(false);
-    this.state = ko.observable(lep.LauncherSlot.STATE.EMPTY);
+    this._playState = {
+        isStop: false,
+        isPlay: false,
+        isRecord: false,
+        isQueued: false
+    };
+    this.playState = ko.observable(this._playState);
 };
 
 lep.LauncherSlot.prototype = {
@@ -26,23 +32,27 @@ lep.LauncherSlot.prototype = {
         this.sceneBank.stop();
     },
     toggle: function() {
-        var state = this.state();
-        if (state !== lep.LauncherSlot.STATE.EMPTY && state !== lep.LauncherSlot.STATE.STOPPED) {
-            this.stop();
-        } else {
-            this.play();
-        }
-    }
-};
+        var state = this.hasContent() && this._playState,
+            canStop = !state || (state.isPlay || state.isRecord),
+            canPlay = state && (state.isStop || (!state.isPlay && !state.isRecord));
 
-/** @static */
-lep.LauncherSlot.STATE = {
-    EMPTY: 0,
-    STOPPED: 1,
-    STOP_QUEUED: 2,
-    PLAYING: 3,
-    PLAY_QUEUED: 4,
-    RECORDING: 5,
-    RECORD_QUEUED: 6,
-    OTHER: 7
+        if (canPlay) {
+            this.play();
+        } else if (canStop) {
+            this.stop();
+        }
+    },
+    /**
+     * To be used by the {@link MatrixWindow} only to update this LauncherSlot with updated values from the Bitwig API.
+     * All params assumed to be {boolean}.
+     */
+    updatePlayStateByFlags: function(isStop, isPlay, isRecord, isQueued) {
+        // lep.logDev('Update state for {} -> isStop:{}, isPlay:{}, isRecord:{}, isQueued:{}',
+        //                              this.name, isStop, isPlay, isRecord, isQueued);
+        this._playState.isStop = isStop;
+        this._playState.isPlay = isPlay;
+        this._playState.isRecord = isRecord;
+        this._playState.isQueued = isQueued;
+        this.playState.valueHasMutated();
+    }
 };
