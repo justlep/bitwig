@@ -1,6 +1,14 @@
 /**
  * Basic Bitwig Controller Script for the Akai APC mini.
  *
+ *  - Toggle Matrix orientation (Tracks-Scenes <> Scenes-Tracks)
+ *  - [Shift+Clip] => Stop Clip
+ *  - [Clip] = Play Clip
+ *  - [Stop] = Toggle Play/Stop
+ *  - [Shift+Stop] = Return to Arrangement
+ *  - [Double-click Shift] = Stop*
+ *
+ *
  * Author: Lennart Pegel - https://github.com/justlep/bitwig
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  */
@@ -29,16 +37,17 @@ function ApcMini() {
         MATRIX_SCENES = 8,
         NOTE = {
             MATRIX_START_NOTES_BY_ROW: [56, 48, 40, 32, 24, 16, 8, 0],
-            FIRST_SIDE_BUTTON: 82,
-            FIRST_BOTTOM_BUTTON: 64,
+            SIDE_BUTTONS_START: 82,
+            BOTTOM_BUTTONS_START: 64,
             SHIFT_BUTTON: 98
         },
         ACTION_NOTE = {
-            MATRIX_UP: NOTE.FIRST_BOTTOM_BUTTON,
-            MATRIX_DOWN: NOTE.FIRST_BOTTOM_BUTTON + 1,
-            MATRIX_LEFT: NOTE.FIRST_BOTTOM_BUTTON + 2,
-            MATRIX_RIGHT: NOTE.FIRST_BOTTOM_BUTTON + 3,
-            MATRIX_ROTATE: NOTE.FIRST_SIDE_BUTTON + 6
+            MATRIX_UP: NOTE.BOTTOM_BUTTONS_START,
+            MATRIX_DOWN: NOTE.BOTTOM_BUTTONS_START + 1,
+            MATRIX_LEFT: NOTE.BOTTOM_BUTTONS_START + 2,
+            MATRIX_RIGHT: NOTE.BOTTOM_BUTTONS_START + 3,
+            MATRIX_ROTATE: NOTE.SIDE_BUTTONS_START + 6,
+            STOP_ALL: NOTE.SIDE_BUTTONS_START + 7
         },
         CC = {
             FIRST_FADER: 48
@@ -56,13 +65,30 @@ function ApcMini() {
     ApcMini.resetButtons();
 
     var eventDispatcher = lep.MidiEventDispatcher.getInstance(),
+        transport = lep.util.getTransport(),
         matrixWindow = lep.MatrixWindow.createMain(MATRIX_TRACKS, 0, MATRIX_SCENES),
         isShiftPressed = ko.observable(false).updatedBy(function() {
+            var maxNextDoubleClickTime = 0,
+                DOUBLE_CLICK_TIME_IN_MILLIS = 400;
+
             eventDispatcher.onNote(NOTE.SHIFT_BUTTON, function(note, value) {
-                isShiftPressed(!!value);
-                lep.logDev('Shift: {}', !!value);
+                var isPressed = !!value,
+                    clickTimeNow;
+
+                if (isPressed) {
+                    clickTimeNow = Date.now();
+                    if (clickTimeNow < maxNextDoubleClickTime) {
+                        transport.stop();
+                        return;
+                    } else {
+                        maxNextDoubleClickTime = clickTimeNow + DOUBLE_CLICK_TIME_IN_MILLIS;
+                    }
+                }
+                isShiftPressed(isPressed);
+                //lep.logDev('Shift: {}', isPressed);
             });
         }),
+        isPlaying = ko.observable(false).updatedByBitwigValue(transport.isPlaying()),
         CONTROLSET = {
             MATRIX: matrixWindow.createMatrixControlSet(function(colIndex, rowIndex, absoluteIndex) {
                 return new lep.Button({
@@ -70,21 +96,8 @@ function ApcMini() {
                     clickNote: NOTE.MATRIX_START_NOTES_BY_ROW[rowIndex] + colIndex
                 });
             })
-        },
-        VALUESET = {
-        },
-        VALUE = {},
-        resetAllButtons = function() {
-            const colorVelocity = COLOR.OFF;
-
-            NOTE.MATRIX_START_NOTES_BY_ROW.forEach(function (startNote) {
-                for (var i=0; i<8; i++) sendNoteOn(MIDI_CHANNEL, startNote+i, colorVelocity);
-            });
-            for (var i=0; i<8; i++) {
-                sendNoteOn(MIDI_CHANNEL, NOTE.FIRST_SIDE_BUTTON+i, colorVelocity);
-                sendNoteOn(MIDI_CHANNEL, NOTE.FIRST_BOTTOM_BUTTON+i, colorVelocity);
-            }
         };
+
 
     function initScrollButtons() {
         new lep.Button({
@@ -156,13 +169,42 @@ function ApcMini() {
         });
     }
 
+    function initTransportButtons() {
+        new lep.Button({
+            name: 'PlayStopBtn',
+            clickNote: ACTION_NOTE.STOP_ALL,
+            midiChannel: MIDI_CHANNEL,
+            valueToAttach: new lep.KnockoutSyncedValue({
+                name: 'PlayStop',
+                ownValue: true,
+                refObservable: ko.computed(function(){
+                    return isShiftPressed() || isPlaying();
+                }),
+                computedVelocity: ko.computed(function() {
+                    return isPlaying() ? (isShiftPressed() ? COLOR.GREEN : COLOR.GREEN_BLINK) : COLOR.OFF;
+                }),
+                onClick: function() {
+                    if (isShiftPressed()) {
+                        transport.returnToArrangement();
+                    } else {
+                        transport.togglePlay();
+                    }
+                }
+            })
+        });
+    }
+
     matrixWindow.prepareLauncherSlotValueSets(function (launcherSlot) {
         return new lep.KnockoutSyncedValue({
             name: lep.util.formatString('{}Value', launcherSlot.name),
             ownValue: true,
             refObservable: launcherSlot.playState,
             onClick: function () {
-                launcherSlot.toggle();
+                if (isShiftPressed()) {
+                    launcherSlot.stop();
+                } else {
+                    launcherSlot.play();
+                }
             },
             computedVelocity: ko.computed(function () {
                 var state = launcherSlot.hasContent() && launcherSlot.playState(),
@@ -177,6 +219,7 @@ function ApcMini() {
     });
 
     initScrollButtons();
+    initTransportButtons();
 
     ko.computed(function() {
         CONTROLSET.MATRIX.setValueSet( matrixWindow.launcherSlotValueSet() );
