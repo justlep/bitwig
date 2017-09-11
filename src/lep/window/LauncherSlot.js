@@ -1,12 +1,12 @@
 /**
- * Represents a launcher slot managed by a ClipWindow.
+ * Represents a launcher slot managed by a MatrixWindow.
  *
  * Author: Lennart Pegel - https://github.com/justlep/bitwig
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  *
- * @param trackIndex {Number} track position of the launcherSlot within the parent ClipWindow
- * @param sceneIndex {Number} slot/scene position of the launcherSlot within the parent ClipWindow
- * @param sceneBank {ClipLauncherSlotOrSceneBank} the scene bank this launcher belongs to
+ * @param trackIndex {Number} track position of the launcherSlot within the parent MatrixWindow
+ * @param sceneIndex {Number} slot/scene position of the launcherSlot within its SceneBank
+ * @param sceneBank {ClipLauncherSlotOrSceneBank} the scene bank this launcher slot belongs to
  * @constructor
  */
 lep.LauncherSlot = function(trackIndex, sceneIndex, sceneBank) {
