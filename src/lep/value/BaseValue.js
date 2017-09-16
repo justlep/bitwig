@@ -1,5 +1,7 @@
 /**
- * Represents a single value than can be connected to both Bitwig and
+ * @abstract
+ *
+ * Base class representing a single value than can be connected to both Bitwig and
  * a hardware controller's element (encoder and such) via BaseControl.js or subclass.
  *
  * @param opts (Object)
@@ -22,7 +24,6 @@ lep.BaseValue = function(opts) {
 
 lep.BaseValue.prototype = {
     setIndication:   lep.util.NOP,
-    syncToDaw:       lep.util.NOP,
 
     syncToController: function() {
         if (this.controller && this.controller.isWriteable) {
@@ -51,6 +52,6 @@ lep.BaseValue.prototype = {
     },
     onAbsoluteValueReceived: function(absoluteValue, isTakeoverRequired) {
         this.value = absoluteValue;
-        this.syncToDaw();
+        // a subclass must sync the change value to Bitwig (taking into account `isTakeoverRequired` for unidirectional controls)
     }
 };

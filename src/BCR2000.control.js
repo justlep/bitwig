@@ -68,7 +68,6 @@ lep.BCR2000 = function(bcrPresetNumber, bcfMidiChannel) {
         SENDS_NUMBER = 6,
         PARAM_PAGES_NUMBER = 12,
         USER_CONTROL_PAGES = 6,
-        MAX_MORPHABLE_PARAMS_NUMBER = (WINDOW_SIZE * Math.max(SENDS_NUMBER, PARAM_PAGES_NUMBER, USER_CONTROL_PAGES)),
         prefs = {
             soloExclusive: true
         },
@@ -92,7 +91,6 @@ lep.BCR2000 = function(bcrPresetNumber, bcfMidiChannel) {
             MODE_ARM_SELECT: NOTE.EG3,
             MODE_VALUE_SELECT: NOTE.EG4,
             SHIFT: NOTE.F1,
-            MORPHER: NOTE.F2,
             RECORD: NOTE.F3,
             LOOP: NOTE.F4,
             PREV_DEVICE_OR_CHANNEL_PAGE: NOTE.P1,
@@ -110,8 +108,6 @@ lep.BCR2000 = function(bcrPresetNumber, bcfMidiChannel) {
 
         isShiftPressed = ko.observable(false),
         clearPunchOnStop = ko.observable(true),
-
-        morpher = lep.Morpher.getInstance(WINDOW_SIZE, MAX_MORPHABLE_PARAMS_NUMBER, isShiftPressed),
 
         HANDLERS = {
             NEXT_DEVICE_OR_CHANNEL_PAGE: function() {
@@ -205,11 +201,7 @@ lep.BCR2000 = function(bcrPresetNumber, bcfMidiChannel) {
                 read: _valueSet,
                 write: function(newValueSet) {
                     lep.util.assertValueSet(newValueSet, 'Invalid valueSet for currentFaderValueSetObservable');
-                    if (morpher.isActive()) {
-                        lep.logDebug('(!) Forcing currentFaderValueSetObservable to value=null since morpher is active.');
-                        _valueSet(null);
-                        return;
-                    }
+
                     var oldValueSet = _valueSet(),
                         otherObservable = currentEncoderValueSetObservable;
                     _valueSet(newValueSet);
@@ -358,48 +350,6 @@ lep.BCR2000 = function(bcrPresetNumber, bcfMidiChannel) {
             })
         },
 
-        /**
-         * Create the button and attachend value that toggle the Morpher on/off
-         */
-        initMorpherButton = function() {
-            new lep.Button({
-                name: 'MorpherToggleBtn',
-                midiChannel: bcfMidiChannel,
-                clickNote: NOTE_ACTION.MORPHER,
-                valueToAttach: new lep.KnockoutSyncedValue({
-                    name: 'MorpherToggle',
-                    ownValue: true,
-                    refObservable: morpher.isActive,
-                    onClick: function() {
-                        if (morpher.isActive()) {
-                            if (isShiftPressed()) {
-                                morpher.clearAllSnapshots();
-                                return;
-                            }
-                            morpher.deactivate(function(previousValueSet) {
-                                var isPreviousValueSetRestorable = (previousValueSet && !previousValueSet.isControlled());
-
-                                if (isPreviousValueSetRestorable) {
-                                    currentFaderValueSetObservable(previousValueSet);
-                                } else {
-                                    // e.g. if volume was assigned to the faders before morpher took control over them,
-                                    // and then volume is assigned to the upper encoders, then on deactivating morpher,
-                                    // don't "steal back" the volume valueSet from the encoders
-                                    // but assign the next best *free* unused valueSet to the faders
-                                    currentFaderValueSetObservable( getNextFreeSwitchableValueSet() );
-                                }
-                            });
-                        }  else {
-                            morpher.activate(CONTROLSET.FADERS, CONTROLSET.ENCODERS.valueSet);
-                            currentFaderValueSetObservable(CONTROLSET.FADERS.valueSet());
-                        }
-                        // update button rows by re-triggering the currentEncoderGroupMode's write()
-                        currentEncoderGroupMode(currentEncoderGroupMode());
-                    }
-                })
-            });
-        },
-
         currentEncoderGroupMode = (function(){
             var _currentEncoderGroupMode = ko.observable();
             return ko.computed({
@@ -410,18 +360,7 @@ lep.BCR2000 = function(bcrPresetNumber, bcfMidiChannel) {
                     _currentEncoderGroupMode(newGroupModeKey);
 
                     var buttonValueSets = ENCODER_GROUPS[newGroupModeKey].BUTTON_VALUESETS,
-                        lowerButtonValueSet = buttonValueSets.lower,
-                        enforceMorpherSnapshotSelects = morpher.isActive() && lowerButtonValueSet &&
-                                                        lowerButtonValueSet !== VALUESET.MUTE &&
-                                                        lowerButtonValueSet !== VALUESET.SELECT;
-
-                    if (enforceMorpherSnapshotSelects) {
-                        // While the morpher is active, the lower button row is reserved for
-                        // mute (in SOLO/MUTE mode), select (in ARM/SELECT mode)
-                        // or the Morpher's own snapshotSelect values in ALL other EG modes.
-                        lep.logDebug('Reserved {} for Morpher Snapshot-selects', CONTROLSET.LOWER_BUTTONS.name);
-                        lowerButtonValueSet = morpher.getSnapshotSelectValueSet();
-                    }
+                        lowerButtonValueSet = buttonValueSets.lower;
 
                     if (buttonValueSets.upper) {
                         CONTROLSET.UPPER_BUTTONS.setValueSet(buttonValueSets.upper);
@@ -584,7 +523,6 @@ lep.BCR2000 = function(bcrPresetNumber, bcfMidiChannel) {
     initTransportButtons();
     initEncodersAndFadersValueSet();
     initEncoderModeButtons();
-    initMorpherButton();
 
     println('\n-------------\nBCR2000 ready');
 };
