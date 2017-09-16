@@ -40,8 +40,9 @@ lep.StandardRangedValue = lep.util.extendClass(lep.BaseValue, {
         this.rangedValue.inc(delta, range);
     },
     /** @Override */
-    onAbsoluteValueReceived: function(absoluteValue, optionalRange) {
-        this.rangedValue.set(absoluteValue, optionalRange || 128);
+    onAbsoluteValueReceived: function(absoluteValue, isTakeoverRequired) {
+        // TODO eval `isTakeoverRequired`
+        this.rangedValue.set(absoluteValue, 128);
     }
 });
 

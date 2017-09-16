@@ -85,7 +85,7 @@ lep.KnockoutSyncedValue = lep.util.extendClass(lep.BaseValue, {
     onRelativeValueReceived: lep.util.NOP,
 
     /** @Override */
-    onAbsoluteValueReceived: function(absoluteValue) {
+    onAbsoluteValueReceived: function(absoluteValue /*, isTakeoverRequired */) {
         var isPressed = !!absoluteValue,
             isReleaseAfterLongClick = (!isPressed && this.restoreRefAfterLongClick && lep.util.stopTimer(this.id) > this.LONG_CLICK_TIME);
 

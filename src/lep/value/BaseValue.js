@@ -25,10 +25,11 @@ lep.BaseValue.prototype = {
     syncToDaw:       lep.util.NOP,
 
     syncToController: function() {
-        if (this.controller) {
+        if (this.controller && this.controller.isWriteable) {
             this.controller.syncToMidi();
         }
     },
+    /** @final */
     onAttach: function(controller) {
         lep.util.assertBaseControl(controller, 'Invalid controller for BaseValue.onAttach()');
         this.controller = controller;
@@ -36,6 +37,7 @@ lep.BaseValue.prototype = {
         this.setIndication(true);
         lep.logDebug('Attached {} <> {}', this.controller.name, this.name);
     },
+    /** @final */
     onDetach: function() {
         // lep.logDebug('onDetach {}', this.name);
         if (this.controller) {
@@ -47,7 +49,7 @@ lep.BaseValue.prototype = {
     onRelativeValueReceived: function(delta, range) {
         lep.logDebug('{} onRelativeChange({},{})', this.id, delta, range);
     },
-    onAbsoluteValueReceived: function(absoluteValue) {
+    onAbsoluteValueReceived: function(absoluteValue, isTakeoverRequired) {
         this.value = absoluteValue;
         this.syncToDaw();
     }

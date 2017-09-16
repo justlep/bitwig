@@ -53,6 +53,17 @@ lep.BaseControl = function(opts) {
     );
 
     this.isMuted = !!opts.isMuted;
+    this.isReadOnly = !!opts.isReadOnly;
+    if (this.isReadOnly) {
+        // since unidirectional controls have no use for the syncToMidi(), we can replace it with a nop
+        this.syncToMidi = lep.util.NOP;
+    }
+    this.isWriteable = !this.isReadOnly; // redundant flag to save constant negations
+    this.useTakeover = !!opts.useTakeover;
+    if (this.useTakeover) {
+        lep.util.assert(this.isReadOnly, 'Takeover is unsupported for unidirectional control "{}"', this.name);
+        lep.util.assert(!this.sendsDiffValues, 'Takeover is unsupported for control "{}" sending diff values', this.name);
+    }
 
     // the latest absolute value received from the controller that might be
     // skipped (and reset) during the next syncToMidi() if skipFeedbackLoops is not explicitly disabled
@@ -145,7 +156,7 @@ lep.BaseControl.prototype = {
             this.value.onRelativeValueReceived(delta, this.diffValueRange);
         } else {
             this.nextFeedbackLoopValue = receivedValue;
-            this.value.onAbsoluteValueReceived(receivedValue);
+            this.value.onAbsoluteValueReceived(receivedValue, this.useTakeover);
         }
     },
     onClickNoteReceived: function(clickNote, receivedValue) {

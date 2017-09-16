@@ -33,7 +33,7 @@ lep.ToggledTransportValue = lep.util.extendClass(lep.BaseValue, {
         });
     },
     /** @Override */
-    onAbsoluteValueReceived: function(absoluteValue) {
+    onAbsoluteValueReceived: function(absoluteValue /*, isTakeoverRequired */) {
         var isPressed = !!absoluteValue;
         if (this.toggleOnPressed === isPressed) {
             this.togglingMethod();

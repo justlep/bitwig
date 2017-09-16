@@ -26,7 +26,7 @@ lep.ToggledValue = lep.util.extendClass(lep.BaseValue, {
         });
     },
     /** @Override */
-    onAbsoluteValueReceived: function(absoluteValue) {
+    onAbsoluteValueReceived: function(absoluteValue /*, isTakeoverRequired */) {
         var isPressed = !!absoluteValue;
         if (this.toggleOnPressed === isPressed) {
             if (this.prefs && (typeof this.prefs.soloExclusive !== 'undefined')) {
