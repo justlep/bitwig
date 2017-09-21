@@ -92,6 +92,45 @@ describe('lep.StandardRangedValue', function() {
         assert.strictEqual(s.value, 29);
     });
 
+    it('re-calculates takeover-range upon all non-controller-changes', function() {
+        // lep.setLogLevel(lep.LOGLEVEL.DEV);
+
+        let rangedValue = new RangedValueMock(),
+            s = new lep.StandardRangedValue({
+                name: 'myStdRgdValue',
+                rangedValue: rangedValue,
+                isTakeoverEnabled: true
+            });
+
+        rangedValue.set(22); // simulate value-update from bitwig
+        assert.strictEqual(s.value, 22);
+        s.onAbsoluteValueReceived(10, true);
+        assert.strictEqual(s.value, 22);
+        s.onAbsoluteValueReceived(20, true);
+        assert.strictEqual(s.value, 22);
+        s.onAbsoluteValueReceived(21, true);
+        assert.strictEqual(s.value, 22);
+        s.onAbsoluteValueReceived(22, true);
+        assert.strictEqual(s.value, 22);
+        s.onAbsoluteValueReceived(40, true);
+        assert.strictEqual(s.value, 40);
+        rangedValue.set(30); // simulate manual change in Bitwig
+        s.onAbsoluteValueReceived(39, true); // <-- this generates take over range 0-30
+        assert.strictEqual(s.value, 30);
+        s.onAbsoluteValueReceived(39, true);
+        assert.strictEqual(s.value, 30);
+        s.onAbsoluteValueReceived(31, true);
+        assert.strictEqual(s.value, 30);
+
+        rangedValue.set(50);                 // <-- invalidates the old sync status & range
+        s.onAbsoluteValueReceived(29, true); // <-- this should trigger re-calculation of the takeover-range => 50-127
+        assert.strictEqual(s.value, 50);
+        s.onAbsoluteValueReceived(49, true);
+        assert.strictEqual(s.value, 50);
+        s.onAbsoluteValueReceived(51, true);
+        assert.strictEqual(s.value, 51);
+    });
+
     it('follows received absolute values from UNIdirectional control with takeover DISABLED', function() {
         // lep.setLogLevel(lep.LOGLEVEL.DEV);
 

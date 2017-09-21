@@ -17,15 +17,15 @@ lep.StandardRangedValue = lep.util.extendClass(lep.BaseValue, {
         lep.util.assertFunction(this.indicateableValue.setIndication, 'Invalid indicateableValue for {}', this.name);
 
         this._takeover = null;
-        this.setTakeoverEnabled(!!opts.isTakeoverEnabled);
+        this.setTakeoverEnabled(opts.isTakeoverEnabled);
 
         this.rangedValue.addValueObserver(128, function(newValue) {
             // lep.logDebug('{} -> rangedValue observer fired with newValue: {}', self.name, newValue);
             self.value = newValue;
 
             var takeover = self._takeover;
-            if (takeover && takeover.isSynced) {
-                if (takeover.recentSyncedValues[newValue]) {
+            if (takeover) {
+                if (takeover.isSynced && takeover.recentSyncedValues[newValue]) {
                     takeover.recentSyncedValues[newValue] = 0;
                 } else {
                     // lep.logDebug('{} -> went OFF SYNC -> newValue: {}', self.name, newValue);
