@@ -54,6 +54,14 @@ lep.StandardRangedValue = lep.util.extendClass(lep.BaseValue, {
         }) : null;
     },
     /** @Override */
+    afterDetach: function() {
+        var takeover = this._takeover;
+        if (takeover) {
+            takeover.isSynced = null;
+            takeover.recentSyncedValues = {};
+        }
+    },
+    /** @Override */
     setIndication: function(on) {
         // lep.logDebug('setIndications({}) for {}', on, this.name);
         this.indicateableValue.setIndication(on);

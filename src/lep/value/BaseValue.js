@@ -24,6 +24,7 @@ lep.BaseValue = function(opts) {
 
 lep.BaseValue.prototype = {
     setIndication:   lep.util.NOP,
+    afterDetach: lep.util.NOP,
 
     syncToController: function() {
         if (this.controller && this.controller.isBidirectional) {
@@ -45,6 +46,7 @@ lep.BaseValue.prototype = {
             lep.logDebug('Detached {} <> {}', this.controller.name, this.name);
             this.controller = null;
             this.setIndication(false);
+            this.afterDetach();
         }
     },
     onRelativeValueReceived: function(delta, range) {
