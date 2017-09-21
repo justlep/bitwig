@@ -7,7 +7,8 @@
  *  - [Stop] = Toggle Play/Stop
  *  - [Shift+Stop] = Return to Arrangement
  *  - [Double-click Shift] = Stop*
- *
+ *  - Volume, Pan, Send, Device-Params mode for faders
+ *  - Volume/Pan mode on master fader
  *
  * Author: Lennart Pegel - https://github.com/justlep/bitwig
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
@@ -33,6 +34,7 @@ function init() {
  */
 function ApcMini() {
     const MIDI_CHANNEL = 0,
+        MATRIX_SENDS = 6,
         MATRIX_TRACKS = 8,
         MATRIX_SCENES = 8,
         NOTE = {
@@ -47,10 +49,15 @@ function ApcMini() {
             MATRIX_LEFT: NOTE.BOTTOM_BUTTONS_START + 2,
             MATRIX_RIGHT: NOTE.BOTTOM_BUTTONS_START + 3,
             MATRIX_ROTATE: NOTE.SIDE_BUTTONS_START + 6,
-            STOP_ALL: NOTE.SIDE_BUTTONS_START + 7
+            STOP_ALL: NOTE.SIDE_BUTTONS_START + 7,
+            VOL: NOTE.BOTTOM_BUTTONS_START + 4,
+            PAN: NOTE.BOTTOM_BUTTONS_START + 5,
+            SEND: NOTE.BOTTOM_BUTTONS_START + 6,
+            DEVICE: NOTE.BOTTOM_BUTTONS_START + 7
         },
         CC = {
-            FIRST_FADER: 48
+            FIRST_FADER: 48,
+            MASTER_FADER: 48 + 8
         },
         COLOR = {
             OFF: 0,
@@ -66,8 +73,9 @@ function ApcMini() {
 
     var eventDispatcher = lep.MidiEventDispatcher.getInstance(),
         transport = lep.util.getTransport(),
-        matrixWindow = lep.MatrixWindow.createMain(MATRIX_TRACKS, 0, MATRIX_SCENES),
+        matrixWindow = lep.MatrixWindow.createMain(MATRIX_TRACKS, MATRIX_SENDS, MATRIX_SCENES),
         masterTrack = host.createMasterTrack(0),
+        cursorDevice = host.createEditorCursorDevice(0),
         isShiftPressed = ko.observable(false).updatedBy(function() {
             var maxNextDoubleClickTime = 0,
                 DOUBLE_CLICK_TIME_IN_MILLIS = 400;
@@ -91,8 +99,22 @@ function ApcMini() {
         }),
         isPlaying = ko.observable(false).updatedByBitwigValue(transport.isPlaying()),
         VALUESET = {
-            VOLUME: lep.ValueSet.createVolumeValueSet(matrixWindow.trackBank, 8)
+            VOLUME: lep.ValueSet.createVolumeValueSet(matrixWindow.trackBank, 8),
+            PAN: lep.ValueSet.createPanValueSet(matrixWindow.trackBank, 8),
+            SEND: lep.ValueSet.createSendsValueSet(matrixWindow.trackBank, MATRIX_SENDS, 8),
+            DEVICE_PARAMS: new lep.ParamsValueSet(cursorDevice)
         },
+        VALUE = {
+            MASTER_VOLUME: new lep.StandardRangedValue({
+                name: 'MasterVol',
+                rangedValue: masterTrack.getVolume()
+            }),
+            MASTER_PAN: new lep.StandardRangedValue({
+                name: 'MasterVol',
+                rangedValue: masterTrack.getPan()
+            })
+        },
+        currentFaderValueSet = ko.observable(VALUESET.VOLUME),
         CONTROLSET = {
             MATRIX: matrixWindow.createMatrixControlSet(function(colIndex, rowIndex, absoluteIndex) {
                 return new lep.Button({
@@ -107,18 +129,68 @@ function ApcMini() {
                     midiChannel: MIDI_CHANNEL,
                     isUnidirectional: true
                 });
-            }),
+            })
+        },
+        CONTROL = {
             MASTER_FADER: new lep.Fader({
                 name: 'MasterFader',
-                valueCC: CC.FIRST_FADER + 8,
+                valueCC: CC.MASTER_FADER,
                 midiChannel: MIDI_CHANNEL,
                 isUnidirectional: true
+            }),
+            VOL_BTN: new lep.Button({
+                name: 'VolBtn',
+                clickNote: ACTION_NOTE.VOL,
+                midiChannel: MIDI_CHANNEL,
+                valueToAttach: new lep.KnockoutSyncedValue({
+                    name: 'VolMode',
+                    ownValue: VALUESET.VOLUME,
+                    refObservable: currentFaderValueSet,
+                    restoreRefAfterLongClick: true,
+                    velocityValueOn: COLOR.RED,
+                    velocityValueOff: COLOR.OFF
+                })
+            }),
+            PAN_BTN: new lep.Button({
+                name: 'PanBtn',
+                clickNote: ACTION_NOTE.PAN,
+                midiChannel: MIDI_CHANNEL,
+                valueToAttach: new lep.KnockoutSyncedValue({
+                    name: 'PanMode',
+                    ownValue: VALUESET.PAN,
+                    refObservable: currentFaderValueSet,
+                    restoreRefAfterLongClick: true,
+                    velocityValueOn: COLOR.RED,
+                    velocityValueOff: COLOR.OFF
+                })
+            }),
+            SEND_BTN: new lep.Button({
+                name: 'SendBtn',
+                clickNote: ACTION_NOTE.SEND,
+                midiChannel: MIDI_CHANNEL,
+                valueToAttach: new lep.KnockoutSyncedValue({
+                    name: 'SendMode',
+                    ownValue: VALUESET.SEND,
+                    refObservable: currentFaderValueSet,
+                    restoreRefAfterLongClick: true,
+                    velocityValueOn: COLOR.RED,
+                    velocityValueOff: COLOR.OFF
+                })
+            }),
+            DEVICE_BTN: new lep.Button({
+                name: 'DeviceBtn',
+                clickNote: ACTION_NOTE.DEVICE,
+                midiChannel: MIDI_CHANNEL,
+                valueToAttach: new lep.KnockoutSyncedValue({
+                    name: 'DeviceMode',
+                    ownValue: VALUESET.DEVICE_PARAMS,
+                    refObservable: currentFaderValueSet,
+                    restoreRefAfterLongClick: true,
+                    velocityValueOn: COLOR.RED,
+                    velocityValueOff: COLOR.OFF
+                })
             })
         };
-
-    function initMasterFader() {
-        // TODO
-    }
 
     function initScrollButtons() {
         new lep.Button({
@@ -240,14 +312,19 @@ function ApcMini() {
     });
 
     initScrollButtons();
-    initMasterFader();
     initTransportButtons();
 
     ko.computed(function() {
         CONTROLSET.MATRIX.setValueSet( matrixWindow.launcherSlotValueSet() );
     });
 
-    CONTROLSET.FADER_ROW.setValueSet(VALUESET.VOLUME);
+    ko.computed(function() {
+        var faderValueSet = currentFaderValueSet(),
+            masterValue = (faderValueSet === VALUESET.PAN) ? VALUE.MASTER_PAN : VALUE.MASTER_VOLUME;
+
+        CONTROLSET.FADER_ROW.setValueSet(faderValueSet);
+        CONTROL.MASTER_FADER.attachValue(masterValue);
+    });
 
     lep.StandardRangedValue.globalTakeoverEnabled(true);
 
