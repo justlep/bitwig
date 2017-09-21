@@ -39,6 +39,8 @@ var host = (function() {
             var status = 0xB0 + channel,
                 inPort = inPorts[inPort];
             inPort && inPort.midiCallback.apply(this, [status, cc, value]);
+        },
+        showPopupNotification: function() {
         }
     };
 })();

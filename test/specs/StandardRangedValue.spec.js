@@ -12,6 +12,7 @@ describe('lep.StandardRangedValue', function() {
 
     beforeEach(function() {
         lep.setLogLevel(lep.LOGLEVEL.WARN);
+        lep.StandardRangedValue.globalTakeoverEnabled(false);
     });
 
     it('follows received absolute values when takeover is disabled', function() {
@@ -33,7 +34,8 @@ describe('lep.StandardRangedValue', function() {
         let rangedValue = new RangedValueMock(),
             s = new lep.StandardRangedValue({
                 name: 'myStdRgdValue',
-                rangedValue: rangedValue
+                rangedValue: rangedValue,
+                isTakeoverEnabled: true
             });
 
         rangedValue.set(22); // simulate value-update from bitwig
@@ -58,16 +60,16 @@ describe('lep.StandardRangedValue', function() {
         assert.strictEqual(s.value, 29);
     });
 
+    // TEST#3
     it('follows received absolute values from UNIdirectional control with takeover ENABLED', function() {
         // lep.setLogLevel(lep.LOGLEVEL.DEV);
 
         let rangedValue = new RangedValueMock(),
             s = new lep.StandardRangedValue({
                 name: 'myStdRgdValue',
-                rangedValue: rangedValue
+                rangedValue: rangedValue,
+                isTakeoverEnabled: true
             });
-
-        s.setTakeoverEnabled(true);
 
         rangedValue.set(22); // simulate value-update from bitwig
         assert.strictEqual(s.value, 22);
@@ -99,8 +101,6 @@ describe('lep.StandardRangedValue', function() {
                 rangedValue: rangedValue
             });
 
-        s.setTakeoverEnabled(false);
-
         rangedValue.set(22); // simulate value-update from bitwig
         assert.strictEqual(s.value, 22);
         s.onAbsoluteValueReceived(10, true);
@@ -118,6 +118,39 @@ describe('lep.StandardRangedValue', function() {
         assert.strictEqual(s.value, 39);
         s.onAbsoluteValueReceived(31, true);
         assert.strictEqual(s.value, 31);
+        s.onAbsoluteValueReceived(29, true);
+        assert.strictEqual(s.value, 29);
+    });
+
+    // This is a copy of TEST#3, except takeoverEnabed is set global AFTER instantiation
+    it('can toggle takeover for ALL existing instances via static globalTakeoverEnabled()', function() {
+        // lep.setLogLevel(lep.LOGLEVEL.DEV);
+
+        let rangedValue = new RangedValueMock(),
+            s = new lep.StandardRangedValue({
+                name: 'myStdRgdValue',
+                rangedValue: rangedValue
+            });
+
+        lep.StandardRangedValue.globalTakeoverEnabled(true); // <-- toggle takeover mode for all existing instances
+
+        rangedValue.set(22); // simulate value-update from bitwig
+        assert.strictEqual(s.value, 22);
+        s.onAbsoluteValueReceived(10, true);
+        assert.strictEqual(s.value, 22);
+        s.onAbsoluteValueReceived(20, true);
+        assert.strictEqual(s.value, 22);
+        s.onAbsoluteValueReceived(21, true);
+        assert.strictEqual(s.value, 22);
+        s.onAbsoluteValueReceived(22, true);
+        assert.strictEqual(s.value, 22);
+        s.onAbsoluteValueReceived(40, true);
+        assert.strictEqual(s.value, 40);
+        rangedValue.set(30); // simulate manual change in Bitwig
+        s.onAbsoluteValueReceived(39, true);
+        assert.strictEqual(s.value, 30);
+        s.onAbsoluteValueReceived(31, true);
+        assert.strictEqual(s.value, 30);
         s.onAbsoluteValueReceived(29, true);
         assert.strictEqual(s.value, 29);
     });
