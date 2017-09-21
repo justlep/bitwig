@@ -26,7 +26,7 @@ lep.BaseValue.prototype = {
     setIndication:   lep.util.NOP,
 
     syncToController: function() {
-        if (this.controller && this.controller.isWriteable) {
+        if (this.controller && this.controller.isBidirectional) {
             this.controller.syncToMidi();
         }
     },

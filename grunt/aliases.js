@@ -36,6 +36,6 @@ module.exports = function (grunt, opts) {
     ]);
 
     grunt.registerTask('test', [
-        'mochaTest'
+        'mochaTest:all'
     ]);
 };

@@ -53,17 +53,12 @@ lep.BaseControl = function(opts) {
     );
 
     this.isMuted = !!opts.isMuted;
-    this.isReadOnly = !!opts.isReadOnly;
-    if (this.isReadOnly) {
+    this.isUnidirectional = !!opts.isUnidirectional;
+    if (this.isUnidirectional) {
         // since unidirectional controls have no use for the syncToMidi(), we can replace it with a nop
         this.syncToMidi = lep.util.NOP;
     }
-    this.isWriteable = !this.isReadOnly; // redundant flag to save constant negations
-    this.useTakeover = !!opts.useTakeover;
-    if (this.useTakeover) {
-        lep.util.assert(this.isReadOnly, 'Takeover is unsupported for unidirectional control "{}"', this.name);
-        lep.util.assert(!this.sendsDiffValues, 'Takeover is unsupported for control "{}" sending diff values', this.name);
-    }
+    this.isBidirectional = !this.isUnidirectional; // redundant flag to save constant negations
 
     // the latest absolute value received from the controller that might be
     // skipped (and reset) during the next syncToMidi() if skipFeedbackLoops is not explicitly disabled
@@ -118,7 +113,7 @@ lep.BaseControl.prototype = {
      * @param [valueOverride] (Number) optional value to send instead of the BaseValue's value
      */
     syncToMidi: function(valueOverride) {
-        if (this.isMuted || (!this.value && !arguments.length)) return;
+        if (this.isMuted || this.isUnidirectional || (!this.value && !arguments.length)) return;
 
         var useOverride = !!arguments.length,
             valueToSend = useOverride ? valueOverride : (this.value.value || 0),
@@ -156,7 +151,7 @@ lep.BaseControl.prototype = {
             this.value.onRelativeValueReceived(delta, this.diffValueRange);
         } else {
             this.nextFeedbackLoopValue = receivedValue;
-            this.value.onAbsoluteValueReceived(receivedValue, this.useTakeover);
+            this.value.onAbsoluteValueReceived(receivedValue, this.isUnidirectional);
         }
     },
     onClickNoteReceived: function(clickNote, receivedValue) {

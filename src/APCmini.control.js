@@ -67,6 +67,7 @@ function ApcMini() {
     var eventDispatcher = lep.MidiEventDispatcher.getInstance(),
         transport = lep.util.getTransport(),
         matrixWindow = lep.MatrixWindow.createMain(MATRIX_TRACKS, 0, MATRIX_SCENES),
+        masterTrack = host.createMasterTrack(0),
         isShiftPressed = ko.observable(false).updatedBy(function() {
             var maxNextDoubleClickTime = 0,
                 DOUBLE_CLICK_TIME_IN_MILLIS = 400;
@@ -89,15 +90,35 @@ function ApcMini() {
             });
         }),
         isPlaying = ko.observable(false).updatedByBitwigValue(transport.isPlaying()),
+        VALUESET = {
+            VOLUME: lep.ValueSet.createVolumeValueSet(matrixWindow.trackBank, 8)
+        },
         CONTROLSET = {
             MATRIX: matrixWindow.createMatrixControlSet(function(colIndex, rowIndex, absoluteIndex) {
                 return new lep.Button({
                     name: lep.util.formatString('MatrixBtn {}:{}', colIndex, rowIndex),
                     clickNote: NOTE.MATRIX_START_NOTES_BY_ROW[rowIndex] + colIndex
                 });
+            }),
+            FADER_ROW: new lep.ControlSet('Faders', 8, function(index) {
+                return new lep.Fader({
+                    name: 'Fader' + index,
+                    valueCC: CC.FIRST_FADER + index,
+                    midiChannel: MIDI_CHANNEL,
+                    isUnidirectional: true
+                });
+            }),
+            MASTER_FADER: new lep.Fader({
+                name: 'MasterFader',
+                valueCC: CC.FIRST_FADER + 8,
+                midiChannel: MIDI_CHANNEL,
+                isUnidirectional: true
             })
         };
 
+    function initMasterFader() {
+        // TODO
+    }
 
     function initScrollButtons() {
         new lep.Button({
@@ -219,11 +240,16 @@ function ApcMini() {
     });
 
     initScrollButtons();
+    initMasterFader();
     initTransportButtons();
 
     ko.computed(function() {
         CONTROLSET.MATRIX.setValueSet( matrixWindow.launcherSlotValueSet() );
     });
+
+    CONTROLSET.FADER_ROW.setValueSet(VALUESET.VOLUME);
+
+    lep.StandardRangedValue.globalTakeoverEnabled(true);
 
     lep.logDev('APC mini ready');
 }

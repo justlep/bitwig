@@ -12,6 +12,9 @@ module.exports = function (grunt, opts) {
         },
         all: {
             src: ['test/specs/*.spec.js']
+        },
+        StandardRangedValue: {
+            src: ['test/specs/StandardRangedValue.spec.js']
         }
     };
 };

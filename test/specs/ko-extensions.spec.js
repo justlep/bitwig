@@ -81,7 +81,7 @@ describe('ko-extensions.js', function() {
 
         setTimeout(function() {
             clearInterval(timer);
-            assert.closeTo(o(), 20, 2);
+            assert.closeTo(o(), 20, 10);
             done();
         }, 200);
     });

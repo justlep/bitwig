@@ -9,19 +9,32 @@ lep.StandardRangedValue = lep.util.extendClass(lep.BaseValue, {
     _init: function(opts) {
         this._super(opts);
 
-        lep.util.assertObject(opts.rangedValue, 'Missing rangedValue for {}', opts.name);
-
         var self = this;
 
+        lep.util.assertObject(opts.rangedValue, 'Missing rangedValue for {}', opts.name);
         this.rangedValue = opts.rangedValue;
         this.indicateableValue = opts.indicateableValue || opts.rangedValue;
-
         lep.util.assertFunction(this.indicateableValue.setIndication, 'Invalid indicateableValue for {}', this.name);
+        this._takeover = null;
 
         this.rangedValue.addValueObserver(128, function(newValue) {
+            // lep.logDebug('{} -> rangedValue observer fired with newValue: {}', self.name, newValue);
             self.value = newValue;
+
+            var takeover = self._takeover;
+            if (takeover && takeover.isSynced) {
+                if (takeover.recentSyncedValues[newValue]) {
+                    takeover.recentSyncedValues[newValue] = 0;
+                } else {
+                    // lep.logDebug('{} -> went OFF SYNC -> newValue: {}', self.name, newValue);
+                    takeover.isSynced = null;
+                    takeover.recentSyncedValues = {};
+                }
+            }
             self.syncToController();
         });
+
+        lep.StandardRangedValue._instances.push(this);
     },
 
     /**
@@ -30,6 +43,14 @@ lep.StandardRangedValue = lep.util.extendClass(lep.BaseValue, {
     setValue: function(value, optionalRange) {
         this.rangedValue.set(value, optionalRange || 128);
     },
+    setTakeoverEnabled: function(isEnabled) {
+        this._takeover = isEnabled ? (this._takeover || {
+            isSynced: null, // null := not synced && no takeover range defined;  false := not synced, but range defined
+            minValue: null,
+            maxValue: null,
+            recentSyncedValues: {}
+        }) : null;
+    },
     /** @Override */
     setIndication: function(on) {
         // lep.logDebug('setIndications({}) for {}', on, this.name);
@@ -37,14 +58,61 @@ lep.StandardRangedValue = lep.util.extendClass(lep.BaseValue, {
     },
     /** @Override */
     onRelativeValueReceived: function(delta, range) {
+        if (this._takeover) {
+            this.setTakeoverEnabled(false);
+        }
         this.rangedValue.inc(delta, range);
     },
     /** @Override */
-    onAbsoluteValueReceived: function(absoluteValue, isTakeoverRequired) {
-        // TODO eval `isTakeoverRequired`
+    onAbsoluteValueReceived: function(absoluteValue, isTakeoverAdvised) {
+        // lep.logDebug('{} -> onAbsoluteValueReceived({}, {})', this.name, absoluteValue, isTakeoverAdvised);
+        var takeover = this._takeover,
+            takeoverDirectionMsg;
+
+        if (takeover && isTakeoverAdvised) {
+            if (!takeover.isSynced) {
+                if (takeover.isSynced === null) {
+                    if (absoluteValue < this.value) {
+                        takeover.minValue = this.value;
+                        takeover.maxValue = 127;
+                        takeoverDirectionMsg = 'Takeover ↑↑';
+                    } else {
+                        takeover.minValue = 0;
+                        takeover.maxValue = this.value;
+                        takeoverDirectionMsg = 'Takeover ↓↓';
+                    }
+                    host.showPopupNotification(takeoverDirectionMsg);
+                }
+                takeover.isSynced = (absoluteValue >= takeover.minValue) && (absoluteValue <= takeover.maxValue);
+                if (!takeover.isSynced) {
+                    // lep.logDebug('{} -> rejected takeover: {} <> [{}-{}]', this.name, absoluteValue, takeover.minValue, takeover.maxValue);
+                    return;
+                }
+                // lep.logDebug('{} -> takeover SUCCESS', this.name);
+            }
+            takeover.recentSyncedValues[absoluteValue] = 1;
+        }
         this.rangedValue.set(absoluteValue, 128);
     }
 });
+
+/** @static */
+lep.StandardRangedValue._instances = [];
+
+/** @static */
+lep.StandardRangedValue.globalTakeoverEnabled = (function(_enabledObs, _allInstances) {
+    return ko.computed({
+        read: _enabledObs,
+        write: function(newIsEnabled) {
+            for (var i = _allInstances.length - 1; i >= 0; i--) {
+                _allInstances[i].setTakeoverEnabled(newIsEnabled);
+            }
+            _enabledObs(newIsEnabled);
+            host.showPopupNotification('Takeover ' + (newIsEnabled ? 'enabled' : 'disabled'));
+        }
+    }).extend({toggleable: true});
+})(ko.observable(false), lep.StandardRangedValue._instances);
+
 
 /** @static */
 lep.StandardRangedValue.createVolumeValue = function(channelBank, channelIndex) {
