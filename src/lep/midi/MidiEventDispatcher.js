@@ -64,11 +64,6 @@ lep.MidiEventDispatcher = (function () {
                  * To save CPU cycles checking for channel-dependent handlers if there are none, anyway.
                  */
                 boundChannelsBitmap = 0,
-                invokeHandlers = function(handlerList, noteOrCC, value, channel) {
-                    for (var i = 0, len = handlerList.length; i < len; i++) {
-                        handlerList[i](noteOrCC, value, channel);
-                    }
-                },
                 getChannelDependentHandlerIndex = function(channel, noteOrCC) {
                     return ((channel + 1) << 7) + noteOrCC;
                 },
@@ -106,7 +101,8 @@ lep.MidiEventDispatcher = (function () {
                             channelAwareIndex =  hasChannelDependentHandlers && getChannelDependentHandlerIndex(channel, noteOrCC),
                             genericHandlers,
                             noteOnOffHandlers,
-                            handlerIndex = noteOrCC;
+                            handlerIndex = noteOrCC,
+                            i, len;
 
                         //lep.logDev('channel: {}, noteOrCC: {}, handlerIndex: {}, channelAwareIndex: {}',
                         //    channel.toString(16), noteOrCC.toString(16), handlerIndex.toString(16), channelAwareIndex.toString(16)
@@ -120,7 +116,7 @@ lep.MidiEventDispatcher = (function () {
 
                         while (true) {
                             if (msgType === 0xB0) { // CC
-                                lep.logDebug('MED received value {} on CC {} / channel {}', value, noteOrCC, channel);
+                                // lep.logDebug('MED received value {} on CC {} / channel {}', value, noteOrCC, channel);
                                 genericHandlers = handlers.cc[handlerIndex];
                             } else if (msgType === 0x90) { // NOTE ON
                                 genericHandlers = handlers.note[handlerIndex];
@@ -136,12 +132,16 @@ lep.MidiEventDispatcher = (function () {
                             if (genericHandlers) {
                                 // lep.logDebug('Invoking {} handlers for note/cc {}, handlerIndex: {}',
                                 // genericHandlers.length, noteOrCC, handlerIndex);
-                                invokeHandlers(genericHandlers, noteOrCC, value, channel);
+                                for (i = 0, len = genericHandlers.length; i < len; i++) {
+                                    genericHandlers[i](noteOrCC, value, channel);
+                                }
                             }
                             if (noteOnOffHandlers) {
                                 // lep.logDebug('Invoking {} handlers for note {}, handlerIndex {}',
                                 // noteOnOffHandlers.length, noteOrCC, handlerIndex);
-                                invokeHandlers(noteOnOffHandlers, noteOrCC, value, channel);
+                                for (i = 0, len = noteOnOffHandlers.length; i < len; i++) {
+                                    noteOnOffHandlers[i](noteOrCC, value, channel);
+                                }
                             }
 
                             if (!channelAwareIndex || handlerIndex === channelAwareIndex) {
