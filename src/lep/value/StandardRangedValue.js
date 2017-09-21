@@ -15,7 +15,9 @@ lep.StandardRangedValue = lep.util.extendClass(lep.BaseValue, {
         this.rangedValue = opts.rangedValue;
         this.indicateableValue = opts.indicateableValue || opts.rangedValue;
         lep.util.assertFunction(this.indicateableValue.setIndication, 'Invalid indicateableValue for {}', this.name);
+
         this._takeover = null;
+        this.setTakeoverEnabled(!!opts.isTakeoverEnabled);
 
         this.rangedValue.addValueObserver(128, function(newValue) {
             // lep.logDebug('{} -> rangedValue observer fired with newValue: {}', self.name, newValue);
