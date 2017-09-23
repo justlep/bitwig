@@ -194,6 +194,9 @@ lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
  * @param numScenes {Number}
  * @static
  */
-lep.MatrixWindow.createMain = function(numTracks, numSends, numScenes) {
-    return new lep.MatrixWindow('MainMatrixWindow', numTracks, numSends, numScenes);
+lep.MatrixWindow.createMain = function(numTracks, numSends, numScenes, launcherSlotValueCreatorFn) {
+    lep.util.assertFunction(launcherSlotValueCreatorFn, 'Invalid launcherSlotValueCreatorFn for MatrixWindow.createMain');
+    var matrixWindow = new lep.MatrixWindow('MainMatrixWindow', numTracks, numSends, numScenes);
+    matrixWindow.prepareLauncherSlotValueSets(launcherSlotValueCreatorFn);
+    return matrixWindow;
 };
