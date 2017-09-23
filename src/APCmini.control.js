@@ -102,7 +102,22 @@ function ApcMini() {
             VOLUME: lep.ValueSet.createVolumeValueSet(matrixWindow.trackBank, 8),
             PAN: lep.ValueSet.createPanValueSet(matrixWindow.trackBank, 8),
             SEND: lep.ValueSet.createSendsValueSet(matrixWindow.trackBank, MATRIX_SENDS, 8),
-            DEVICE_PARAMS: new lep.ParamsValueSet(cursorDevice)
+            DEVICE_PARAMS: new lep.ParamsValueSet(cursorDevice),
+            CONFIG: new lep.ValueSet('ConfigValues', 8, 8, function(row, col) {
+                if (!row) {
+                    return new lep.KnockoutSyncedValue({
+                        name: 'TrackScrollSize' + (col + 1),
+                        ownValue: (col + 1),
+                        refObservable: matrixWindow.tracksScrollSize,
+                        velocityValueOn: COLOR.RED_BLINK,
+                        velocityValueOff: COLOR.YELLOW
+                    });
+                }
+                return new lep.BaseValue({
+                    name: lep.util.formatString('UnusedConfigSlot{}{}', col, row),
+                    value: COLOR.OFF
+                });
+            })
         },
         VALUE = {
             MASTER_VOLUME: new lep.StandardRangedValue({
@@ -315,7 +330,9 @@ function ApcMini() {
     initTransportButtons();
 
     ko.computed(function() {
-        CONTROLSET.MATRIX.setValueSet( matrixWindow.launcherSlotValueSet() );
+        var matrixValueSet = isShiftPressed() ? VALUESET.CONFIG : matrixWindow.launcherSlotValueSet();
+        // TODO find better key to enable config mode (SHIFT+Device?)
+        CONTROLSET.MATRIX.setValueSet(matrixValueSet);
     });
 
     ko.computed(function() {
