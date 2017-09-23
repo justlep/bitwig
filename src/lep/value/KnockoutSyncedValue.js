@@ -18,6 +18,7 @@
  *          - [velocityValueOff] (number) (optional) velo midi value to send if ownValue matches refObservable
  *          - [computedVelocity] (function|Observable) (optional) function returning the velocity value to send to the controller
  *            (!) If computedVelocity is given, it overrides any given velocityValueOn/velocityValueOff value.
+ *          - [ignoreClickIf] (observable) if given, the `click` event
  *
  * Author: Lennart Pegel - https://github.com/justlep
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
@@ -36,6 +37,7 @@ lep.KnockoutSyncedValue = lep.util.extendClass(lep.BaseValue, {
         lep.util.assertNumberInRangeOrEmpty(opts.velocityValueOn, 0, 127, 'Invalid velocityValueOn {} for {}', opts.velocityValueOn, this.name);
         lep.util.assertNumberInRangeOrEmpty(opts.velocityValueOff, 0, 127, 'Invalid velocityValueOff {} for {}',
                                             opts.velocityValueOff, this.name);
+        lep.util.assertFunctionOrEmpty(this.ignoreClickIf, 'Invalid ignoreClickIf for {}', this.name);
 
         var self = this,
             initDone = false;
@@ -56,6 +58,7 @@ lep.KnockoutSyncedValue = lep.util.extendClass(lep.BaseValue, {
 
         this.toggleOnPressed = (opts.toggleOnPressed !== false);
         this.restoreRefAfterLongClick = !!opts.restoreRefAfterLongClick;
+        this.ignoreClickIf = opts.ignoreClickIf;
 
         if (this.restoreRefAfterLongClick) {
             lep.util.assert(this.toggleOnPressed, 'restoreRefAfterLongClick requires toggleOnPressed=true, {}', this.name);
@@ -86,8 +89,13 @@ lep.KnockoutSyncedValue = lep.util.extendClass(lep.BaseValue, {
 
     /** @Override */
     onAbsoluteValueReceived: function(absoluteValue /*, isTakeoverRequired */) {
+        if (this.ignoreClickIf && this.ignoreClickIf()) {
+            lep.util.stopTimer(this.id, true);
+            return;
+        }
+
         var isPressed = !!absoluteValue,
-            isReleaseAfterLongClick = (!isPressed && this.restoreRefAfterLongClick && lep.util.stopTimer(this.id) > this.LONG_CLICK_TIME);
+            isReleaseAfterLongClick = (!isPressed && this.restoreRefAfterLongClick && lep.util.stopTimer(this.id, true) > this.LONG_CLICK_TIME);
 
         if (isReleaseAfterLongClick) {
             // only restore the refObservable if the refObservable still has the value it was given by this button
