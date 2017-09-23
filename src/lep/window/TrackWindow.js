@@ -35,13 +35,35 @@ lep.TrackWindow = function(name, numTracks, numSends, numScenes, trackBank) {
     this.canMoveChannelBack = ko.observable(false).updatedByBitwigValue(this.trackBank.canScrollChannelsUp());
     this.canMoveChannelForth = ko.observable(false).updatedByBitwigValue(this.trackBank.canScrollChannelsDown());
 
+    this.tracksScrollSize = (function(_obs) {
+        return ko.computed({
+            read: _obs,
+            write: function(newScrollSize) {
+                lep.util.assertNumberInRange(newScrollSize, 1, numTracks, 'Invalid new tracksScrollSize "{}" for {}', newScrollSize, self.name);
+                self.trackBank.setChannelScrollStepSize(newScrollSize);
+                _obs(newScrollSize);
+                host.showPopupNotification('Tracks per scroll: ' + newScrollSize);
+            }
+        });
+    })(ko.observable(1));
+
     this.moveChannelForth = function() {
+        if (self.tracksScrollSize.peek() === numTracks) {
+            // TODO remove this block when Bitwig fixes ChannelBank.setChannelScrollStepSize (no effect at all in Bitwig 2.1.3)
+            self.moveChannelPageForth();
+            return;
+        }
         self.trackBank.scrollChannelsDown();
     };
     this.moveChannelPageForth = function() {
         self.trackBank.scrollChannelsPageDown();
     };
     this.moveChannelBack = function() {
+        if (self.tracksScrollSize.peek() === numTracks) {
+            // TODO remove this block when Bitwig fixes ChannelBank.setChannelScrollStepSize (no effect at all in Bitwig 2.1.3)
+            self.moveChannelPageBack();
+            return;
+        }
         self.trackBank.scrollChannelsUp();
     };
     this.moveChannelPageBack = function() {
