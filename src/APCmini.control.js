@@ -73,9 +73,32 @@ function ApcMini() {
 
     var eventDispatcher = lep.MidiEventDispatcher.getInstance(),
         transport = lep.util.getTransport(),
-        matrixWindow = lep.MatrixWindow.createMain(MATRIX_TRACKS, MATRIX_SENDS, MATRIX_SCENES),
+        matrixWindow = lep.MatrixWindow.createMain(MATRIX_TRACKS, MATRIX_SENDS, MATRIX_SCENES, function (launcherSlot) {
+            return new lep.KnockoutSyncedValue({
+                name: lep.util.formatString('{}Value', launcherSlot.name),
+                ownValue: true,
+                refObservable: launcherSlot.playState,
+                onClick: function () {
+                    if (isShiftPressed()) {
+                        launcherSlot.stop();
+                    } else {
+                        launcherSlot.play();
+                    }
+                },
+                computedVelocity: ko.computed(function () {
+                    var state = launcherSlot.hasContent() && launcherSlot.playState(),
+                        queued = state && state.isQueued;
+
+                    return (!state) ? COLOR.OFF :
+                            (state.isStop) ? (queued ? COLOR.GREEN_BLINK : COLOR.GREEN)  :
+                            (state.isPlay) ? (queued ? COLOR.YELLOW_BLINK : COLOR.YELLOW) :
+                            (state.isRecord) ? (queued ? COLOR.RED_BLINK : COLOR.RED) : COLOR.GREEN;
+                })
+            });
+        }),
         masterTrack = host.createMasterTrack(0),
         cursorDevice = host.createEditorCursorDevice(0),
+        isConfigModeEnabled = ko.observable(false).extend({toggleable: true}),
         isShiftPressed = ko.observable(false).updatedBy(function() {
             var maxNextDoubleClickTime = 0,
                 DOUBLE_CLICK_TIME_IN_MILLIS = 400;
@@ -106,10 +129,30 @@ function ApcMini() {
             CONFIG: new lep.ValueSet('ConfigValues', 8, 8, function(row, col) {
                 if (!row) {
                     return new lep.KnockoutSyncedValue({
-                        name: 'TrackScrollSize' + (col + 1),
+                        name: 'CfgTrackScrollSize' + (col + 1),
                         ownValue: (col + 1),
                         refObservable: matrixWindow.tracksScrollSize,
+                        velocityValueOn: COLOR.GREEN,
+                        velocityValueOff: COLOR.YELLOW
+                    });
+                }
+                if (row === 7 && col === 7) {
+                    return new lep.KnockoutSyncedValue({
+                        name: 'CfgExit',
+                        ownValue: true,
+                        refObservable: ko.observable(true),
+                        onClick: isConfigModeEnabled.toggleOff,
                         velocityValueOn: COLOR.RED_BLINK,
+                        velocityValueOff: COLOR.OFF
+                    });
+                }
+                if (row === 7 && !col) {
+                    return new lep.KnockoutSyncedValue({
+                        name: 'CfgTakeover',
+                        ownValue: true,
+                        refObservable: lep.StandardRangedValue.globalTakeoverEnabled,
+                        onClick: lep.StandardRangedValue.globalTakeoverEnabled.toggle,
+                        velocityValueOn: COLOR.GREEN,
                         velocityValueOff: COLOR.YELLOW
                     });
                 }
@@ -119,6 +162,7 @@ function ApcMini() {
                 });
             })
         },
+        currentFaderValueSet = ko.observable(VALUESET.VOLUME),
         VALUE = {
             MASTER_VOLUME: new lep.StandardRangedValue({
                 name: 'MasterVol',
@@ -129,7 +173,6 @@ function ApcMini() {
                 rangedValue: masterTrack.getPan()
             })
         },
-        currentFaderValueSet = ko.observable(VALUESET.VOLUME),
         CONTROLSET = {
             MATRIX: matrixWindow.createMatrixControlSet(function(colIndex, rowIndex, absoluteIndex) {
                 return new lep.Button({
@@ -201,6 +244,7 @@ function ApcMini() {
                     ownValue: VALUESET.DEVICE_PARAMS,
                     refObservable: currentFaderValueSet,
                     restoreRefAfterLongClick: true,
+                    ignoreClickIf: isShiftPressed,
                     velocityValueOn: COLOR.RED,
                     velocityValueOff: COLOR.OFF
                 })
@@ -302,38 +346,18 @@ function ApcMini() {
         });
     }
 
-    matrixWindow.prepareLauncherSlotValueSets(function (launcherSlot) {
-        return new lep.KnockoutSyncedValue({
-            name: lep.util.formatString('{}Value', launcherSlot.name),
-            ownValue: true,
-            refObservable: launcherSlot.playState,
-            onClick: function () {
-                if (isShiftPressed()) {
-                    launcherSlot.stop();
-                } else {
-                    launcherSlot.play();
-                }
-            },
-            computedVelocity: ko.computed(function () {
-                var state = launcherSlot.hasContent() && launcherSlot.playState(),
-                    queued = state && state.isQueued;
-
-                return (!state) ? COLOR.OFF :
-                       (state.isStop) ? (queued ? COLOR.GREEN_BLINK : COLOR.GREEN)  :
-                       (state.isPlay) ? (queued ? COLOR.YELLOW_BLINK : COLOR.YELLOW) :
-                       (state.isRecord) ? (queued ? COLOR.RED_BLINK : COLOR.RED) : COLOR.GREEN;
-            })
-        });
-    });
-
     initScrollButtons();
     initTransportButtons();
 
-    ko.computed(function() {
-        var matrixValueSet = isShiftPressed() ? VALUESET.CONFIG : matrixWindow.launcherSlotValueSet();
-        // TODO find better key to enable config mode (SHIFT+Device?)
-        CONTROLSET.MATRIX.setValueSet(matrixValueSet);
+    eventDispatcher.onNotePressed(ACTION_NOTE.DEVICE, function() {
+        if (isShiftPressed()) {
+            isConfigModeEnabled.toggleOn();
+        }
     });
+
+    CONTROLSET.MATRIX.setObservableValueSet(ko.computed(function() {
+        return isConfigModeEnabled() ? VALUESET.CONFIG : matrixWindow.launcherSlotValueSet();
+    }));
 
     ko.computed(function() {
         var faderValueSet = currentFaderValueSet(),
