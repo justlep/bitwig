@@ -217,5 +217,13 @@ lep.ControlSet.prototype = {
         this.reset();
         lep.logDebug('Assigning {} to {}', newValueSet.name, this.name);
         this.valueSet(newValueSet);
+    },
+
+    setObservableValueSet: function(obs) {
+        lep.util.assert(!this._isFollingObservable, 'ControlSet.setObservableValueSet already called for {}', this.name);
+        lep.util.assertObservable(obs, 'Invalid observable for ControlSet.setObservableValueSet. {}', this.name);
+        this._isFollingObservable = true;
+        obs.subscribe(this.setValueSet, this);
+        this.setValueSet(obs());
     }
 };
