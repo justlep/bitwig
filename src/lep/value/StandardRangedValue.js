@@ -50,7 +50,8 @@ lep.StandardRangedValue = lep.util.extendClass(lep.BaseValue, {
             isSynced: null, // null := not synced && no takeover range defined;  false := not synced, but range defined
             minValue: null,
             maxValue: null,
-            recentSyncedValues: {}
+            recentSyncedValues: {},
+            requiresMoveUp: false
         }) : null;
     },
     /** @Override */
@@ -76,25 +77,26 @@ lep.StandardRangedValue = lep.util.extendClass(lep.BaseValue, {
     /** @Override */
     onAbsoluteValueReceived: function(absoluteValue, isTakeoverAdvised) {
         // lep.logDebug('{} -> onAbsoluteValueReceived({}, {})', this.name, absoluteValue, isTakeoverAdvised);
-        var takeover = this._takeover,
-            takeoverDirectionMsg;
+        var takeover = this._takeover;
 
         if (takeover && isTakeoverAdvised) {
             if (!takeover.isSynced) {
                 if (takeover.isSynced === null) {
-                    if (absoluteValue < this.value) {
+                    takeover.requiresMoveUp = (absoluteValue < this.value);
+                    if (takeover.requiresMoveUp) {
                         takeover.minValue = this.value;
                         takeover.maxValue = 127;
-                        takeoverDirectionMsg = 'Takeover ↑↑';
                     } else {
                         takeover.minValue = 0;
                         takeover.maxValue = this.value;
-                        takeoverDirectionMsg = 'Takeover ↓↓';
                     }
-                    host.showPopupNotification(takeoverDirectionMsg);
                 }
                 takeover.isSynced = (absoluteValue >= takeover.minValue) && (absoluteValue <= takeover.maxValue);
                 if (!takeover.isSynced) {
+                    host.showPopupNotification(takeover.requiresMoveUp ?
+                        '↑↑ Takeover ' + (((this.value - absoluteValue) * 100 / 127) >> 0) + '% ↑↑' :
+                        '↓↓ Takeover ' + (((absoluteValue - this.value) * 100 / 127) >> 0) + '% ↓↓'
+                    );
                     // lep.logDebug('{} -> rejected takeover: {} <> [{}-{}]', this.name, absoluteValue, takeover.minValue, takeover.maxValue);
                     return;
                 }
