@@ -135,7 +135,7 @@ lep.DC1 = function() {
             })
         },
         VALUE_SET = {
-            BANK_PAGES:  new lep.ValueSet('BankPageSet', 1, 8, function (index) {
+            BANK_PAGES:  new lep.ValueSet('BankPageSet', 8, 1, function (index) {
                 return new lep.KnockoutSyncedValue({
                     name: 'BankPage' + (index + 1),
                     ownValue: index,
@@ -148,7 +148,7 @@ lep.DC1 = function() {
                     }
                 });
             }),
-            PRESET_PAGES: new lep.ValueSet('PresetPageSet', 1, 8, function (index) {
+            PRESET_PAGES: new lep.ValueSet('PresetPageSet', 8, 1, function (index) {
                 return new lep.KnockoutSyncedValue({
                     name: 'PresetPage' + (index + 1),
                     ownValue: index,
@@ -161,7 +161,7 @@ lep.DC1 = function() {
                     }
                 });
             }),
-            SNAPSHOT_PAGES: new lep.ValueSet('SnapshotPageSet', 1, 8, function (index) {
+            SNAPSHOT_PAGES: new lep.ValueSet('SnapshotPageSet', 8, 1, function (index) {
                 return new lep.KnockoutSyncedValue({
                     name: 'SnapshotPage' + (index + 1),
                     ownValue: index,
@@ -170,7 +170,7 @@ lep.DC1 = function() {
                     velocityValueOff: COLOR.OFF
                 });
             }),
-            BANKS: new lep.ValueSet('BanksValueSet', 1, 16, function(index) {
+            BANKS: new lep.ValueSet('BanksValueSet', 16, 1, function(index) {
                 return new lep.KnockoutSyncedValue({
                     name: 'BankVal' + (index + 1),
                     ownValue: index,
@@ -187,7 +187,7 @@ lep.DC1 = function() {
                     }
                 });
             }),
-            PRESETS: new lep.ValueSet('PresetValueSet', 1, 16, function(index) {
+            PRESETS: new lep.ValueSet('PresetValueSet', 16, 1, function(index) {
                 return new lep.KnockoutSyncedValue({
                     name: 'PresetVal' + (index + 1),
                     ownValue: index,
@@ -204,7 +204,7 @@ lep.DC1 = function() {
                     }
                 });
             }),
-            SNAPSHOTS: new lep.ValueSet('SnapshotValueSet', 1, 16, function(index) {
+            SNAPSHOTS: new lep.ValueSet('SnapshotValueSet', 16, 1, function(index) {
                 return new lep.KnockoutSyncedValue({
                     name: 'SnapshotVal' + (index + 1),
                     ownValue: index,

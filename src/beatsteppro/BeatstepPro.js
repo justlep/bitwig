@@ -46,7 +46,7 @@ function BeatstepPro(mainChannelsOnly) {
             });
         });
         userControls = host.createUserControls(NUMBER_OF_ENCODERS);
-        controlSet.setValueSet(new lep.ValueSet('EncoderValues CH' + channel, 1, NUMBER_OF_ENCODERS, function(valueIndex) {
+        controlSet.setValueSet(new lep.ValueSet('EncoderValues CH' + channel, NUMBER_OF_ENCODERS, 1, function(valueIndex) {
             var userControlName = lep.util.formatString('BSP-Enc-UC{}|{}', channel, valueIndex);
             return lep.StandardRangedValue.createUserControlValue(userControls, valueIndex, userControlName);
         }));
@@ -61,7 +61,7 @@ function BeatstepPro(mainChannelsOnly) {
             });
         });
         userControls = host.createUserControls(NUMBER_OF_ENCODERS);
-        controlSet.setValueSet(new lep.ValueSet('PatternBtnValues CH' + channel, 1, NUMBER_OF_ENCODERS, function(valueIndex) {
+        controlSet.setValueSet(new lep.ValueSet('PatternBtnValues CH' + channel, NUMBER_OF_ENCODERS, 1, function(valueIndex) {
             var userControlName = lep.util.formatString('BSP-Ptn-UC{}|{}', channel, valueIndex);
             return lep.StandardRangedValue.createUserControlValue(userControls, valueIndex, userControlName);
         }));

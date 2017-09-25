@@ -1,33 +1,34 @@
 /**
- * Represents a set of BaseValue (or subclass) objects.
+ * Represents a set of BaseValue (or subclass) objects
+ * which can be attached to an instance of {@link lep.ControlSet}.
+ *
  * @param name (String)
+ * @param cols (Number) the number of Values to create per row
  * @param rows (Number) the number of rows to generate values for
- * @param valuesPerRow (Number) the number of Values to create per row
- * @param valueCreationFn (function) creating a value, e.g.
- *                                      for rows === 1:  function(valueIndex){...; return new Value(..);}
- *                                      for rows > 1:    function(rowIndex, valueIndexInRow){...; return new Value(..);}
+ * @param valueCreationFn (function) creating a value,
+ *                                   e.g. function(colIndex, rowIndex, totalIndex){...; return new lep.BaseValue(..);}
  *
  * Author: Lennart Pegel - https://github.com/justlep
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  *
  * @constructor
  */
-lep.ValueSet = function(name, rows, valuesPerRow, valueCreationFn) {
+lep.ValueSet = function(name, cols, rows, valueCreationFn) {
     lep.util.assertString(name, 'Invalid name for ValueSet');
     lep.util.assert(!lep.ValueSet.exists(name), 'ValueSet with name "{}" already exists', name);
     lep.util.assertNumber(rows, 'Invalids rows for ValueSet: {}', rows);
-    lep.util.assertNumber(valuesPerRow, 'Invalid valuesPerRow for ValueSet: {}', valuesPerRow);
-    lep.util.assertNumberInRange(rows * valuesPerRow, 1, lep.ValueSet.MAX_SIZE, 'Invalid size for ValueSet (actual: {}, max: {})',
-                                 rows * valuesPerRow, lep.ValueSet.MAX_SIZE);
+    lep.util.assertNumber(cols, 'Invalid cols for ValueSet: {}', cols);
+    lep.util.assertNumberInRange(rows * cols, 1, lep.ValueSet.MAX_SIZE, 'Invalid size for ValueSet (actual: {}, max: {})',
+                                 rows * cols, lep.ValueSet.MAX_SIZE);
     lep.util.assertFunction(valueCreationFn, 'Invalid valueCreationFn for ValueSet');
 
     this.id = lep.util.nextId();
     this.name = name;
     this.values = []; // BaseValues, NOT numerical values
 
-    for (var rowIndex = 0, value; rowIndex < rows; rowIndex++) {
-        for (var valueIndexInRow = 0; valueIndexInRow < valuesPerRow; valueIndexInRow++) {
-            value = (rows > 1) ? valueCreationFn(rowIndex, valueIndexInRow) : valueCreationFn(valueIndexInRow);
+    for (var rowIndex = 0, totalIndex = 0, colIndex, value; rowIndex < rows; rowIndex++) {
+        for (colIndex = 0; colIndex < cols; colIndex++, totalIndex++) {
+            value = valueCreationFn(colIndex, rowIndex, totalIndex);
             lep.util.assertBaseValue(value, 'Invalid value returned by valueCreationFn in ValueSet');
             lep.logDebug("Created {} for ValueSet {}", value.name, this.name);
             this.values.push(value);
@@ -71,7 +72,7 @@ lep.ValueSet.createSoloValueSet = function(trackBank, windowSize, prefs) {
     lep.util.assertObject(prefs, 'Invalid prefs for ValueSet.createSoloValueSet');
     lep.util.assertBoolean(prefs.soloExclusive, 'Invalid prefs.soloExclusive for ValueSet.createSoloValueSet');
 
-    return new lep.ValueSet('Solo', 1, windowSize, function(channelIndex) {
+    return new lep.ValueSet('Solo', windowSize, 1, function(channelIndex) {
         return lep.ToggledValue.createSoloValue(trackBank, channelIndex, prefs);
     });
 };
@@ -81,7 +82,7 @@ lep.ValueSet.createMuteValueSet = function(trackBank, windowSize) {
     lep.util.assertObject(trackBank, 'Invalid trackBank for ValueSet.createMuteValueSet');
     lep.util.assertNumberInRange(windowSize, 1, 1000, 'Invalid windowSize {} for ValueSet.createMuteValueSet', windowSize);
 
-    return new lep.ValueSet('Mute', 1, windowSize, function(channelIndex) {
+    return new lep.ValueSet('Mute', windowSize, 1, function(channelIndex) {
         return lep.ToggledValue.createMuteValue(trackBank, channelIndex);
     });
 };
@@ -91,7 +92,7 @@ lep.ValueSet.createArmValueSet = function(trackBank, windowSize) {
     lep.util.assertObject(trackBank, 'Invalid trackBank for ValueSet.createArmValueSet');
     lep.util.assertNumberInRange(windowSize, 1, 1000, 'Invalid windowSize {} for ValueSet.createArmValueSet', windowSize);
 
-    return new lep.ValueSet('Arm', 1, windowSize, function(channelIndex) {
+    return new lep.ValueSet('Arm', windowSize, 1, function(channelIndex) {
         return lep.ToggledValue.createArmValue(trackBank, channelIndex);
     });
 };
@@ -101,7 +102,7 @@ lep.ValueSet.createSelectValueSet = function(trackBank, windowSize) {
     lep.util.assertObject(trackBank, 'Invalid trackBank for ValueSet.createSelectValueSet');
     lep.util.assertNumberInRange(windowSize, 1, 1000, 'Invalid windowSize {} for ValueSet.createSelectValueSet', windowSize);
 
-    return new lep.ValueSet('Select', 1, windowSize, function(channelIndex) {
+    return new lep.ValueSet('Select', windowSize, 1, function(channelIndex) {
         return lep.ChannelSelectValue.create(trackBank, channelIndex);
     });
 };
@@ -111,8 +112,8 @@ lep.ValueSet.createVolumeValueSet = function(trackBank, windowSize) {
     lep.util.assertObject(trackBank, 'Invalid trackBank for ValueSet.createVolumeValueSet');
     lep.util.assertNumberInRange(windowSize, 1, 1000, 'Invalid windowSize {} for ValueSet.createVolumeValueSet', windowSize);
 
-    return new lep.ValueSet('Volumes', 1, windowSize, function(index) {
-        return lep.StandardRangedValue.createVolumeValue(trackBank, index);
+    return new lep.ValueSet('Volumes', windowSize, 1, function(channelIndex) {
+        return lep.StandardRangedValue.createVolumeValue(trackBank, channelIndex);
     });
 };
 
@@ -121,8 +122,8 @@ lep.ValueSet.createPanValueSet = function(trackBank, windowSize) {
     lep.util.assertObject(trackBank, 'Invalid trackBank for ValueSet.createPanValueSet');
     lep.util.assertNumberInRange(windowSize, 1, 1000, 'Invalid windowSize {} for ValueSet.createPanValueSet', windowSize);
 
-    return new lep.ValueSet('Pans', 1, windowSize, function(index) {
-        return lep.StandardRangedValue.createPanValue(trackBank, index);
+    return new lep.ValueSet('Pans', windowSize, 1, function(channelIndex) {
+        return lep.StandardRangedValue.createPanValue(trackBank, channelIndex);
     });
 };
 
@@ -134,7 +135,7 @@ lep.ValueSet.createSendsValueSet = function(trackBank, numberOfSends, windowSize
 
     var name = (lep.ValueSet.exists('Sends') && allowSecondInstance) ? 'Sends2' : 'Sends';
 
-    return new lep.ValueSet(name, numberOfSends, windowSize, function(sendIndex, channelIndex) {
+    return new lep.ValueSet(name, windowSize, numberOfSends, function(channelIndex, sendIndex) {
         return lep.StandardRangedValue.createSendValue(trackBank, channelIndex, sendIndex);
     });
 };
@@ -154,9 +155,8 @@ lep.ValueSet.createUserControlsValueSet = function(numberOfPages, userControlsPe
 
     var userControlBank = host.createUserControls(numberOfPages * userControlsPerPage);
 
-    return new lep.ValueSet('UserControls', numberOfPages, userControlsPerPage, function(page, indexInPage) {
-        var indexInBank = (page * userControlsPerPage) + indexInPage,
-            label = lep.util.formatString(labelPattern, page + 1, indexInPage + 1);
-        return lep.StandardRangedValue.createUserControlValue(userControlBank, indexInBank, label);
+    return new lep.ValueSet('UserControls', userControlsPerPage, numberOfPages, function(indexInPage, page, indexInUcBank) {
+        var label = lep.util.formatString(labelPattern, page + 1, indexInPage + 1);
+        return lep.StandardRangedValue.createUserControlValue(userControlBank, indexInUcBank, label);
     });
 };

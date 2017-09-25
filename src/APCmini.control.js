@@ -126,7 +126,7 @@ function ApcMini() {
             PAN: lep.ValueSet.createPanValueSet(matrixWindow.trackBank, 8),
             SEND: lep.ValueSet.createSendsValueSet(matrixWindow.trackBank, MATRIX_SENDS, 8),
             DEVICE_PARAMS: new lep.ParamsValueSet(cursorDevice),
-            CONFIG: new lep.ValueSet('ConfigValues', 8, 8, function(row, col) {
+            CONFIG: new lep.ValueSet('ConfigValues', 8, 8, function(col, row) {
                 if (!row) {
                     return new lep.KnockoutSyncedValue({
                         name: 'CfgTrackScrollSize' + (col + 1),

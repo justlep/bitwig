@@ -248,7 +248,7 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
          */
         VALUETYPE_BTN_VALUESET = {
             _assertion: lep.util.assert(SWITCHABLE_VALUESETS.length <= WINDOW_SIZE-2, 'There are more value types than encoder buttons!'),
-            FOR_ENCODERS: new lep.ValueSet('EncoderValueTypeSelect', 1, WINDOW_SIZE, function(index) {
+            FOR_ENCODERS: new lep.ValueSet('EncoderValueTypeSelect', WINDOW_SIZE, 1, function(index) {
                 var isPrevPageIndex = (index === WINDOW_SIZE-2),
                     isNextPageBtn = (index === WINDOW_SIZE-1),
                     switchableValueSet = !isPrevPageIndex && !isNextPageBtn && SWITCHABLE_VALUESETS[index];
@@ -277,7 +277,7 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
                     });
                 }
             }),
-            FOR_FADERS: new lep.ValueSet('FaderValueTypeSelect', 1, WINDOW_SIZE, function(index) {
+            FOR_FADERS: new lep.ValueSet('FaderValueTypeSelect', WINDOW_SIZE, 1, function(index) {
                 lep.util.assert(SWITCHABLE_VALUESETS.length);
                 var isPrevPageIndex = (index === WINDOW_SIZE-2),
                     isNextPageBtn = (index === WINDOW_SIZE-1),
@@ -314,7 +314,7 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
          * attached valueSet of to the encoders/faders.
          */
         VALUEPAGE_BTN_VALUESET = {
-            FOR_ENCODERS: new lep.ValueSet('EncoderValuePageSelect', 1, WINDOW_SIZE, function(index) {
+            FOR_ENCODERS: new lep.ValueSet('EncoderValuePageSelect', WINDOW_SIZE, 1, function(index) {
                 if (index >= WINDOW_SIZE-2) {
                     var prevOrNextValuePageBtnValue = VALUETYPE_BTN_VALUESET.FOR_ENCODERS.values[index];
                     lep.util.assert(prevOrNextValuePageBtnValue && prevOrNextValuePageBtnValue instanceof lep.KnockoutSyncedValue,
@@ -327,7 +327,7 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
                     refObservable: CONTROLSET.ENCODERS.valuePage
                 });
             }),
-            FOR_FADERS: new lep.ValueSet('FaderValuePageSelect', 1, WINDOW_SIZE, function(index) {
+            FOR_FADERS: new lep.ValueSet('FaderValuePageSelect', WINDOW_SIZE, 1, function(index) {
                 if (index >= WINDOW_SIZE-2) {
                     var prevOrNextValuePageBtnValue = VALUETYPE_BTN_VALUESET.FOR_FADERS.values[index];
                     lep.util.assert(prevOrNextValuePageBtnValue && prevOrNextValuePageBtnValue instanceof lep.KnockoutSyncedValue,

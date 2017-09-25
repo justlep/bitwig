@@ -1,5 +1,6 @@
 /**
- * Represents a set of Control objects, e.g. one row of Fader objects.
+ * Represents a set of {@link lep.BaseControl} objects (or derived), e.g. one row of Fader objects.
+ *
  * @param name (String)
  * @param numberOfControls (Number) number of Control objects to generate
  * @param controlCreationFn (function) function creating a control,  e.g. function(index){...; return new BaseControl(..);}

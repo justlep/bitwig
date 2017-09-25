@@ -176,8 +176,7 @@ lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
             if (self.canRotate()) {
                 // generate a swapped-axis version of the `tracksByScenesValueSet`
                 scenesByTrackValueSet = new lep.ValueSet('LauncherSlotValues(SbT)', numScenes, numTracks, function(sceneIndex, trackIndex) {
-                    var sourceValueIndex = (trackIndex * numTracks) + sceneIndex;
-                    return tracksByScenesValueSet.values[sourceValueIndex];
+                    return tracksByScenesValueSet.values[ (sceneIndex * numTracks) + trackIndex ];
                 });
                 lep.logDev('Prepared ValueSet: {}', scenesByTrackValueSet.name);
             }
@@ -189,9 +188,12 @@ lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
 
 /**
  * Creates a MatrixWindow instance with a main track bank.
+ * Includes generating the launcher slot valuesets using the given creator function.
+ *
  * @param numTracks {Number}
  * @param numSends {Number}
  * @param numScenes {Number}
+ * @param launcherSlotValueCreatorFn {function} same callback as in {@link lep.MatrixWindow#prepareLauncherSlotValueSets}
  * @static
  */
 lep.MatrixWindow.createMain = function(numTracks, numSends, numScenes, launcherSlotValueCreatorFn) {

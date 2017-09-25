@@ -22,7 +22,7 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
                 cursorDevice.createCursorRemoteControlsPage(paramsPerPage) :
                 cursorDevice.createCursorRemoteControlsPage(valueSetName, paramsPerPage, '');
 
-        this._super(valueSetName, 1, 8, function(paramIndex) {
+        this._super(valueSetName, 8, 1, function(paramIndex) {
             return lep.StandardRangedValue.createRemoteControlValue(remoteControlsPage, paramIndex);
         });
 

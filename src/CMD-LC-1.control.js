@@ -1,5 +1,5 @@
 /**
- * Bitwig Controller Script for the Behringer CMD LC-1.
+ * Unfinished controller script for the Behringer CMD LC-1.
  *
  * Author: Lennart Pegel - https://github.com/justlep/bitwig
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
@@ -111,23 +111,7 @@ lep.LC1 = function() {
                     clickNote: NOTE.NUM + index,
                     midiChannel: MIDI_CHANNEL
                 });
-            }),
-            CLIP_MATRIX: new lep.ControlSet('Matrix', WINDOW_SIZE * SCENES_NUMBER, function(index) {
-                var track = (index / SCENES_NUMBER) >> 0,
-                    scene = (index % SCENES_NUMBER);
-
-                return new lep.Button({
-                    name: 'MatrixBtn-' + (track+1) + '-' + (scene+1),
-                    clickNote: NOTE.MATRIX + (track + scene * WINDOW_SIZE),
-                    midiChannel: MIDI_CHANNEL
-                });
             })
-        },
-
-        clipPlayStates = [],
-        PLAY_STATE = {
-            PLAYING: 1,
-            STOPPED : 0
         },
 
         VALUESET = {
@@ -135,38 +119,7 @@ lep.LC1 = function() {
             PAN: lep.ValueSet.createPanValueSet(trackBank, WINDOW_SIZE),
             SEND: lep.ValueSet.createSendsValueSet(trackBank, SENDS_NUMBER, WINDOW_SIZE),
             PARAM: new lep.ParamsValueSet(cursorDevice),
-            USERCONTROL: lep.ValueSet.createUserControlsValueSet(USER_CONTROL_PAGES, WINDOW_SIZE, 'LC1-UC-{}-{}'),
-            CLIP_MATRIX: new lep.ValueSet('ClipMatrixValues', WINDOW_SIZE, SCENES_NUMBER, function(trackIndex, sceneIndex) {
-                var clipLaucherSlots = trackBank.getChannel(trackIndex).getClipLauncherSlots(),
-                    index = (trackIndex * SCENES_NUMBER) + sceneIndex,
-                    playState = ko.observable();
-
-                clipPlayStates[index] = playState;
-
-                if (sceneIndex === SCENES_NUMBER - 1) {
-                    clipLaucherSlots.setIndication(true);
-                    clipLaucherSlots.addPlaybackStateObserver(function(scene, state, isQueued) {
-                        var index = (trackIndex * SCENES_NUMBER) + scene,
-                            newState = isQueued ? -1 : state === 0 ? PLAY_STATE.STOPPED : state === 1 ? PLAY_STATE.PLAYING : -2;
-
-                        clipPlayStates[index](newState);
-                    });
-                }
-
-                return new lep.KnockoutSyncedValue({
-                    name: 'MatrixValue-' + (trackIndex+1) + '-' + (sceneIndex+1),
-                    onClick: function() {
-                        clipLaucherSlots.launch(sceneIndex);
-                    },
-                    ownValue: null,
-                    refObservable: playState,
-                    computedVelocity: ko.computed(function() {
-                        var _playState = playState();
-                        return (_playState === PLAY_STATE.PLAYING) ? MATRIX_COLOR.BLUE_BLINK :
-                               (_playState === PLAY_STATE.STOPPED) ? MATRIX_COLOR.GREEN : MATRIX_COLOR.OFF;
-                    })
-                });
-            })
+            USERCONTROL: lep.ValueSet.createUserControlsValueSet(USER_CONTROL_PAGES, WINDOW_SIZE, 'LC1-UC-{}-{}')
         };
 
     function testColors() {
@@ -273,7 +226,7 @@ lep.LC1 = function() {
     // CONTROLSET.ENCODERS.setValueSet(VALUESET.VOLUME);
     CONTROLSET.ENCODERS.setValueSet(VALUESET.PAN);
 
-    CONTROLSET.CLIP_MATRIX.setValueSet(VALUESET.CLIP_MATRIX);
+    // TODO use lep.MatrixWindow for clip matrix
 
     initChannelScrollButtons();
     initChannelButtons();
