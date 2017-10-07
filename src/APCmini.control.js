@@ -24,6 +24,7 @@ host.defineMidiPorts(1, 1);
 
 /** @override */
 function init() {
+    ApcMini.resetButtons();
     lep.setLogLevel(lep.LOGLEVEL.DEV);
     host.getNotificationSettings().getUserNotificationsEnabled().set(true);
     new ApcMini();
@@ -48,7 +49,8 @@ function ApcMini() {
             MATRIX_DOWN: NOTE.BOTTOM_BUTTONS_START + 1,
             MATRIX_LEFT: NOTE.BOTTOM_BUTTONS_START + 2,
             MATRIX_RIGHT: NOTE.BOTTOM_BUTTONS_START + 3,
-            MATRIX_ROTATE: NOTE.SIDE_BUTTONS_START + 6,
+            MATRIX_ROTATE: NOTE.SIDE_BUTTONS_START + 5,
+            TRACK_STATES_MODE: NOTE.SIDE_BUTTONS_START + 6,
             STOP_ALL: NOTE.SIDE_BUTTONS_START + 7,
             VOL: NOTE.BOTTOM_BUTTONS_START + 4,
             PAN: NOTE.BOTTOM_BUTTONS_START + 5,
@@ -67,12 +69,16 @@ function ApcMini() {
             RED_BLINK: 4,
             YELLOW: 5,
             YELLOW_BLINK: 6
+        },
+        MATRIX_MODE = {
+            LAUNCHERS: 1,
+            CONFIG: 2,
+            TRACK_STATES: 3
         };
-
-    ApcMini.resetButtons();
 
     var eventDispatcher = lep.MidiEventDispatcher.getInstance(),
         transport = lep.util.getTransport(),
+        currentMatrixMode = ko.observable(MATRIX_MODE.LAUNCHERS).extend({restoreable: true}),
         matrixWindow = lep.MatrixWindow.createMain(MATRIX_TRACKS, MATRIX_SENDS, MATRIX_SCENES, function (launcherSlot) {
             return new lep.KnockoutSyncedValue({
                 name: lep.util.formatString('{}Value', launcherSlot.name),
@@ -98,7 +104,10 @@ function ApcMini() {
         }),
         masterTrack = host.createMasterTrack(0),
         cursorDevice = host.createEditorCursorDevice(0),
-        isConfigModeEnabled = ko.observable(false).extend({toggleable: true}),
+        soloExclusivePref = {
+            soloExclusive: false
+        },
+        clearPunchOnStop = ko.observable(true).extend({toggleable: true}),
         isShiftPressed = ko.observable(false).updatedBy(function() {
             var maxNextDoubleClickTime = 0,
                 DOUBLE_CLICK_TIME_IN_MILLIS = 400;
@@ -121,6 +130,67 @@ function ApcMini() {
             });
         }),
         isPlaying = ko.observable(false).updatedByBitwigValue(transport.isPlaying()),
+        calcToggledConfigValueVelocity = function(isToggledOn) {
+            return isToggledOn ? COLOR.GREEN : COLOR.YELLOW;
+        },
+        TRANSPORT_VALUE = {
+            PLAY: lep.ToggledTransportValue.getPlayInstance(),
+            RECORD: lep.ToggledTransportValue.getRecordInstance(),
+            ARRANGER_AUTOMATION: lep.ToggledTransportValue.getArrangerAutomationInstance(),
+            LOOP: lep.ToggledTransportValue.getLoopInstance(),
+            METRONOME: lep.ToggledTransportValue.getMetronomeInstance(calcToggledConfigValueVelocity),
+            OVERDUB: lep.ToggledTransportValue.getOverdubInstance(calcToggledConfigValueVelocity),
+            PUNCH_IN: lep.ToggledTransportValue.getPunchInInstance(calcToggledConfigValueVelocity),
+            PUNCH_OUT: lep.ToggledTransportValue.getPunchOutInstance(calcToggledConfigValueVelocity),
+            CLEAR_PUNCH_ON_STOP: new lep.KnockoutSyncedValue({
+                name: 'ClearPunchInOutOnStop',
+                ownValue: true,
+                refObservable: clearPunchOnStop,
+                onClick: clearPunchOnStop.toggle,
+                computedVelocity: function() {
+                    return (!clearPunchOnStop()) ? COLOR.YELLOW : isPlaying() ? COLOR.GREEN_BLINK : COLOR.GREEN;
+                }
+            })
+        },
+        CONFIG_VALUES_BY_XY = (function() {
+            var xy = lep.util.generateArray(8, function(){
+                         return [];
+                     });
+
+            xy[7][7] =  new lep.KnockoutSyncedValue({
+                name: 'MatrixRestore',
+                ownValue: MATRIX_MODE.CONFIG,
+                refObservable: ko.observable(),
+                onClick: currentMatrixMode.restore,
+                velocityValueOn: COLOR.RED_BLINK,
+                velocityValueOff: COLOR.RED_BLINK
+            });
+            xy[0][7] = new lep.KnockoutSyncedValue({
+                name: 'CfgTakeover',
+                ownValue: true,
+                refObservable: lep.StandardRangedValue.globalTakeoverEnabled,
+                onClick: lep.StandardRangedValue.globalTakeoverEnabled.toggle,
+                velocityValueOn: COLOR.GREEN,
+                velocityValueOff: COLOR.YELLOW
+            });
+            xy[7][4] = TRANSPORT_VALUE.OVERDUB;
+            xy[5][5] = TRANSPORT_VALUE.CLEAR_PUNCH_ON_STOP;
+            xy[6][5] = TRANSPORT_VALUE.PUNCH_IN;
+            xy[7][5] = TRANSPORT_VALUE.PUNCH_OUT;
+
+            return xy;
+        })(),
+        TRACK_STATE_VALUESETS = (function() {
+            lep.ToggledValue.setArmVelocityValues(COLOR.RED_BLINK, COLOR.RED);
+            lep.ToggledValue.setMuteVelocityValues(COLOR.YELLOW_BLINK, COLOR.YELLOW);
+            lep.ToggledValue.setSoloVelocityValues(COLOR.GREEN_BLINK, COLOR.GREEN);
+            return {
+                SOLO: lep.ValueSet.createSoloValueSet(matrixWindow.trackBank, MATRIX_TRACKS, soloExclusivePref),
+                ARM: lep.ValueSet.createArmValueSet(matrixWindow.trackBank, MATRIX_TRACKS),
+                MUTE: lep.ValueSet.createMuteValueSet(matrixWindow.trackBank, MATRIX_TRACKS),
+                SELECT: lep.ValueSet.createSelectValueSet(matrixWindow.trackBank, MATRIX_TRACKS)
+            };
+        })(),
         VALUESET = {
             VOLUME: lep.ValueSet.createVolumeValueSet(matrixWindow.trackBank, 8),
             PAN: lep.ValueSet.createPanValueSet(matrixWindow.trackBank, 8),
@@ -136,28 +206,20 @@ function ApcMini() {
                         velocityValueOff: COLOR.YELLOW
                     });
                 }
-                if (row === 7 && col === 7) {
-                    return new lep.KnockoutSyncedValue({
-                        name: 'CfgExit',
-                        ownValue: true,
-                        refObservable: ko.observable(true),
-                        onClick: isConfigModeEnabled.toggleOff,
-                        velocityValueOn: COLOR.RED_BLINK,
-                        velocityValueOff: COLOR.OFF
-                    });
-                }
-                if (row === 7 && !col) {
-                    return new lep.KnockoutSyncedValue({
-                        name: 'CfgTakeover',
-                        ownValue: true,
-                        refObservable: lep.StandardRangedValue.globalTakeoverEnabled,
-                        onClick: lep.StandardRangedValue.globalTakeoverEnabled.toggle,
-                        velocityValueOn: COLOR.GREEN,
-                        velocityValueOff: COLOR.YELLOW
-                    });
+                return CONFIG_VALUES_BY_XY[col][row] || new lep.BaseValue({
+                    name: lep.util.formatString('UnusedConfigSlot{}{}', col, row),
+                    value: COLOR.OFF
+                });
+            }),
+            TRACK_STATES: new lep.ValueSet('TrackStates', 8, 8, function(col, row) {
+                switch (row) {
+                    case 4: return TRACK_STATE_VALUESETS.SOLO.values[col];
+                    case 5: return TRACK_STATE_VALUESETS.MUTE.values[col];
+                    case 6: return TRACK_STATE_VALUESETS.ARM.values[col];
+                    case 7: return TRACK_STATE_VALUESETS.SELECT.values[col];
                 }
                 return new lep.BaseValue({
-                    name: lep.util.formatString('UnusedConfigSlot{}{}', col, row),
+                    name: lep.util.formatString('UnusedTrackStateSlot{}{}', col, row),
                     value: COLOR.OFF
                 });
             })
@@ -189,7 +251,33 @@ function ApcMini() {
                 });
             })
         },
+        isTrackStateModeEnabled = ko.computed({
+            read: function() {
+                return currentMatrixMode() === MATRIX_MODE.TRACK_STATES;
+            },
+            write: function(switchOn) {
+                if (!switchOn || currentMatrixMode() === MATRIX_MODE.TRACK_STATES) {
+                    currentMatrixMode(MATRIX_MODE.LAUNCHERS); // toggle back to launcher-mode
+                } else {
+                    currentMatrixMode(MATRIX_MODE.TRACK_STATES);
+                }
+            }
+        }).extend({ notify: 'always'}),
         CONTROL = {
+            TRACK_STATE_MODE_BTN: new lep.Button({
+                name: 'TrackStateModeBtn',
+                clickNote: ACTION_NOTE.TRACK_STATES_MODE,
+                midiChannel: MIDI_CHANNEL,
+                valueToAttach: new lep.KnockoutSyncedValue({
+                    name: 'TrackStateMode',
+                    ownValue: true,
+                    refObservable: isTrackStateModeEnabled,
+                    forceRewrite: true,
+                    restoreRefAfterLongClick: true,
+                    velocityValueOn: COLOR.GREEN_BLINK,
+                    velocityValueOff: COLOR.GREEN
+                })
+            }),
             MASTER_FADER: new lep.Fader({
                 name: 'MasterFader',
                 valueCC: CC.MASTER_FADER,
@@ -305,7 +393,7 @@ function ApcMini() {
             })
         });
         new lep.Button({
-            name: 'RotateBtn',
+            name: 'MatrixRotateBtn',
             clickNote: ACTION_NOTE.MATRIX_ROTATE,
             midiChannel: MIDI_CHANNEL,
             valueToAttach: new lep.KnockoutSyncedValue({
@@ -315,7 +403,7 @@ function ApcMini() {
                 onClick: matrixWindow.rotate,
                 computedVelocity: ko.computed(function() {
                     return !matrixWindow.canRotate() ? COLOR.OFF :
-                            matrixWindow.isOrientationTracksByScenes() ? COLOR.GREEN : COLOR.GREEN_BLINK;
+                            matrixWindow.isOrientationTracksByScenes() ? COLOR.OFF : COLOR.GREEN;
                 })
             })
         });
@@ -351,28 +439,46 @@ function ApcMini() {
 
     eventDispatcher.onNotePressed(ACTION_NOTE.DEVICE, function() {
         if (isShiftPressed()) {
-            isConfigModeEnabled.toggleOn();
+            if (currentMatrixMode() === MATRIX_MODE.CONFIG) {
+                currentMatrixMode.restore();
+            } else {
+                currentMatrixMode(MATRIX_MODE.CONFIG);
+            }
         }
     });
 
-    CONTROLSET.MATRIX.setObservableValueSet(ko.computed(function() {
-        return isConfigModeEnabled() ? VALUESET.CONFIG : matrixWindow.launcherSlotValueSet();
-    }));
-
-    ko.computed(function() {
-        var faderValueSet = currentFaderValueSet(),
-            masterValue = (faderValueSet === VALUESET.PAN) ? VALUE.MASTER_PAN : VALUE.MASTER_VOLUME;
-
-        CONTROLSET.FADER_ROW.setValueSet(faderValueSet);
-        CONTROL.MASTER_FADER.attachValue(masterValue);
+    // auto-disable PUNCH IN / PUNCH OUT
+    isPlaying.subscribe(function(_isPlaying) {
+        if (!_isPlaying && clearPunchOnStop()) {
+            transport.isPunchInEnabled().set(false);
+            transport.isPunchOutEnabled().set(false);
+        }
     });
 
     lep.StandardRangedValue.globalTakeoverEnabled(true);
 
-    lep.logDev('APC mini ready');
+    ApcMini.onFirstFlush = function() {
+        ApcMini.onFirstFlush = null;
+
+        ko.computed(function() {
+            var faderValueSet = currentFaderValueSet(),
+                masterValue = (faderValueSet === VALUESET.PAN) ? VALUE.MASTER_PAN : VALUE.MASTER_VOLUME;
+
+            CONTROLSET.FADER_ROW.setValueSet(faderValueSet);
+            CONTROL.MASTER_FADER.attachValue(masterValue);
+        });
+
+        CONTROLSET.MATRIX.setObservableValueSet(ko.computed(function () {
+            var matrixMode = currentMatrixMode();
+            return (matrixMode === MATRIX_MODE.CONFIG) ? VALUESET.CONFIG :
+                (matrixMode === MATRIX_MODE.TRACK_STATES) ? VALUESET.TRACK_STATES : matrixWindow.launcherSlotValueSet();
+        }));
+
+        lep.logDev('ApcMini ready.');
+    };
+
+    lep.logDev('Awaiting initial MIDI flush...');
 }
-
-
 
 /** @static **/
 ApcMini.resetButtons = function(leaveExitPattern) {
@@ -394,8 +500,15 @@ ApcMini.resetButtons = function(leaveExitPattern) {
     }
 };
 
+/** override */
+function flush() {
+    if (ApcMini.onFirstFlush) {
+        ApcMini.onFirstFlush();
+    }
+}
 
 /** @override */
 function exit() {
     ApcMini.resetButtons(true);
 }
+
