@@ -50,3 +50,23 @@ ko.extenders.toggleable = function(target /*, opts */) {
 
     return target;
 };
+
+/**
+ * An extender adding a context-safe .restore() method to a writeable observable,
+ * that can be called to restore its value from before the last change.
+ * @param target {ko.observable}
+ */
+ko.extenders.restoreable = function(target /*, opts */) {
+    lep.util.assert(ko.isWriteableObservable(target), 'Cannot use toggleable extender on readonly observables');
+
+    target.subscribe(function(oldValue) {
+        target.__rst_previousValue__ = oldValue;
+    }, null, 'beforeChange');
+
+    target.restore = function() {
+        if (target.__rst_previousValue__ !== undefined) {
+            target(target.__rst_previousValue__);
+        }
+    };
+    return target;
+};

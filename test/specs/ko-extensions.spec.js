@@ -68,6 +68,36 @@ describe('ko-extensions.js', function() {
         assert.strictEqual(o3(), true);
     });
 
+    it('can restore previous values using the restoreable extender', function() {
+        var o1 = ko.observable().extend({restoreable: true}),
+            o2 = ko.observable(5).extend({restoreable: true});
+
+        assert.isFunction(o1.restore);
+        assert.isFunction(o2.restore);
+        assert.strictEqual(o1(), undefined);
+        assert.strictEqual(o2(), 5);
+        o1.restore();
+        o2.restore();
+        assert.strictEqual(o1(), undefined);
+        assert.strictEqual(o2(), 5);
+
+        o1(123);
+        assert.strictEqual(o1(), 123);
+        o1.restore();
+        assert.strictEqual(o1(), 123); // o1 had no previous value
+        o1(666);
+        assert.strictEqual(o1(), 666);
+        o1.restore();
+        assert.strictEqual(o1(), 123);
+
+        o2(999);
+        assert.strictEqual(o2(), 999);
+        o2.restore();
+        assert.strictEqual(o2(), 5);
+        o2.restore();
+        assert.strictEqual(o2(), 999);
+    });
+
     it('adds an `updatedBy` method to the subscribable prototype', function(done) {
         var timer,
             registerAsyncUpdater = function(obs) {
