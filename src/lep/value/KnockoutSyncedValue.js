@@ -19,6 +19,7 @@
  *          - [computedVelocity] (function|Observable) (optional) function returning the velocity value to send to the controller
  *            (!) If computedVelocity is given, it overrides any given velocityValueOn/velocityValueOff value.
  *          - [ignoreClickIf] (observable) if given, the `click` event
+ *          - [forceRewrite] (boolean) if true, the refObservable will be written with `ownValue` even if it already has that value
  *
  * Author: Lennart Pegel - https://github.com/justlep
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
@@ -59,6 +60,7 @@ lep.KnockoutSyncedValue = lep.util.extendClass(lep.BaseValue, {
         this.toggleOnPressed = (opts.toggleOnPressed !== false);
         this.restoreRefAfterLongClick = !!opts.restoreRefAfterLongClick;
         this.ignoreClickIf = opts.ignoreClickIf;
+        this.forceRewrite = !!opts.forceRewrite;
 
         if (this.restoreRefAfterLongClick) {
             lep.util.assert(this.toggleOnPressed, 'restoreRefAfterLongClick requires toggleOnPressed=true, {}', this.name);
@@ -126,7 +128,7 @@ lep.KnockoutSyncedValue = lep.util.extendClass(lep.BaseValue, {
                 this._savedRefValue = this.refObservable();
             }
         }
-        if (!isAlreadySelected) {
+        if (!isAlreadySelected || this.forceRewrite) {
             this.refObservable(this.ownValue);
         }
     }
