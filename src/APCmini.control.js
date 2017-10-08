@@ -274,8 +274,8 @@ function ApcMini() {
                     refObservable: isTrackStateModeEnabled,
                     forceRewrite: true,
                     restoreRefAfterLongClick: true,
-                    velocityValueOn: COLOR.GREEN_BLINK,
-                    velocityValueOff: COLOR.GREEN
+                    velocityValueOn: COLOR.GREEN,
+                    velocityValueOff: COLOR.OFF
                 })
             }),
             MASTER_FADER: new lep.Fader({
@@ -398,13 +398,19 @@ function ApcMini() {
             midiChannel: MIDI_CHANNEL,
             valueToAttach: new lep.KnockoutSyncedValue({
                 name: 'MatrixRotate',
-                ownValue: true,
-                refObservable: matrixWindow.canRotate,
-                onClick: matrixWindow.rotate,
-                computedVelocity: ko.computed(function() {
-                    return !matrixWindow.canRotate() ? COLOR.OFF :
-                            matrixWindow.isOrientationTracksByScenes() ? COLOR.OFF : COLOR.GREEN;
-                })
+                ownValue: MATRIX_MODE.LAUNCHERS,
+                refObservable: currentMatrixMode,
+                onClick: function() {
+                    if (currentMatrixMode() === MATRIX_MODE.LAUNCHERS) {
+                        matrixWindow.rotate();
+                    } else {
+                        currentMatrixMode(MATRIX_MODE.LAUNCHERS);
+                    }
+                },
+                computedVelocity: function() {
+                    return (currentMatrixMode() !== MATRIX_MODE.LAUNCHERS) ? COLOR.OFF :
+                            matrixWindow.isOrientationTracksByScenes() ? COLOR.GREEN: COLOR.GREEN_BLINK;
+                }
             })
         });
     }
@@ -420,9 +426,9 @@ function ApcMini() {
                 refObservable: ko.computed(function(){
                     return isShiftPressed() || isPlaying();
                 }),
-                computedVelocity: ko.computed(function() {
+                computedVelocity: function() {
                     return isPlaying() ? (isShiftPressed() ? COLOR.GREEN : COLOR.GREEN_BLINK) : COLOR.OFF;
-                }),
+                },
                 onClick: function() {
                     if (isShiftPressed()) {
                         transport.returnToArrangement();
