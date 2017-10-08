@@ -231,7 +231,6 @@ function ApcMini() {
                 });
             })
         },
-        currentFaderValueSet = ko.observable(VALUESET.VOLUME),
         VALUE = {
             MASTER_VOLUME: new lep.StandardRangedValue({
                 name: 'MasterVol',
@@ -291,6 +290,7 @@ function ApcMini() {
                 midiChannel: MIDI_CHANNEL,
                 isUnidirectional: true,
                 valueToAttach: ko.computed(function() {
+                    return currentFaderMode().isPan ? VALUE.MASTER_PAN : VALUE.MASTER_VOLUME;
                 })
             }),
             VOL_BTN: new lep.Button({
@@ -427,11 +427,11 @@ function ApcMini() {
             })
         });
         new lep.Button({
-            name: 'MatrixRotateBtn',
+            name: 'MatrixLauncherModeBtn',
             clickNote: ACTION_NOTE.MATRIX_ROTATE,
             midiChannel: MIDI_CHANNEL,
             valueToAttach: new lep.KnockoutSyncedValue({
-                name: 'MatrixRotate',
+                name: 'MatrixLauncherMode',
                 ownValue: MATRIX_MODE.LAUNCHERS,
                 refObservable: currentMatrixMode,
                 onClick: function() {
@@ -511,8 +511,8 @@ function ApcMini() {
 
         CONTROLSET.MATRIX.setObservableValueSet(ko.computed(function () {
             var matrixMode = currentMatrixMode();
-            return (matrixMode === MATRIX_MODE.CONFIG) ? VALUESET.CONFIG :
-                   (matrixMode === MATRIX_MODE.TRACK_STATES) ? VALUESET.TRACK_STATES :
+            return (matrixMode.isConfig) ? VALUESET.CONFIG :
+                   (matrixMode.isTrackStates) ? VALUESET.TRACK_STATES :
                     matrixWindow.launcherSlotValueSet();
         }));
 
