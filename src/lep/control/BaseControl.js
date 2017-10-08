@@ -66,6 +66,18 @@ lep.BaseControl = function(opts) {
     this.skipFeedbackLoops = !this.sendsDiffValues && !this.feedbackValueCorrectionMultiplier && opts.skipFeedbackLoops !== false;
 
     this.bindMidiValueListener();
+
+    if (opts.valueToAttach) {
+        if (ko.isObservable(opts.valueToAttach)) {
+            this.attachValue(opts.valueToAttach());
+            opts.valueToAttach.subscribe(function(newValueToAttach) {
+                lep.util.assertBaseValue(newValueToAttach, 'Invalid newValueToAttach in observable of BaseControl {}', this.name);
+                this.attachValue(newValueToAttach);
+            }, this);
+        } else {
+            this.attachValue(opts.valueToAttach);
+        }
+    }
 };
 
 /** @static */

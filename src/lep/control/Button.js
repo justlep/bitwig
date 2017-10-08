@@ -12,18 +12,6 @@ lep.Button = lep.util.extendClass(lep.BaseControl, {
         this.resyncOnClickRelease = (opts.resyncOnClickRelease !== false);
 
         var self = this;
-
-        if (opts.valueToAttach) {
-            if (ko.isObservable(opts.valueToAttach)) {
-                this.attachValue(opts.valueToAttach());
-                opts.valueToAttach.subscribe(function(newValueToAttach) {
-                    lep.util.assertBaseValue(newValueToAttach, 'Invalid newValueToAttach in observable of Button {}', self.name);
-                    self.attachValue(newValueToAttach);
-                });
-            } else {
-                this.attachValue(opts.valueToAttach);
-            }
-        }
     },
     /** @Override */
     onClickNotePressed: function() {
