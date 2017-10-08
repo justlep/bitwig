@@ -71,9 +71,9 @@ function ApcMini() {
             YELLOW_BLINK: 6
         },
         MATRIX_MODE = {
-            LAUNCHERS: 1,
-            CONFIG: 2,
-            TRACK_STATES: 3
+            LAUNCHERS: {isLaunchers: true},
+            CONFIG: {isConfig: true},
+            TRACK_STATES: {isTrackStates: true}
         };
 
     var eventDispatcher = lep.MidiEventDispatcher.getInstance(),
@@ -253,10 +253,10 @@ function ApcMini() {
         },
         isTrackStateModeEnabled = ko.computed({
             read: function() {
-                return currentMatrixMode() === MATRIX_MODE.TRACK_STATES;
+                return currentMatrixMode().isTrackStates;
             },
             write: function(switchOn) {
-                if (!switchOn || currentMatrixMode() === MATRIX_MODE.TRACK_STATES) {
+                if (!switchOn || currentMatrixMode().isTrackStates) {
                     currentMatrixMode(MATRIX_MODE.LAUNCHERS); // toggle back to launcher-mode
                 } else {
                     currentMatrixMode(MATRIX_MODE.TRACK_STATES);
@@ -340,6 +340,39 @@ function ApcMini() {
         };
 
     function initScrollButtons() {
+        var MATRIX_LEFT_VALUE = new lep.KnockoutSyncedValue({
+                name: 'MatrixLeft',
+                ownValue: true,
+                refObservable: matrixWindow.canMoveMatrixLeft,
+                onClick: matrixWindow.moveMatrixLeft,
+                velocityValueOn: COLOR.RED,
+                velocityValueOff: COLOR.OFF
+            }),
+            MATRIX_RIGHT_VALUE =  new lep.KnockoutSyncedValue({
+                name: 'MatrixRight',
+                ownValue: true,
+                refObservable: matrixWindow.canMoveMatrixRight,
+                onClick: matrixWindow.moveMatrixRight,
+                velocityValueOn: COLOR.RED,
+                velocityValueOff: COLOR.OFF
+            }),
+            TRACKS_LEFT_VALUE =  new lep.KnockoutSyncedValue({
+                name: 'TracksLeft',
+                ownValue: true,
+                refObservable: matrixWindow.canMoveChannelBack,
+                onClick: matrixWindow.moveChannelBack,
+                velocityValueOn: COLOR.RED,
+                velocityValueOff: COLOR.OFF
+            }),
+            TRACKS_RIGHT_VALUE =  new lep.KnockoutSyncedValue({
+                name: 'TracksRight',
+                ownValue: true,
+                refObservable: matrixWindow.canMoveChannelForth,
+                onClick: matrixWindow.moveChannelForth,
+                velocityValueOn: COLOR.RED,
+                velocityValueOff: COLOR.OFF
+            });
+
         new lep.Button({
             name: 'UpBtn',
             clickNote: ACTION_NOTE.MATRIX_UP,
@@ -349,7 +382,7 @@ function ApcMini() {
                 ownValue: true,
                 refObservable: matrixWindow.canMoveMatrixUp,
                 onClick: matrixWindow.moveMatrixUp,
-                velocityValueOn: COLOR.GREEN,
+                velocityValueOn: COLOR.RED,
                 velocityValueOff: COLOR.OFF
             })
         });
@@ -362,7 +395,7 @@ function ApcMini() {
                 ownValue: true,
                 refObservable: matrixWindow.canMoveMatrixDown,
                 onClick: matrixWindow.moveMatrixDown,
-                velocityValueOn: COLOR.GREEN,
+                velocityValueOn: COLOR.RED,
                 velocityValueOff: COLOR.OFF
             })
         });
@@ -370,26 +403,18 @@ function ApcMini() {
             name: 'LeftBtn',
             clickNote: ACTION_NOTE.MATRIX_LEFT,
             midiChannel: MIDI_CHANNEL,
-            valueToAttach: new lep.KnockoutSyncedValue({
-                name: 'MatrixLeft',
-                ownValue: true,
-                refObservable: matrixWindow.canMoveMatrixLeft,
-                onClick: matrixWindow.moveMatrixLeft,
-                velocityValueOn: COLOR.GREEN,
-                velocityValueOff: COLOR.OFF
+            valueToAttach: ko.computed(function() {
+                // TODO if device mode, left/right should scroll to the previous/next device
+                return currentMatrixMode().isLaunchers ? MATRIX_LEFT_VALUE : TRACKS_LEFT_VALUE;
             })
         });
         new lep.Button({
             name: 'RightBtn',
             clickNote: ACTION_NOTE.MATRIX_RIGHT,
             midiChannel: MIDI_CHANNEL,
-            valueToAttach: new lep.KnockoutSyncedValue({
-                name: 'MatrixRight',
-                ownValue: true,
-                refObservable: matrixWindow.canMoveMatrixRight,
-                onClick: matrixWindow.moveMatrixRight,
-                velocityValueOn: COLOR.GREEN,
-                velocityValueOff: COLOR.OFF
+            valueToAttach: ko.computed(function() {
+                // TODO if device mode, left/right should scroll to the previous/next device
+                return currentMatrixMode().isLaunchers ? MATRIX_RIGHT_VALUE : TRACKS_RIGHT_VALUE;
             })
         });
         new lep.Button({
@@ -401,14 +426,14 @@ function ApcMini() {
                 ownValue: MATRIX_MODE.LAUNCHERS,
                 refObservable: currentMatrixMode,
                 onClick: function() {
-                    if (currentMatrixMode() === MATRIX_MODE.LAUNCHERS) {
+                    if (currentMatrixMode().isLaunchers) {
                         matrixWindow.rotate();
                     } else {
                         currentMatrixMode(MATRIX_MODE.LAUNCHERS);
                     }
                 },
                 computedVelocity: function() {
-                    return (currentMatrixMode() !== MATRIX_MODE.LAUNCHERS) ? COLOR.OFF :
+                    return (!currentMatrixMode().isLaunchers) ? COLOR.OFF :
                             matrixWindow.isOrientationTracksByScenes() ? COLOR.GREEN: COLOR.GREEN_BLINK;
                 }
             })
@@ -445,7 +470,7 @@ function ApcMini() {
 
     eventDispatcher.onNotePressed(ACTION_NOTE.DEVICE, function() {
         if (isShiftPressed()) {
-            if (currentMatrixMode() === MATRIX_MODE.CONFIG) {
+            if (currentMatrixMode().isConfig) {
                 currentMatrixMode.restore();
             } else {
                 currentMatrixMode(MATRIX_MODE.CONFIG);
