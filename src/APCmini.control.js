@@ -268,85 +268,86 @@ function ApcMini() {
                     currentMatrixMode(MATRIX_MODE.TRACK_STATES);
                 }
             }
-        }).extend({ notify: 'always'}),
-        CONTROL = {
-            TRACK_STATE_MODE_BTN: new lep.Button({
-                name: 'TrackStateModeBtn',
-                clickNote: ACTION_NOTE.TRACK_STATES_MODE,
-                midiChannel: MIDI_CHANNEL,
-                valueToAttach: new lep.KnockoutSyncedValue({
-                    name: 'TrackStateMode',
-                    ownValue: true,
-                    refObservable: isTrackStateModeEnabled,
-                    forceRewrite: true,
-                    restoreRefAfterLongClick: true,
-                    velocityValueOn: COLOR.GREEN,
-                    velocityValueOff: COLOR.OFF
-                })
-            }),
-            MASTER_FADER: new lep.Fader({
-                name: 'MasterFader',
-                valueCC: CC.MASTER_FADER,
-                midiChannel: MIDI_CHANNEL,
-                isUnidirectional: true,
-                valueToAttach: ko.computed(function() {
-                    return currentFaderMode().isPan ? VALUE.MASTER_PAN : VALUE.MASTER_VOLUME;
-                })
-            }),
-            VOL_BTN: new lep.Button({
-                name: 'VolBtn',
-                clickNote: ACTION_NOTE.VOL,
-                midiChannel: MIDI_CHANNEL,
-                valueToAttach: new lep.KnockoutSyncedValue({
-                    name: 'VolMode',
-                    ownValue: FADER_MODE.VOLUME,
-                    refObservable: currentFaderMode,
-                    restoreRefAfterLongClick: true,
-                    velocityValueOn: COLOR.RED,
-                    velocityValueOff: COLOR.OFF
-                })
-            }),
-            PAN_BTN: new lep.Button({
-                name: 'PanBtn',
-                clickNote: ACTION_NOTE.PAN,
-                midiChannel: MIDI_CHANNEL,
-                valueToAttach: new lep.KnockoutSyncedValue({
-                    name: 'PanMode',
-                    ownValue: FADER_MODE.PAN,
-                    refObservable: currentFaderMode,
-                    restoreRefAfterLongClick: true,
-                    velocityValueOn: COLOR.RED,
-                    velocityValueOff: COLOR.OFF
-                })
-            }),
-            SEND_BTN: new lep.Button({
-                name: 'SendBtn',
-                clickNote: ACTION_NOTE.SEND,
-                midiChannel: MIDI_CHANNEL,
-                valueToAttach: new lep.KnockoutSyncedValue({
-                    name: 'SendMode',
-                    ownValue: FADER_MODE.SEND,
-                    refObservable: currentFaderMode,
-                    restoreRefAfterLongClick: true,
-                    velocityValueOn: COLOR.RED,
-                    velocityValueOff: COLOR.OFF
-                })
-            }),
-            DEVICE_BTN: new lep.Button({
-                name: 'DeviceBtn',
-                clickNote: ACTION_NOTE.DEVICE,
-                midiChannel: MIDI_CHANNEL,
-                valueToAttach: new lep.KnockoutSyncedValue({
-                    name: 'DeviceMode',
-                    ownValue: FADER_MODE.DEVICE,
-                    refObservable: currentFaderMode,
-                    restoreRefAfterLongClick: true,
-                    ignoreClickIf: isShiftPressed,
-                    velocityValueOn: COLOR.RED,
-                    velocityValueOff: COLOR.OFF
-                })
+        }).extend({ notify: 'always'});
+
+    function initTrackControls() {
+        new lep.Button({
+            name: 'TrackStateModeBtn',
+            clickNote: ACTION_NOTE.TRACK_STATES_MODE,
+            midiChannel: MIDI_CHANNEL,
+            valueToAttach: new lep.KnockoutSyncedValue({
+                name: 'TrackStateMode',
+                ownValue: true,
+                refObservable: isTrackStateModeEnabled,
+                forceRewrite: true,
+                restoreRefAfterLongClick: true,
+                velocityValueOn: COLOR.GREEN,
+                velocityValueOff: COLOR.OFF
             })
-        };
+        });
+        new lep.Fader({
+            name: 'MasterFader',
+            valueCC: CC.MASTER_FADER,
+            midiChannel: MIDI_CHANNEL,
+            isUnidirectional: true,
+            valueToAttach: ko.computed(function() {
+                return currentFaderMode().isPan ? VALUE.MASTER_PAN : VALUE.MASTER_VOLUME;
+            })
+        });
+        new lep.Button({
+            name: 'VolBtn',
+            clickNote: ACTION_NOTE.VOL,
+            midiChannel: MIDI_CHANNEL,
+            valueToAttach: new lep.KnockoutSyncedValue({
+                name: 'VolMode',
+                ownValue: FADER_MODE.VOLUME,
+                refObservable: currentFaderMode,
+                restoreRefAfterLongClick: true,
+                velocityValueOn: COLOR.RED,
+                velocityValueOff: COLOR.OFF
+            })
+        });
+        new lep.Button({
+            name: 'PanBtn',
+            clickNote: ACTION_NOTE.PAN,
+            midiChannel: MIDI_CHANNEL,
+            valueToAttach: new lep.KnockoutSyncedValue({
+                name: 'PanMode',
+                ownValue: FADER_MODE.PAN,
+                refObservable: currentFaderMode,
+                restoreRefAfterLongClick: true,
+                velocityValueOn: COLOR.RED,
+                velocityValueOff: COLOR.OFF
+            })
+        });
+        new lep.Button({
+            name: 'SendBtn',
+            clickNote: ACTION_NOTE.SEND,
+            midiChannel: MIDI_CHANNEL,
+            valueToAttach: new lep.KnockoutSyncedValue({
+                name: 'SendMode',
+                ownValue: FADER_MODE.SEND,
+                refObservable: currentFaderMode,
+                restoreRefAfterLongClick: true,
+                velocityValueOn: COLOR.RED,
+                velocityValueOff: COLOR.OFF
+            })
+        });
+        new lep.Button({
+            name: 'DeviceBtn',
+            clickNote: ACTION_NOTE.DEVICE,
+            midiChannel: MIDI_CHANNEL,
+            valueToAttach: new lep.KnockoutSyncedValue({
+                name: 'DeviceMode',
+                ownValue: FADER_MODE.DEVICE,
+                refObservable: currentFaderMode,
+                restoreRefAfterLongClick: true,
+                ignoreClickIf: isShiftPressed,
+                velocityValueOn: COLOR.RED,
+                velocityValueOff: COLOR.OFF
+            })
+        });
+    }
 
     function initScrollButtons() {
         var MATRIX_LEFT_VALUE = new lep.KnockoutSyncedValue({
@@ -380,32 +381,50 @@ function ApcMini() {
                 onClick: matrixWindow.moveChannelForth,
                 velocityValueOn: COLOR.RED,
                 velocityValueOff: COLOR.OFF
-            });
-
-        new lep.Button({
-            name: 'UpBtn',
-            clickNote: ACTION_NOTE.MATRIX_UP,
-            midiChannel: MIDI_CHANNEL,
-            valueToAttach: new lep.KnockoutSyncedValue({
+            }),
+            MATRIX_UP_VALUE = new lep.KnockoutSyncedValue({
                 name: 'MatrixUp',
                 ownValue: true,
                 refObservable: matrixWindow.canMoveMatrixUp,
                 onClick: matrixWindow.moveMatrixUp,
                 velocityValueOn: COLOR.RED,
                 velocityValueOff: COLOR.OFF
-            })
-        });
-        new lep.Button({
-            name: 'DownBtn',
-            clickNote: ACTION_NOTE.MATRIX_DOWN,
-            midiChannel: MIDI_CHANNEL,
-            valueToAttach: new lep.KnockoutSyncedValue({
+            }),
+            MATRIX_DOWN_VALUE = new lep.KnockoutSyncedValue({
                 name: 'MatrixDown',
                 ownValue: true,
                 refObservable: matrixWindow.canMoveMatrixDown,
                 onClick: matrixWindow.moveMatrixDown,
                 velocityValueOn: COLOR.RED,
                 velocityValueOff: COLOR.OFF
+            }),
+            FADER_VALUESET_PREV_PAGE_VALUE = new lep.KnockoutSyncedValue({
+                name: 'FaderValuePageUpBtn',
+                ownValue: true,
+                refObservable: CONTROLSET.FADER_ROW.hasPrevValuePage,
+                onClick: CONTROLSET.FADER_ROW.prevValuePage
+            }),
+            FADER_VALUESET_NEXT_PAGE_VALUE = new lep.KnockoutSyncedValue({
+                name: 'FaderValuePageDownBtn',
+                ownValue: true,
+                refObservable: CONTROLSET.FADER_ROW.hasNextValuePage,
+                onClick: CONTROLSET.FADER_ROW.nextValuePage
+            });
+
+        new lep.Button({
+            name: 'UpBtn',
+            clickNote: ACTION_NOTE.MATRIX_UP,
+            midiChannel: MIDI_CHANNEL,
+            valueToAttach: ko.computed(function() {
+                return currentMatrixMode().isTrackStates ? FADER_VALUESET_PREV_PAGE_VALUE : MATRIX_UP_VALUE;
+            })
+        });
+        new lep.Button({
+            name: 'DownBtn',
+            clickNote: ACTION_NOTE.MATRIX_DOWN,
+            midiChannel: MIDI_CHANNEL,
+            valueToAttach: ko.computed(function() {
+                return currentMatrixMode().isTrackStates ? FADER_VALUESET_NEXT_PAGE_VALUE : MATRIX_DOWN_VALUE;
             })
         });
         new lep.Button({
@@ -474,8 +493,10 @@ function ApcMini() {
         });
     }
 
-    initScrollButtons();
-    initTransportButtons();
+    FADER_MODE.VOLUME.valueSet = VALUESET.VOLUME;
+    FADER_MODE.PAN.valueSet = VALUESET.PAN;
+    FADER_MODE.SEND.valueSet = VALUESET.SEND;
+    FADER_MODE.DEVICE.valueSet = VALUESET.DEVICE_PARAMS;
 
     eventDispatcher.onNotePressed(ACTION_NOTE.DEVICE, function() {
         if (isShiftPressed()) {
@@ -500,10 +521,9 @@ function ApcMini() {
     ApcMini.onFirstFlush = function() {
         ApcMini.onFirstFlush = null;
 
-        FADER_MODE.VOLUME.valueSet = VALUESET.VOLUME;
-        FADER_MODE.PAN.valueSet = VALUESET.PAN;
-        FADER_MODE.SEND.valueSet = VALUESET.SEND;
-        FADER_MODE.DEVICE.valueSet = VALUESET.DEVICE_PARAMS;
+        initTrackControls();
+        initScrollButtons();
+        initTransportButtons();
 
         CONTROLSET.FADER_ROW.setObservableValueSet(ko.computed(function() {
             return currentFaderMode().valueSet;
