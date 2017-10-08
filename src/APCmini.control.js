@@ -74,11 +74,18 @@ function ApcMini() {
             LAUNCHERS: {isLaunchers: true},
             CONFIG: {isConfig: true},
             TRACK_STATES: {isTrackStates: true}
+        },
+        FADER_MODE = {
+            VOLUME: {isVolume: true},
+            PAN: {isPan: true},
+            SEND: {isSend: true},
+            DEVICE: {isDevice: true}
         };
 
     var eventDispatcher = lep.MidiEventDispatcher.getInstance(),
         transport = lep.util.getTransport(),
         currentMatrixMode = ko.observable(MATRIX_MODE.LAUNCHERS).extend({restoreable: true}),
+        currentFaderMode = ko.observable(FADER_MODE.VOLUME).extend({restoreable: true}),
         matrixWindow = lep.MatrixWindow.createMain(MATRIX_TRACKS, MATRIX_SENDS, MATRIX_SCENES, function (launcherSlot) {
             return new lep.KnockoutSyncedValue({
                 name: lep.util.formatString('{}Value', launcherSlot.name),
@@ -282,7 +289,9 @@ function ApcMini() {
                 name: 'MasterFader',
                 valueCC: CC.MASTER_FADER,
                 midiChannel: MIDI_CHANNEL,
-                isUnidirectional: true
+                isUnidirectional: true,
+                valueToAttach: ko.computed(function() {
+                })
             }),
             VOL_BTN: new lep.Button({
                 name: 'VolBtn',
@@ -290,8 +299,8 @@ function ApcMini() {
                 midiChannel: MIDI_CHANNEL,
                 valueToAttach: new lep.KnockoutSyncedValue({
                     name: 'VolMode',
-                    ownValue: VALUESET.VOLUME,
-                    refObservable: currentFaderValueSet,
+                    ownValue: FADER_MODE.VOLUME,
+                    refObservable: currentFaderMode,
                     restoreRefAfterLongClick: true,
                     velocityValueOn: COLOR.RED,
                     velocityValueOff: COLOR.OFF
@@ -303,8 +312,8 @@ function ApcMini() {
                 midiChannel: MIDI_CHANNEL,
                 valueToAttach: new lep.KnockoutSyncedValue({
                     name: 'PanMode',
-                    ownValue: VALUESET.PAN,
-                    refObservable: currentFaderValueSet,
+                    ownValue: FADER_MODE.PAN,
+                    refObservable: currentFaderMode,
                     restoreRefAfterLongClick: true,
                     velocityValueOn: COLOR.RED,
                     velocityValueOff: COLOR.OFF
@@ -316,8 +325,8 @@ function ApcMini() {
                 midiChannel: MIDI_CHANNEL,
                 valueToAttach: new lep.KnockoutSyncedValue({
                     name: 'SendMode',
-                    ownValue: VALUESET.SEND,
-                    refObservable: currentFaderValueSet,
+                    ownValue: FADER_MODE.SEND,
+                    refObservable: currentFaderMode,
                     restoreRefAfterLongClick: true,
                     velocityValueOn: COLOR.RED,
                     velocityValueOff: COLOR.OFF
@@ -329,8 +338,8 @@ function ApcMini() {
                 midiChannel: MIDI_CHANNEL,
                 valueToAttach: new lep.KnockoutSyncedValue({
                     name: 'DeviceMode',
-                    ownValue: VALUESET.DEVICE_PARAMS,
-                    refObservable: currentFaderValueSet,
+                    ownValue: FADER_MODE.DEVICE,
+                    refObservable: currentFaderMode,
                     restoreRefAfterLongClick: true,
                     ignoreClickIf: isShiftPressed,
                     velocityValueOn: COLOR.RED,
@@ -491,18 +500,20 @@ function ApcMini() {
     ApcMini.onFirstFlush = function() {
         ApcMini.onFirstFlush = null;
 
-        ko.computed(function() {
-            var faderValueSet = currentFaderValueSet(),
-                masterValue = (faderValueSet === VALUESET.PAN) ? VALUE.MASTER_PAN : VALUE.MASTER_VOLUME;
+        FADER_MODE.VOLUME.valueSet = VALUESET.VOLUME;
+        FADER_MODE.PAN.valueSet = VALUESET.PAN;
+        FADER_MODE.SEND.valueSet = VALUESET.SEND;
+        FADER_MODE.DEVICE.valueSet = VALUESET.DEVICE_PARAMS;
 
-            CONTROLSET.FADER_ROW.setValueSet(faderValueSet);
-            CONTROL.MASTER_FADER.attachValue(masterValue);
-        });
+        CONTROLSET.FADER_ROW.setObservableValueSet(ko.computed(function() {
+            return currentFaderMode().valueSet;
+        }));
 
         CONTROLSET.MATRIX.setObservableValueSet(ko.computed(function () {
             var matrixMode = currentMatrixMode();
             return (matrixMode === MATRIX_MODE.CONFIG) ? VALUESET.CONFIG :
-                (matrixMode === MATRIX_MODE.TRACK_STATES) ? VALUESET.TRACK_STATES : matrixWindow.launcherSlotValueSet();
+                   (matrixMode === MATRIX_MODE.TRACK_STATES) ? VALUESET.TRACK_STATES :
+                    matrixWindow.launcherSlotValueSet();
         }));
 
         lep.logDev('ApcMini ready.');
