@@ -1,4 +1,4 @@
-/* API Version - 2.1.3 */
+/* API Version - 2.2 */
 
 /**
  * Interface for an object that acts as a proxy for the actual object in Bitwig Studio (for example a track, a

@@ -1,4 +1,4 @@
-/* API Version - 2.1.3 */
+/* API Version - 2.2 */
 
 /**
  * Mode that defines how a {@link CursorDevice} follows a device within the {@link CursorTrack} it is created

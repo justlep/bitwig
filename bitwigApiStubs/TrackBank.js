@@ -1,4 +1,4 @@
-/* API Version - 2.1.3 */
+/* API Version - 2.2 */
 
 /**
  * A track bank provides access to a range of tracks and their scenes (clip launcher slots) in Bitwig Studio.

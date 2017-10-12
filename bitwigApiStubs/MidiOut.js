@@ -1,4 +1,4 @@
-/* API Version - 2.1.3 */
+/* API Version - 2.2 */
 
 /**
  * Instances of this interface are used to send MIDI messages to a specific MIDI hardware.

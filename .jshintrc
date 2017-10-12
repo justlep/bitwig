@@ -148,6 +148,7 @@
     "StringValue",
     "StringValueChangedCallback",
     "Subscribable",
+    "SysexBuilder",
     "SysexMidiDataReceivedCallback",
     "TimeSignatureValue",
     "Track",

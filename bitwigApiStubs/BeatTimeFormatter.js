@@ -1,4 +1,4 @@
-/* API Version - 2.1.3 */
+/* API Version - 2.2 */
 
 /**
  * Defines a formatter for a beat time that can convert a beat time to a string for display to the user.

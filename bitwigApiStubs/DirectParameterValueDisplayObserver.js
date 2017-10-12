@@ -1,4 +1,4 @@
-/* API Version - 2.1.3 */
+/* API Version - 2.2 */
 
 /**
  * This interface is used to configure observation of pretty-printed device parameter values.

@@ -1,4 +1,4 @@
-/* API Version - 2.1.3 */
+/* API Version - 2.2 */
 
 /**
  * This interface is used to store custom controller settings into the Bitwig Studio preferences. The settings

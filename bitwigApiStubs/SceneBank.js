@@ -1,4 +1,4 @@
-/* API Version - 2.1.3 */
+/* API Version - 2.2 */
 
 /**
  * A scene bank provides access to a range of scenes in Bitwig Studio. Instances of scene bank are configured

@@ -1,4 +1,4 @@
-/* API Version - 2.1.3 */
+/* API Version - 2.2 */
 
 /**
  * Represents a cursor that looks at a {@link RemoteControlsPage}.

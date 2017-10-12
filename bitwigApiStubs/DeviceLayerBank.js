@@ -1,4 +1,4 @@
-/* API Version - 2.1.3 */
+/* API Version - 2.2 */
 
 /**
  * Devices layers are features of special Bitwig Studio devices, more specifically the Layer Instrument and

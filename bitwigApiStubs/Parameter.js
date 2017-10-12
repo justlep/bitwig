@@ -1,4 +1,4 @@
-/* API Version - 2.1.3 */
+/* API Version - 2.2 */
 
 /**
  * Instances of this interface represent ranged parameters that can be controlled with automation in Bitwig

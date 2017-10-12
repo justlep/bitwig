@@ -1,4 +1,4 @@
-/* API Version - 2.1.3 */
+/* API Version - 2.2 */
 
 /**
  * A special kind of channel that follows a channel selection cursor in Bitwig Studio. The selection can

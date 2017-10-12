@@ -1,4 +1,4 @@
-/* API Version - 2.1.3 */
+/* API Version - 2.2 */
 
 function ClipLauncherSlotOrScene() {}
 
@@ -27,3 +27,19 @@ ClipLauncherSlotOrScene.prototype.launch = function() {};
  * @since API version 2
  */
 ClipLauncherSlotOrScene.prototype.sceneIndex = function() {};
+
+/**
+ * Copies the current slot or scene into the dest slot or scene.
+ *
+ * @param {ClipLauncherSlotOrScene} source
+ * @since API version 4
+ */
+ClipLauncherSlotOrScene.prototype.copyFrom = function(source) {};
+
+/**
+ * Moves the current slot or scene into the destination slot or scene.
+ *
+ * @param {ClipLauncherSlotOrScene} dest
+ * @since API version 4
+ */
+ClipLauncherSlotOrScene.prototype.moveTo = function(dest) {};

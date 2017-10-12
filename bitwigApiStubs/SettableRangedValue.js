@@ -1,4 +1,4 @@
-/* API Version - 2.1.3 */
+/* API Version - 2.2 */
 
 /**
  * Instances of this interface represent numeric values that have an upper and lower limit.
@@ -12,13 +12,25 @@ SettableRangedValue.prototype.constructor = SettableRangedValue;
 
 /**
  * Sets the value in an absolute fashion as a value between 0 .. 1 where 0 represents the minimum value and
- * 1 the maximum.
+ * 1 the maximum. The value may not be set immediately if the user has configured a take over strategy for
+ * the controller.
  *
  * @param value
           absolute value [0 .. 1]
  * @since API version 2
  */
 SettableRangedValue.prototype.set = function(value) {};
+
+/**
+ * Sets the value in an absolute fashion as a value between 0 .. 1 where 0 represents the minimum value and
+ * 1 the maximum. The value change is applied immediately and does not care about what take over mode the
+ * user has selected. This is useful if the value does not need take over (e.g. a motorized slider).
+ *
+ * @param value
+          absolute value [0 .. 1]
+ * @since API version 4
+ */
+SettableRangedValue.prototype.setImmediately = function(value) {};
 
 /**
  * Sets the value in an absolute fashion. The value will be scaled according to the given resolution.

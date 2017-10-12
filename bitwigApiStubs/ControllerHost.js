@@ -1,4 +1,4 @@
-/* API Version - 2.1.3 */
+/* API Version - 2.2 */
 
 /**
  * An interface representing the host application to the script. A singleton instance of this interface is
@@ -110,7 +110,7 @@ ControllerHost.prototype.platformIsLinux = function() {};
           For generating random UUID strings several free web tools are available.
  * @param author
           the name of the script author
-@since API version 1
+ * @since API version 1
  */
 ControllerHost.prototype.defineController = function(vendor, name, version, uuid, author) {};
 
@@ -135,7 +135,7 @@ ControllerHost.prototype.defineMidiPorts = function(numInports, numOutports) {};
  * @param index
           the index of the MIDI input port, must be valid.
  * @return {MidiIn} the requested MIDI input port
-@since API version 1
+ * @since API version 1
  */
 ControllerHost.prototype.getMidiInPort = function(index) {};
 
@@ -145,7 +145,7 @@ ControllerHost.prototype.getMidiInPort = function(index) {};
  * @param index
           the index of the MIDI output port, must be valid.
  * @return {MidiOut} the requested MIDI output port
-@since API version 1
+ * @since API version 1
  */
 ControllerHost.prototype.getMidiOutPort = function(index) {};
 
@@ -174,7 +174,7 @@ ControllerHost.prototype.addDeviceNameBasedDiscoveryPair = function(inputs, outp
  * in Bitwig Studio.
  *
  * @return {Preferences} an object that provides access to custom controller preferences
-@since API version 1
+ * @since API version 1
  */
 ControllerHost.prototype.getPreferences = function() {};
 
@@ -183,7 +183,7 @@ ControllerHost.prototype.getPreferences = function() {};
  * Studio.
  *
  * @return {DocumentState} an object that provides access to custom document settings
-@since API version 1
+ * @since API version 1
  */
 ControllerHost.prototype.getDocumentState = function() {};
 
@@ -213,7 +213,7 @@ ControllerHost.prototype.getProject = function() {};
  * desired.
  *
  * @return {Transport} an object that represents the `Transport` section in Bitwig Studio.
-@since API version 1
+ * @since API version 1
  */
 ControllerHost.prototype.createTransport = function() {};
 
@@ -222,7 +222,7 @@ ControllerHost.prototype.createTransport = function() {};
  * should be called once during initialization of the script if groove control is desired.
  *
  * @return {Groove} an object that represents the `Groove` section in Bitwig Studio.
-@since API version 1
+ * @since API version 1
  */
 ControllerHost.prototype.createGroove = function() {};
 
@@ -232,7 +232,7 @@ ControllerHost.prototype.createGroove = function() {};
  * document.
  *
  * @return {Application} an application object.
-@since API version 1
+ * @since API version 1
  */
 ControllerHost.prototype.createApplication = function() {};
 
@@ -241,7 +241,6 @@ ControllerHost.prototype.createApplication = function() {};
  * is equal to `createArranger(-1)`.
  *
  * @return {Arranger} an arranger object
-@see #createArranger(int)
  * @since API version 1
  */
 ControllerHost.prototype.createArranger = function() {};
@@ -253,7 +252,7 @@ ControllerHost.prototype.createArranger = function() {};
           the index of the window where the arranger panel is shown, or -1 in case the first arranger
           panel found on any window should be taken
  * @return {Arranger} an arranger object
-@since API version 1
+ * @since API version 1
  */
 ControllerHost.prototype.createArranger = function(window) {};
 
@@ -262,7 +261,7 @@ ControllerHost.prototype.createArranger = function(window) {};
  * equal to `createMixer(-1, null)`.
  *
  * @return {Mixer} a `Mixer` object
-@since API version 1
+ * @since API version 1
  */
 ControllerHost.prototype.createMixer = function() {};
 
@@ -276,7 +275,7 @@ ControllerHost.prototype.createMixer = function() {};
           the same way as `null`. To receive the list of available panel layouts see
           {@link Application#addPanelLayoutObserver}.
  * @return {Mixer} a `Mixer` object
-@since API version 1
+ * @since API version 1
  */
 ControllerHost.prototype.createMixer = function(panelLayout) {};
 
@@ -288,7 +287,7 @@ ControllerHost.prototype.createMixer = function(panelLayout) {};
           the index of the window where the mixer panel is shown, or -1 in case the first mixer panel
           found on any window should be taken
  * @return {Mixer} a `Mixer` object
-@since API version 1
+ * @since API version 1
  */
 ControllerHost.prototype.createMixer = function(window) {};
 
@@ -304,7 +303,7 @@ ControllerHost.prototype.createMixer = function(window) {};
           the index of the window where the mixer panel is shown, or -1 in case the first mixer panel
           found on any window should be taken
  * @return {Mixer} a `Mixer` object
-@since API version 1
+ * @since API version 1
  */
 ControllerHost.prototype.createMixer = function(panelLayout, window) {};
 
@@ -499,7 +498,7 @@ ControllerHost.prototype.createEditorCursorDevice = function(numSends) {};
  * @param gridHeight
           the number of keys spanned by one page of the note content grid.
  * @return {Clip} an object representing the currently selected cursor clip
-@since API version 1
+ * @since API version 1
  */
 ControllerHost.prototype.createLauncherCursorClip = function(gridWidth, gridHeight) {};
 
@@ -512,7 +511,7 @@ ControllerHost.prototype.createLauncherCursorClip = function(gridWidth, gridHeig
  * @param gridHeight
           the number of keys spanned by one page of the note content grid.
  * @return {Clip} an object representing the currently selected cursor clip
-@since API version 1
+ * @since API version 1
  */
 ControllerHost.prototype.createArrangerCursorClip = function(gridWidth, gridHeight) {};
 
@@ -524,7 +523,7 @@ ControllerHost.prototype.createArrangerCursorClip = function(gridWidth, gridHeig
  * @param numControllers
           the number of controls that are available for free assignments
  * @return {UserControlBank} An object that represents a set of custom user controls.
-@since API version 1
+ * @since API version 1
  */
 ControllerHost.prototype.createUserControls = function(numControllers) {};
 
@@ -534,6 +533,7 @@ ControllerHost.prototype.createUserControls = function(numControllers) {};
  *
  * @param {java.lang.Runnable} callback
  * @param {long} delay
+ * @since API version 2
  */
 ControllerHost.prototype.scheduleTask = function(callback, delay) {};
 
@@ -584,7 +584,7 @@ ControllerHost.prototype.showPopupNotification = function(text) {};
           the port that should be used for the connection. If the port is already in use, then another
           port will be used. Check {@link RemoteSocket#getPort()} on the returned object to be sure.
  * @return {RemoteSocket} the object that represents the socket
-@since API version 1
+ * @since API version 1
  */
 ControllerHost.prototype.createRemoteConnection = function(name, defaultPort) {};
 
@@ -598,7 +598,7 @@ ControllerHost.prototype.createRemoteConnection = function(name, defaultPort) {}
  * @param callback
           the callback function that gets called when the connection gets established. A single
           {@link RemoteConnection} parameter is passed into the callback function.
-@since API version 1
+ * @since API version 1
  */
 ControllerHost.prototype.connectToRemoteHost = function(host, port, callback) {};
 
@@ -612,7 +612,7 @@ ControllerHost.prototype.connectToRemoteHost = function(host, port, callback) {}
  * @param data
           the data to be send. When creating a numeric byte array in JavaScript, the byte values must be
           signed (in the range -128..127).
-@since API version 1
+ * @since API version 1
  */
 ControllerHost.prototype.sendDatagramPacket = function(host, port, data) {};
 
@@ -627,7 +627,7 @@ ControllerHost.prototype.sendDatagramPacket = function(host, port, data) {};
           the callback function that gets called when data arrives. The function receives a single
           parameter that contains the data byte array.
  * @return {boolean} {@true} if was possible to bind the port, false otherwise
-@since API version 1
+ * @since API version 1
  */
 ControllerHost.prototype.addDatagramPacketObserver = function(name, port, callback) {};
 

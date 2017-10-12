@@ -1,4 +1,4 @@
-/* API Version - 2.1.3 */
+/* API Version - 2.2 */
 
 function ColorValue() {}
 
@@ -14,7 +14,7 @@ ColorValue.prototype.constructor = ColorValue;
 ColorValue.prototype.red = function() {};
 
 /**
- * Gets the red component of the current value.
+ * Gets the green component of the current value.
  *
  * @return {float}
  * @since API version 2
@@ -22,9 +22,17 @@ ColorValue.prototype.red = function() {};
 ColorValue.prototype.green = function() {};
 
 /**
- * Gets the red component of the current value.
+ * Gets the blue component of the current value.
  *
  * @return {float}
  * @since API version 2
  */
 ColorValue.prototype.blue = function() {};
+
+/**
+ * Gets the alpha component of the current value.
+ *
+ * @return {float}
+ * @since API version 4
+ */
+ColorValue.prototype.alpha = function() {};

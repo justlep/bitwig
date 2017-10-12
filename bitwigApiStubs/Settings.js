@@ -1,4 +1,4 @@
-/* API Version - 2.1.3 */
+/* API Version - 2.2 */
 
 /**
  * This interface builds the foundation for storing custom settings in Bitwig Studio documents or in the

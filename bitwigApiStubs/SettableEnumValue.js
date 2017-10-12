@@ -1,4 +1,4 @@
-/* API Version - 2.1.3 */
+/* API Version - 2.2 */
 
 /**
  * Instances of this interface represent enumeration values. Enum values work similar to string values, but

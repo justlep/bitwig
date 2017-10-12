@@ -1,4 +1,4 @@
-/* API Version - 2.1.3 */
+/* API Version - 2.2 */
 
 /**
  * Represents a page of remote controls in a device.
@@ -15,3 +15,8 @@ RemoteControlsPage.prototype.constructor = RemoteControlsPage;
  * @return {RemoteControl}
  */
 RemoteControlsPage.prototype.getParameter = function(indexInBank) {};
+
+/**
+ * @return {StringValue}
+ */
+RemoteControlsPage.prototype.getName = function() {};

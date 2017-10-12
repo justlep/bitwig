@@ -1,4 +1,4 @@
-/* API Version - 2.1.3 */
+/* API Version - 2.2 */
 
 /**
  * An interface that provides access to the contents of a clip in Bitwig Studio.
