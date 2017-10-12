@@ -16,7 +16,7 @@ module.exports = function (grunt, opts) {
     grunt.registerTask(TASK_NAME, 'Copies an altered .jshintrc to the api path.', () => {
 
         let FN_OR_CLASS_REGEX = /function[\s\t]+([a-z0-9_]+)\(/ig,
-            API_VERSION_REGEX = /\/\* API Version - (\d\.\d+.\d+[^ ]*) \*\//,
+            API_VERSION_REGEX = /\/\* API Version - (\d\.\d+[.0-9A-Za-z-]*) \*\//,
             jshintrc = grunt.file.readJSON('.jshintrc.in'),
             apiStubFiles = grunt.file.expand(['bitwigApiStubs/**/*.js']),
             globalClasses = [],
