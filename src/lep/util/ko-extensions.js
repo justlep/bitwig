@@ -56,17 +56,29 @@ ko.extenders.toggleable = function(target /*, opts */) {
  * that can be called to restore its value from before the last change.
  * @param target {ko.observable}
  */
-ko.extenders.restoreable = function(target /*, opts */) {
-    lep.util.assert(ko.isWriteableObservable(target), 'Cannot use toggleable extender on readonly observables');
-
-    target.subscribe(function(oldValue) {
-        target.__rst_previousValue__ = oldValue;
-    }, null, 'beforeChange');
-
-    target.restore = function() {
-        if (target.__rst_previousValue__ !== undefined) {
-            target(target.__rst_previousValue__);
+ko.extenders.restoreable = (function() {
+    const DESCRIPTOR = {
+        enumerable: false,
+        configurable: false,
+        get: function() {
+            return this.__rst_previousValue__;
         }
     };
-    return target;
-};
+
+    return function(target /*, opts */) {
+        lep.util.assert(ko.isWriteableObservable(target), 'Cannot use toggleable extender on readonly observables');
+
+        target.subscribe(function(oldValue) {
+            target.__rst_previousValue__ = oldValue;
+        }, null, 'beforeChange');
+
+        Object.defineProperty(target, 'previousValue', DESCRIPTOR);
+
+        target.restore = function() {
+            if (target.__rst_previousValue__ !== undefined) {
+                target(target.__rst_previousValue__);
+            }
+        };
+        return target;
+    };
+})();

@@ -77,6 +77,29 @@ describe('ko-extensions.js', function() {
         assert.strictEqual(o3(), true);
     });
 
+    it('provides readonly access to the previous value via previousValue', function() {
+        var o1 = ko.observable(),
+            o2 = ko.observable().extend({restoreable: true});
+
+        assert.isUndefined(o1.previousValue);
+        assert.isUndefined(o2.previousValue);
+        o1(11);
+        o2(22);
+        assert.isUndefined(o1.previousValue);
+        assert.isUndefined(o2.previousValue);
+        o1(111);
+        o2(222);
+        assert.isUndefined(o1.previousValue);
+        assert.strictEqual(o2.previousValue, 22);
+        assert.strictEqual(o2(), 222);
+        o2.restore();
+        assert.strictEqual(o2(), 22);
+        assert.strictEqual(o2.previousValue, 222);
+        o2.previousValue = 666;
+        // previousValue is readonly, so the previous assignment should have no effect
+        assert.strictEqual(o2.previousValue, 222);
+    });
+
     it('can restore previous values using the restoreable extender', function() {
         var o1 = ko.observable().extend({restoreable: true}),
             o2 = ko.observable(5).extend({restoreable: true});
