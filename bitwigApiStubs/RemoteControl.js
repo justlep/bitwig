@@ -1,4 +1,4 @@
-/* API Version - 2.2 */
+/* API Version - 2.2.3 */
 
 /**
  * Represents a remote control in Bitwig Studio.

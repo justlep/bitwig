@@ -1,4 +1,4 @@
-/* API Version - 2.2 */
+/* API Version - 2.2.3 */
 
 /**
  * A channel bank provides access to a range of channels in Bitwig Studio, such as tracks or device layers.

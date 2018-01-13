@@ -1,4 +1,4 @@
-/* API Version - 2.2 */
+/* API Version - 2.2.3 */
 
 /**
  * An interface representing various commands which can be performed on the Bitwig Studio arranger.<br/>

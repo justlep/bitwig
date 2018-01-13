@@ -11,7 +11,7 @@ module.exports = function (grunt, opts) {
 
     const TASK_NAME = 'generateJshintConfig',
           TARGET_JSHINTRC = './.jshintrc',
-          TARGET_SUMMARY_FILE = './bitwigApiStubs/!globalsList.txt';
+          TARGET_SUMMARY_FILE = './bitwigApiStubs/!all-globals-list.txt';
 
     grunt.registerTask(TASK_NAME, 'Copies an altered .jshintrc to the api path.', () => {
 

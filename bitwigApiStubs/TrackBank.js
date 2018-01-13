@@ -1,4 +1,4 @@
-/* API Version - 2.2 */
+/* API Version - 2.2.3 */
 
 /**
  * A track bank provides access to a range of tracks and their scenes (clip launcher slots) in Bitwig Studio.
@@ -32,7 +32,7 @@ TrackBank.prototype.constructor = TrackBank;
 TrackBank.prototype.getChannel = function(indexInBank) {};
 
 /**
- * {@link SceneBank} that represents a view on the screnes in this {@link TrackBank}.
+ * {@link SceneBank} that represents a view on the scenes in this {@link TrackBank}.
  *
  * @return {SceneBank}
  * @since API version 2

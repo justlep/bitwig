@@ -1,4 +1,4 @@
-/* API Version - 2.2 */
+/* API Version - 2.2.3 */
 
 /**
  * Instances of this interface are used to setup handler functions for incoming MIDI messages from a specific

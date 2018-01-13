@@ -1,4 +1,4 @@
-/* API Version - 2.2 */
+/* API Version - 2.2.3 */
 
 /**
  * Defines an extension that enabled a controller to work with Bitwig Studio.

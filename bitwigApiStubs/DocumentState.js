@@ -1,4 +1,4 @@
-/* API Version - 2.2 */
+/* API Version - 2.2.3 */
 
 /**
  * This interface is used to save custom script settings inside Bitwig Studio documents. The settings are

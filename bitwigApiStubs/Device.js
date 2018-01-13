@@ -1,4 +1,4 @@
-/* API Version - 2.2 */
+/* API Version - 2.2.3 */
 
 /**
  * This interface represents a device in Bitwig Studio, both internal devices and plugins.

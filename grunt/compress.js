@@ -31,7 +31,7 @@ module.exports = function (grunt, opts) {
                 mode: 'zip',
                 level: 1,
                 pretty: true,
-                archive: 'bitwigApiStubs/!unmodifiedApiStubs.zip',
+                archive: 'bitwigApiStubs/!unmodified-stubs.zip',
                 comment: 'Original API stubs from the Bitwig installation'
             },
             files: [

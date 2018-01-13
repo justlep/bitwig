@@ -1,4 +1,4 @@
-/* API Version - 2.2 */
+/* API Version - 2.2.3 */
 
 /**
  * An interface representing the host application to the script. A singleton instance of this interface is

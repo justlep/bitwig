@@ -1,4 +1,4 @@
-/* API Version - 2.2 */
+/* API Version - 2.2.3 */
 
 /**
  * A bank provides access to a range of items in Bitwig Studio. Instances of a bank are configured with a

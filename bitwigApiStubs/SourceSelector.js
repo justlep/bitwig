@@ -1,4 +1,4 @@
-/* API Version - 2.2 */
+/* API Version - 2.2.3 */
 
 /**
  * Instance of this class represent sources selectors in Bitwig Studio, which are shown as choosers in the

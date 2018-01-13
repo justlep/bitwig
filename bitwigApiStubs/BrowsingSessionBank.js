@@ -1,4 +1,4 @@
-/* API Version - 2.2 */
+/* API Version - 2.2.3 */
 
 /**
  * Instances of this interface are used to navigate the available sessions in Bitwig Studio's contextual

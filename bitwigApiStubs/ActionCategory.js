@@ -1,4 +1,4 @@
-/* API Version - 2.2 */
+/* API Version - 2.2.3 */
 
 /**
  * Instances of this interface are used to categorize actions in Bitwig Studio. The list of action categories

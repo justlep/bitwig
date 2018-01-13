@@ -1,4 +1,4 @@
-/* API Version - 2.2 */
+/* API Version - 2.2.3 */
 
 /**
  * This interface is used for navigation of device chains in Bitwig Studio. Instances are configured with a

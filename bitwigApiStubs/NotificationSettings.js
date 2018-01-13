@@ -1,4 +1,4 @@
-/* API Version - 2.2 */
+/* API Version - 2.2.3 */
 
 /**
  * Bitwig Studio supports automatic visual feedback from controllers that shows up as popup notifications. For

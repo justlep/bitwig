@@ -1,8 +1,8 @@
 
-***************************************************************
+*****************************************************************
 Last result of `grunt generateJshintConfig`
-API version 2.2 | 161 files | 142 classes | 42 global functions
-***************************************************************
+API version 2.2.3 | 161 files | 142 classes | 42 global functions
+*****************************************************************
 
 Global functions: 
  - addPageNamesObserver
