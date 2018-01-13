@@ -176,7 +176,7 @@ lep.BaseControl.prototype = {
         }
     },
     bindMidiValueListener: function() {
-        var eventDispatcher = lep.MidiEventDispatcher.getInstance({midiInPort: this.midiInPort});
+        var eventDispatcher = lep.MidiEventDispatcher.getInstance(this.midiInPort);
         if (this.useValueNote) {
             eventDispatcher.onNote(this.valueNote, this.onValueReceived, this, this.listeningMidiChannel);
             lep.logDebug('MIDI bound: {} -> note {} channel {}', this.name, this.valueNote, this.listeningMidiChannel);

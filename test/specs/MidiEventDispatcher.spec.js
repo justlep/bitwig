@@ -1,3 +1,5 @@
+/*global describe, it, beforeEach */
+
 var chai = require('chai'),
     assert = chai.assert,
     spies = require('chai-spies'),
@@ -14,21 +16,22 @@ describe('lep.MidiEventDispatcher', function() {
         med1;
 
     beforeEach(function() {
-        med0 = lep.MidiEventDispatcher.getInstance({
-            midiInPort: 0
-        });
-        med1 = lep.MidiEventDispatcher.getInstance({
-            midiInPort: 1
-        });
+        med0 = lep.MidiEventDispatcher.getInstance(0);
+        med1 = lep.MidiEventDispatcher.getInstance(1);
     });
 
     it('creates one reused instance per inPort', function() {
         var medDefault = lep.MidiEventDispatcher.getInstance(),
             medDefault2 = lep.MidiEventDispatcher.getInstance(),
-            med5_1 = lep.MidiEventDispatcher.getInstance({midiInPort: 5}),
-            med5_2 = lep.MidiEventDispatcher.getInstance({midiInPort: 5});
+            med5_1 = lep.MidiEventDispatcher.getInstance(5),
+            med5_2 = lep.MidiEventDispatcher.getInstance(5);
 
-        assert.isObject(medDefault);
+        assert.instanceOf(medDefault, lep.MidiEventDispatcher);
+        assert.instanceOf(medDefault2, lep.MidiEventDispatcher);
+        assert.instanceOf(med0, lep.MidiEventDispatcher);
+        assert.instanceOf(med1, lep.MidiEventDispatcher);
+        assert.instanceOf(med5_1, lep.MidiEventDispatcher);
+        assert.instanceOf(med5_2, lep.MidiEventDispatcher);
         assert.strictEqual(medDefault, medDefault2);
         assert.strictEqual(medDefault, med0);
         assert.notStrictEqual(med0, med1);
@@ -55,20 +58,20 @@ describe('lep.MidiEventDispatcher', function() {
 
         med0.onNotePressed(55, SPY.NOTE55A.ON, null, CH_A);
         med0.onNoteReleased(55, SPY.NOTE55A.OFF, null, CH_A);
-        med0.onCC(88, SPY.CC88A)
+        med0.onCC(88, SPY.CC88A);
 
         host.mockNoteOn(0, 55, 127, CH_A);
-        expect(SPY.NOTE55A.ON).to.have.been.called.once;
-        expect(SPY.NOTE55A.ON).to.have.been.called.with(55,127,CH_A)
+        expect(SPY.NOTE55A.ON).to.have.been.called.once();
+        expect(SPY.NOTE55A.ON).to.have.been.called.with(55,127,CH_A);
 
         host.mockNoteOn(0, 55, 66, CH_A);
-        expect(SPY.NOTE55A.ON).to.have.been.called.with(55,66,CH_A)
-        expect(SPY.NOTE55A.ON).to.have.been.called.twice; // different note should not call the handler
+        expect(SPY.NOTE55A.ON).to.have.been.called.with(55,66,CH_A);
+        expect(SPY.NOTE55A.ON).to.have.been.called.twice(); // different note should not call the handler
 
         host.mockNoteOn(0, 50, 127, CH_A);
-        expect(SPY.NOTE55A.ON).to.have.been.called.twice;
+        expect(SPY.NOTE55A.ON).to.have.been.called.twice();
         host.mockNoteOn(1, 55, 127, CH_A);
-        expect(SPY.NOTE55A.ON).to.have.been.called.twice; // different input should not call the handler
+        expect(SPY.NOTE55A.ON).to.have.been.called.twice(); // different input should not call the handler
 
         expect(SPY.NOTE55B.ON).to.not.have.been.called();
         expect(SPY.NOTE55B.OFF).to.not.have.been.called();
@@ -88,14 +91,14 @@ describe('lep.MidiEventDispatcher', function() {
         med0.onCC(77, SPY.CC77_CHANNEL15, null, 15);      // channel-dependent
 
         // trigger notes and CCs on the "wrong" input
-        for (var channel = 0, VALUE; channel <= 15; channel ++) {
+        for (let channel = 0, VALUE; channel <= 15; channel ++) {
             VALUE = (channel + 1) * 3;
             host.mockNoteOn(1, 77, VALUE, channel);
             host.mockCC(1, 77, VALUE, channel);
             expect(SPY.NOTE77_ANYCHANNEL.ON).to.not.have.been.called();
             expect(SPY.NOTE77_CHANNEL14.OFF).to.not.have.been.called();
         }
-        for (var channel = 0, VALUE; channel <= 15; channel ++) {
+        for (let channel = 0, VALUE; channel <= 15; channel ++) {
             VALUE = (channel + 1) * 3;
             host.mockNoteOn(0, 77, VALUE, channel);
             expect(SPY.NOTE77_ANYCHANNEL.ON).to.have.been.called.with(77, VALUE, channel);
@@ -110,7 +113,7 @@ describe('lep.MidiEventDispatcher', function() {
         expect(SPY.CC77_ANYCHANNEL).to.not.have.been.called();
         expect(SPY.CC77_CHANNEL15).to.not.have.been.called();
 
-        for (var channel = 0, VALUE; channel <= 15; channel ++) {
+        for (let channel = 0, VALUE; channel <= 15; channel ++) {
             VALUE = (channel + 1) * 3;
             host.mockCC(0, 77, VALUE, channel);
             expect(SPY.CC77_ANYCHANNEL).to.have.been.called.with(77, VALUE, channel);
@@ -161,8 +164,8 @@ describe('lep.MidiEventDispatcher', function() {
             NOTE = 55,
             CHANNEL = 7,
             OTHERCHANNEL = 15,
-            strictMED = lep.MidiEventDispatcher.getInstance({midiInPort: PORT_STRICT, strictNoteOff: true}),
-            looseMED= lep.MidiEventDispatcher.getInstance({midiInPort: PORT_LOOSE}),
+            strictMED = lep.MidiEventDispatcher.getInstance(PORT_STRICT).setStrictNoteOff(true),
+            looseMED= lep.MidiEventDispatcher.getInstance(PORT_LOOSE),
             SPY = {
                 STRICT_ON: chai.spy(),
                 STRICT_OFF: chai.spy(),
@@ -178,14 +181,14 @@ describe('lep.MidiEventDispatcher', function() {
         strictMED.onNoteReleased(NOTE, SPY.STRICT_OFF);
 
         host.mockNoteOn(PORT_STRICT, NOTE, 0, CHANNEL);
-        expect(SPY.STRICT_ON).to.have.been.called.once;
+        expect(SPY.STRICT_ON).to.have.been.called.once();
         expect(SPY.STRICT_OFF).to.not.have.been.called();
-        host.mockNoteOn(PORT_STRICT, NOTE, 123, CHANNEL)
+        host.mockNoteOn(PORT_STRICT, NOTE, 123, CHANNEL);
         expect(SPY.STRICT_ON).to.have.been.called.exactly(2);
         expect(SPY.STRICT_OFF).to.not.have.been.called();
         host.mockNoteOff(PORT_STRICT, NOTE, 0, CHANNEL);
         expect(SPY.STRICT_ON).to.have.been.called.exactly(2);
-        expect(SPY.STRICT_OFF).to.have.been.called.once;
+        expect(SPY.STRICT_OFF).to.have.been.called.once();
         expect(SPY.STRICT_OFF).to.have.been.called.with(NOTE, 0, CHANNEL);
 
 
@@ -196,12 +199,12 @@ describe('lep.MidiEventDispatcher', function() {
 
         host.mockNoteOn(PORT_LOOSE, NOTE, 0, CHANNEL);
         expect(SPY.LOOSE_ON).to.not.have.been.called();
-        expect(SPY.LOOSE_OFF).to.have.been.called.once;
-        host.mockNoteOn(PORT_LOOSE, NOTE, 123, CHANNEL)
-        expect(SPY.LOOSE_ON).to.have.been.called.once;
-        expect(SPY.LOOSE_OFF).to.have.been.called.once;
+        expect(SPY.LOOSE_OFF).to.have.been.called.once();
+        host.mockNoteOn(PORT_LOOSE, NOTE, 123, CHANNEL);
+        expect(SPY.LOOSE_ON).to.have.been.called.once();
+        expect(SPY.LOOSE_OFF).to.have.been.called.once();
         host.mockNoteOff(PORT_LOOSE, NOTE, 0, CHANNEL);
-        expect(SPY.LOOSE_ON).to.have.been.called.once;
+        expect(SPY.LOOSE_ON).to.have.been.called.once();
         expect(SPY.LOOSE_OFF).to.have.been.called.exactly(2);
         expect(SPY.LOOSE_OFF).to.have.been.called.with(NOTE, 0, CHANNEL);
         host.mockNoteOff(PORT_LOOSE, NOTE, 0, OTHERCHANNEL);

@@ -5,6 +5,9 @@
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  */
 
+// dirt alert: found no cleaner way to let IntelliJ know global `host` is an instance of ControllerHost, not Host :-/
+/** @typedef {ControllerHost} Host */
+
 var lep = {};
 
 load('../lib/knockout-stripped.js');
