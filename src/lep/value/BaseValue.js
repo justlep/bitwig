@@ -1,6 +1,4 @@
 /**
- * @abstract
- *
  * Base class representing a single value than can be connected to both Bitwig and
  * a hardware controller's element (encoder and such) via BaseControl.js or subclass.
  *
