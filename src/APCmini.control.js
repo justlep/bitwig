@@ -42,15 +42,19 @@ function ApcMini() {
             MATRIX_START_NOTES_BY_ROW: [56, 48, 40, 32, 24, 16, 8, 0],
             SIDE_BUTTONS_START: 82,
             BOTTOM_BUTTONS_START: 64,
-            SHIFT_BUTTON: 98
+            SHIFT_BUTTON: 98,
+            ARROW_UP: 64,
+            ARROW_DOWN: 65,
+            ARROW_LEFT: 66,
+            ARROW_RIGHT: 67
         },
         ACTION_NOTE = {
             MATRIX_UP: NOTE.BOTTOM_BUTTONS_START,
             MATRIX_DOWN: NOTE.BOTTOM_BUTTONS_START + 1,
             MATRIX_LEFT: NOTE.BOTTOM_BUTTONS_START + 2,
             MATRIX_RIGHT: NOTE.BOTTOM_BUTTONS_START + 3,
-            MATRIX_ROTATE: NOTE.SIDE_BUTTONS_START + 5,
-            TRACK_STATES_MODE: NOTE.SIDE_BUTTONS_START + 6,
+            MATRIX_MODE: NOTE.SIDE_BUTTONS_START + 5,
+            MIX_MODE: NOTE.SIDE_BUTTONS_START + 6,
             STOP_ALL: NOTE.SIDE_BUTTONS_START + 7,
             VOL: NOTE.BOTTOM_BUTTONS_START + 4,
             PAN: NOTE.BOTTOM_BUTTONS_START + 5,
@@ -73,7 +77,7 @@ function ApcMini() {
         MATRIX_MODE = {
             LAUNCHERS: {isLaunchers: true},
             CONFIG: {isConfig: true},
-            TRACK_STATES: {isTrackStates: true}
+            MIX: {isMix: true}
         },
         FADER_MODE = {
             VOLUME: {isVolume: true},
@@ -192,7 +196,7 @@ function ApcMini() {
 
             return xy;
         })(),
-        TRACK_STATE_VALUESETS = (function() {
+        MIX_VALUESETS = (function() {
             lep.ToggledValue.setArmVelocityValues(COLOR.RED_BLINK, COLOR.RED);
             lep.ToggledValue.setMuteVelocityValues(COLOR.YELLOW_BLINK, COLOR.YELLOW);
             lep.ToggledValue.setSoloVelocityValues(COLOR.GREEN_BLINK, COLOR.GREEN);
@@ -234,15 +238,15 @@ function ApcMini() {
                         });
                 }
             }),
-            TRACK_STATES: new lep.ValueSet('TrackStates', 8, 8, function(col, row) {
+            MIX: new lep.ValueSet('MixValues', 8, 8, function(col, row) {
                 switch(row) {
-                    case 4: return TRACK_STATE_VALUESETS.ARM.values[col];
-                    case 5: return TRACK_STATE_VALUESETS.SOLO.values[col];
-                    case 6: return TRACK_STATE_VALUESETS.MUTE.values[col];
-                    case 7: return TRACK_STATE_VALUESETS.SELECT.values[col];
+                    case 4: return MIX_VALUESETS.ARM.values[col];
+                    case 5: return MIX_VALUESETS.SOLO.values[col];
+                    case 6: return MIX_VALUESETS.MUTE.values[col];
+                    case 7: return MIX_VALUESETS.SELECT.values[col];
                 }
                 return new lep.BaseValue({
-                    name: lep.util.formatString('UnusedTrackStateSlot{}{}', col, row),
+                    name: lep.util.formatString('UnusedMixSlot{}{}', col, row),
                     value: COLOR.OFF
                 });
             })
@@ -273,28 +277,28 @@ function ApcMini() {
                 });
             })
         },
-        isTrackStateModeEnabled = ko.computed({
+        isMixModeEnabled = ko.computed({
             read: function() {
-                return currentMatrixMode().isTrackStates;
+                return currentMatrixMode().isMix;
             },
             write: function(switchOn) {
-                if (!switchOn || currentMatrixMode().isTrackStates) {
+                if (!switchOn || currentMatrixMode().isMix) {
                     currentMatrixMode(MATRIX_MODE.LAUNCHERS); // toggle back to launcher-mode
                 } else {
-                    currentMatrixMode(MATRIX_MODE.TRACK_STATES);
+                    currentMatrixMode(MATRIX_MODE.MIX);
                 }
             }
         }).extend({ notify: 'always'});
 
     function initTrackControls() {
         new lep.Button({
-            name: 'TrackStateModeBtn',
-            clickNote: ACTION_NOTE.TRACK_STATES_MODE,
+            name: 'MixModeBtn',
+            clickNote: ACTION_NOTE.MIX_MODE,
             midiChannel: MIDI_CHANNEL,
             valueToAttach: new lep.KnockoutSyncedValue({
-                name: 'TrackStateMode',
+                name: 'MixMode',
                 ownValue: true,
-                refObservable: isTrackStateModeEnabled,
+                refObservable: isMixModeEnabled,
                 forceRewrite: true,
                 restoreRefAfterLongClick: true,
                 velocityValueOn: COLOR.GREEN,
@@ -433,23 +437,23 @@ function ApcMini() {
 
         new lep.Button({
             name: 'UpBtn',
-            clickNote: ACTION_NOTE.MATRIX_UP,
+            clickNote: NOTE.ARROW_UP,
             midiChannel: MIDI_CHANNEL,
             valueToAttach: ko.computed(function() {
-                return currentMatrixMode().isTrackStates ? FADER_VALUESET_PREV_PAGE_VALUE : MATRIX_UP_VALUE;
+                return currentMatrixMode().isMix ? FADER_VALUESET_PREV_PAGE_VALUE : MATRIX_UP_VALUE;
             })
         });
         new lep.Button({
             name: 'DownBtn',
-            clickNote: ACTION_NOTE.MATRIX_DOWN,
+            clickNote: NOTE.ARROW_DOWN,
             midiChannel: MIDI_CHANNEL,
             valueToAttach: ko.computed(function() {
-                return currentMatrixMode().isTrackStates ? FADER_VALUESET_NEXT_PAGE_VALUE : MATRIX_DOWN_VALUE;
+                return currentMatrixMode().isMix ? FADER_VALUESET_NEXT_PAGE_VALUE : MATRIX_DOWN_VALUE;
             })
         });
         new lep.Button({
             name: 'LeftBtn',
-            clickNote: ACTION_NOTE.MATRIX_LEFT,
+            clickNote: NOTE.ARROW_LEFT,
             midiChannel: MIDI_CHANNEL,
             valueToAttach: ko.computed(function() {
                 // TODO if device mode, left/right should scroll to the previous/next device
@@ -458,7 +462,7 @@ function ApcMini() {
         });
         new lep.Button({
             name: 'RightBtn',
-            clickNote: ACTION_NOTE.MATRIX_RIGHT,
+            clickNote: NOTE.ARROW_RIGHT,
             midiChannel: MIDI_CHANNEL,
             valueToAttach: ko.computed(function() {
                 // TODO if device mode, left/right should scroll to the previous/next device
@@ -467,7 +471,7 @@ function ApcMini() {
         });
         new lep.Button({
             name: 'MatrixLauncherModeBtn',
-            clickNote: ACTION_NOTE.MATRIX_ROTATE,
+            clickNote: ACTION_NOTE.MATRIX_MODE,
             midiChannel: MIDI_CHANNEL,
             valueToAttach: new lep.KnockoutSyncedValue({
                 name: 'MatrixLauncherMode',
@@ -552,7 +556,7 @@ function ApcMini() {
         CONTROLSET.MATRIX.setObservableValueSet(ko.computed(function () {
             var matrixMode = currentMatrixMode();
             return (matrixMode.isConfig) ? VALUESET.CONFIG :
-                   (matrixMode.isTrackStates) ? VALUESET.TRACK_STATES :
+                   (matrixMode.isMix) ? VALUESET.MIX :
                     matrixWindow.launcherSlotValueSet();
         }));
 
