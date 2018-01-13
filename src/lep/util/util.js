@@ -11,6 +11,7 @@ lep.util = (function() {
 
     var idsCounter = 0,
         transportInstance = null,
+        playingObservable = null,
         /**
          * Throws an error;
          * To be called from within one of the static assert* methods.
@@ -40,6 +41,15 @@ lep.util = (function() {
                 transportInstance = host.createTransport();
             }
             return transportInstance;
+        },
+        /**
+         * @return {ko.observable} a boolean knockout observable telling if Bitwig is currently playing
+         */
+        getTransportIsPlayingObservable: function() {
+            if (!playingObservable) {
+                playingObservable = ko.computed( ko.observable(false).updatedByBitwigValue( this.getTransport().isPlaying() ) );
+            }
+            return playingObservable;
         },
         /**
          * Returns a given String with placeholders replaced.

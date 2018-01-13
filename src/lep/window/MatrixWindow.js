@@ -10,7 +10,7 @@
  * @param numSends {Number}
  * @param [numScenes] {Number} optional; must be 0 or empty if no `trackBank` is given
  * @param [trackBank] {TrackBank|null} if null, a MainTrackBank with 0 scenes will be created
- * @extends TrackWindow
+ * @extends lep.TrackWindow
  * @constructor
  */
 lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
