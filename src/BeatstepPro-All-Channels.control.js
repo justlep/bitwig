@@ -27,6 +27,7 @@ host.defineMidiPorts(1, 1);
 
 function init() {
     lep.setLogLevel(lep.LOGLEVEL.WARN);
+    /*global BeatstepPro */
     BeatstepPro.getInstanceForAllChannels();
     println('\n-------------\nBeatstepPro ready (all channels)');
 }
