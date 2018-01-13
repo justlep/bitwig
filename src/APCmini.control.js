@@ -136,6 +136,11 @@ function ApcMini() {
                 //lep.logDev('Shift: {}', isPressed);
             });
         }),
+        createShiftCurriedHandler = function(fn) {
+            return function() {
+                fn(isShiftPressed.peek());
+            }
+        },
         isPlaying = ko.observable(false).updatedByBitwigValue(transport.isPlaying()),
         calcToggledConfigValueVelocity = function(isToggledOn) {
             return isToggledOn ? COLOR.GREEN : COLOR.YELLOW;
@@ -354,7 +359,7 @@ function ApcMini() {
                 name: 'MatrixLeft',
                 ownValue: true,
                 refObservable: matrixWindow.canMoveMatrixLeft,
-                onClick: matrixWindow.moveMatrixLeft,
+                onClick: createShiftCurriedHandler(matrixWindow.moveMatrixLeft),
                 velocityValueOn: COLOR.RED,
                 velocityValueOff: COLOR.OFF
             }),
@@ -362,7 +367,7 @@ function ApcMini() {
                 name: 'MatrixRight',
                 ownValue: true,
                 refObservable: matrixWindow.canMoveMatrixRight,
-                onClick: matrixWindow.moveMatrixRight,
+                onClick: createShiftCurriedHandler(matrixWindow.moveMatrixRight),
                 velocityValueOn: COLOR.RED,
                 velocityValueOff: COLOR.OFF
             }),
@@ -386,7 +391,7 @@ function ApcMini() {
                 name: 'MatrixUp',
                 ownValue: true,
                 refObservable: matrixWindow.canMoveMatrixUp,
-                onClick: matrixWindow.moveMatrixUp,
+                onClick: createShiftCurriedHandler(matrixWindow.moveMatrixUp),
                 velocityValueOn: COLOR.RED,
                 velocityValueOff: COLOR.OFF
             }),
@@ -394,7 +399,7 @@ function ApcMini() {
                 name: 'MatrixDown',
                 ownValue: true,
                 refObservable: matrixWindow.canMoveMatrixDown,
-                onClick: matrixWindow.moveMatrixDown,
+                onClick: createShiftCurriedHandler(matrixWindow.moveMatrixDown),
                 velocityValueOn: COLOR.RED,
                 velocityValueOff: COLOR.OFF
             }),

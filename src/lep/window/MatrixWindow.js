@@ -110,17 +110,21 @@ lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
             return self.isOrientationTracksByScenes() ? self.canMoveChannelForth() : self.canMoveSceneForth();
         });
 
-        this.moveMatrixUp = function() {
-            void( self.isOrientationTracksByScenes() ? self.moveSceneBack() : self.moveChannelBack() );
+        this.moveMatrixUp = function(onePage) {
+            void( onePage ? ( self.isOrientationTracksByScenes() ? self.moveScenePageBack() : self.moveChannelPageBack() ) :
+                            ( self.isOrientationTracksByScenes() ? self.moveSceneBack() : self.moveChannelBack() ));
         };
-        this.moveMatrixDown = function() {
-            void( self.isOrientationTracksByScenes() ? self.moveSceneForth() : self.moveChannelForth() );
+        this.moveMatrixDown = function(onePage) {
+            void( onePage ? ( self.isOrientationTracksByScenes() ? self.moveScenePageForth() : self.moveChannelPageForth() ) :
+                            ( self.isOrientationTracksByScenes() ? self.moveSceneForth() : self.moveChannelForth() ));
         };
-        this.moveMatrixLeft = function() {
-            void( self.isOrientationTracksByScenes() ? self.moveChannelBack() : self.moveSceneBack() );
+        this.moveMatrixLeft = function(onePage) {
+            void( onePage ? ( self.isOrientationTracksByScenes() ? self.moveChannelPageBack() : self.moveScenePageBack() ) :
+                            ( self.isOrientationTracksByScenes() ? self.moveChannelBack() : self.moveSceneBack() ));
         };
-        this.moveMatrixRight = function() {
-            void( self.isOrientationTracksByScenes() ? self.moveChannelForth() : self.moveSceneForth() );
+        this.moveMatrixRight = function(onePage) {
+            void( onePage ? ( self.isOrientationTracksByScenes() ? self.moveChannelPageForth() : self.moveScenePageForth() ) :
+                            ( self.isOrientationTracksByScenes() ? self.moveChannelForth() : self.moveSceneForth() ));
         };
 
         /**
