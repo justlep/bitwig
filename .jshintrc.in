@@ -1,11 +1,8 @@
 {
     "passfail": false,
     "maxerr": 100,
-
     "maxlen": 145,
-
     "browser": false,
-
     "node": true,
     "rhino": false,
     "couch": false,
@@ -15,25 +12,17 @@
     "prototypejs": false,
     "mootools": false,
     "dojo": false,
-
-    "predef": [
-        "loadAPI",
-        "load"
-    ],
-
     "debug": false,
     "devel": true,
-
     "globals": {
         "lep": true,
-        "ko": true,
-        "host": true,
-        "BeatstepPro": true
+        "ko": false,
+        "host": false,
+        "load": false,
+        "loadAPI": false
     },
-
     "strict": false,
     "globalstrict": false,
-
     "asi": false,
     "laxbreak": true,
     "bitwise": false,
@@ -48,13 +37,10 @@
     "latedef": false,
     "loopfunc": true,
     "noarg": true,
-    "regexp": true,
-    "regexdash": false,
     "scripturl": true,
     "shadow": false,
     "supernew": false,
     "undef": true,
-
     "newcap": true,
     "noempty": true,
     "nonew": false,

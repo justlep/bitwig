@@ -1,9 +1,9 @@
 /**
- * Generates a new .jshintrc file containing all global functions + classes of the Bitwig API 'predefined',
+ * Generates a new .jshintrc file containing all global functions + classes of the Bitwig API as readonly in the globals section,
  * so jshint won't reject them as unknown.
  *
  * The task is scanning all the .js files in the /bitwigApiStubs folder for global function declarations.
- * Then loads /.jshintrc.in and adds the found function names into the JSON's 'predef' property,
+ * Then loads /.jshintrc.in and adds the found function names into the JSON's 'globals' property,
  * afterwards saves the altered JSON into .jshintrc which is used by the jshint grunt task.
  */
 module.exports = function (grunt, opts) {
@@ -42,7 +42,9 @@ module.exports = function (grunt, opts) {
             });
         });
 
-        jshintrc.predef = jshintrc.predef.concat(globalClasses.sort(), globalFunctions.sort());
+        globalClasses.sort().concat(globalFunctions.sort()).forEach(name => {
+            jshintrc.globals[name] = false;
+        });
 
         let numbersSummary = `API version ${foundApiVersion || '???'} | ${apiStubFiles.length} files | `+
                              `${globalClasses.length} classes | ${globalFunctions.length} global functions`,
