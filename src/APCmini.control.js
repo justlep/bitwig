@@ -164,7 +164,6 @@ function ApcMini() {
             PUNCH_IN: lep.ToggledTransportValue.getPunchInInstance(booleanToColor.yellowRed),
             PUNCH_OUT: lep.ToggledTransportValue.getPunchOutInstance(booleanToColor.yellowRed),
             CLEAR_PUNCH_ON_STOP: (function(clearPunchOnStop) {
-                // auto-disable PUNCH IN / PUNCH OUT
                 isPlaying.subscribe(function(_isPlaying) {
                     if (!_isPlaying && clearPunchOnStop.peek()) {
                         transport.isPunchInEnabled().set(false);
@@ -462,17 +461,23 @@ function ApcMini() {
                 velocityValueOn: COLOR.RED,
                 velocityValueOff: COLOR.OFF
             }),
-            FADER_VALUESET_PREV_PAGE_VALUE = new lep.KnockoutSyncedValue({
-                name: 'FaderValuePageUpBtn',
+            PREV_VALUEPAGE_FOR_FADERS = new lep.KnockoutSyncedValue({
+                name: 'FadersPrevValuePageBtn',
                 ownValue: true,
                 refObservable: CONTROLSET.FADER_ROW.hasPrevValuePage,
                 onClick: CONTROLSET.FADER_ROW.prevValuePage
             }),
-            FADER_VALUESET_NEXT_PAGE_VALUE = new lep.KnockoutSyncedValue({
-                name: 'FaderValuePageDownBtn',
+            NEXT_VALUEPAGE_FOR_FADERS = new lep.KnockoutSyncedValue({
+                name: 'FadersNextValuePageBtn',
                 ownValue: true,
                 refObservable: CONTROLSET.FADER_ROW.hasNextValuePage,
                 onClick: CONTROLSET.FADER_ROW.nextValuePage
+            }),
+            currentModeForArrows = ko.computed(function() {
+                var currentMode = currentMatrixMode(),
+                    modeBeforeConfig = currentMode.isConfig && currentMatrixMode.previousValue;
+
+                return (modeBeforeConfig && !modeBeforeConfig.isConfig) ? modeBeforeConfig : currentMode;
             });
 
         new lep.Button({
@@ -480,7 +485,7 @@ function ApcMini() {
             clickNote: NOTE.ARROW_UP,
             midiChannel: MIDI_CHANNEL,
             valueToAttach: ko.computed(function() {
-                return currentMatrixMode().isMix ? FADER_VALUESET_PREV_PAGE_VALUE : MATRIX_UP_VALUE;
+                return currentModeForArrows().isMix ? PREV_VALUEPAGE_FOR_FADERS : MATRIX_UP_VALUE;
             })
         });
         new lep.Button({
@@ -488,7 +493,7 @@ function ApcMini() {
             clickNote: NOTE.ARROW_DOWN,
             midiChannel: MIDI_CHANNEL,
             valueToAttach: ko.computed(function() {
-                return currentMatrixMode().isMix ? FADER_VALUESET_NEXT_PAGE_VALUE : MATRIX_DOWN_VALUE;
+                return currentModeForArrows().isMix ? NEXT_VALUEPAGE_FOR_FADERS : MATRIX_DOWN_VALUE;
             })
         });
         new lep.Button({
@@ -496,8 +501,7 @@ function ApcMini() {
             clickNote: NOTE.ARROW_LEFT,
             midiChannel: MIDI_CHANNEL,
             valueToAttach: ko.computed(function() {
-                // TODO if device mode, left/right should scroll to the previous/next device
-                return currentMatrixMode().isLaunchers ? MATRIX_LEFT_VALUE : TRACKS_LEFT_VALUE;
+                return currentModeForArrows().isMix ? TRACKS_LEFT_VALUE : MATRIX_LEFT_VALUE;
             })
         });
         new lep.Button({
@@ -505,8 +509,7 @@ function ApcMini() {
             clickNote: NOTE.ARROW_RIGHT,
             midiChannel: MIDI_CHANNEL,
             valueToAttach: ko.computed(function() {
-                // TODO if device mode, left/right should scroll to the previous/next device
-                return currentMatrixMode().isLaunchers ? MATRIX_RIGHT_VALUE : TRACKS_RIGHT_VALUE;
+                return currentModeForArrows().isMix ? TRACKS_RIGHT_VALUE : MATRIX_RIGHT_VALUE;
             })
         });
     }
@@ -532,6 +535,15 @@ function ApcMini() {
         });
     }
 
+    function initMatrix() {
+        CONTROLSET.MATRIX.setObservableValueSet(ko.computed(function () {
+            var matrixMode = currentMatrixMode();
+            return (matrixMode.isConfig) ? VALUESET.CONFIG :
+                   (matrixMode.isMix) ? VALUESET.MIX :
+                    matrixWindow.launcherSlotValueSet();
+        }));
+    }
+
     lep.StandardRangedValue.globalTakeoverEnabled(true);
 
     ApcMini.onFirstFlush = function() {
@@ -540,13 +552,7 @@ function ApcMini() {
         initButtons();
         initScrollButtons();
         initFaders();
-
-        CONTROLSET.MATRIX.setObservableValueSet(ko.computed(function () {
-            var matrixMode = currentMatrixMode();
-            return (matrixMode.isConfig) ? VALUESET.CONFIG :
-                   (matrixMode.isMix) ? VALUESET.MIX :
-                    matrixWindow.launcherSlotValueSet();
-        }));
+        initMatrix();
 
         lep.logDev('ApcMini ready.');
     };
