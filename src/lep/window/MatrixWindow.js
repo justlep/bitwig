@@ -10,6 +10,7 @@
  * @param numSends {Number}
  * @param [numScenes] {Number} optional; must be 0 or empty if no `trackBank` is given
  * @param [trackBank] {TrackBank|null} if null, a MainTrackBank with 0 scenes will be created
+ * @extends TrackWindow
  * @constructor
  */
 lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
@@ -57,6 +58,18 @@ lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
             });
         });
 
+        this.sceneScrollSize = (function(_obs) {
+            return ko.computed({
+                read: _obs,
+                write: function(newScrollSize) {
+                    lep.util.assertNumberInRange(newScrollSize, 1, numScenes, 'Invalid new sceneScrollSize "{}" for {}',
+                                                                              newScrollSize, self.name);
+                    _obs(newScrollSize);
+                    host.showPopupNotification('Scenes per scroll: ' + newScrollSize);
+                }
+            });
+        })(ko.observable(1));
+
         this.canRotate = ko.computed(function() {
             return (numTracks === numScenes);
         });
@@ -84,17 +97,16 @@ lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
         });
 
         this.moveSceneForth = function() {
-            self.trackBank.scrollScenesDown();
+            self.trackBank.scrollToScene( self.sceneScrollPosition() + self.sceneScrollSize() );
         };
         this.moveScenePageForth = function() {
             self.trackBank.scrollScenesPageDown();
         };
         this.moveSceneBack = function() {
-            self.trackBank.scrollScenesUp();
+            self.trackBank.scrollToScene( Math.max(0, self.sceneScrollPosition() - self.sceneScrollSize()) );
         };
         this.moveScenePageBack = function() {
-            var newScenePos = Math.max(0, self.sceneScrollPosition() - numScenes);
-            self.trackBank.scrollToScene(newScenePos);
+            self.trackBank.scrollToScene( Math.max(0, self.sceneScrollPosition() - numScenes) );
         };
 
         this.canMoveMatrixUp = ko.computed(function(){
@@ -198,6 +210,7 @@ lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
  * @param numSends {Number}
  * @param numScenes {Number}
  * @param launcherSlotValueCreatorFn {function} same callback as in {@link lep.MatrixWindow#prepareLauncherSlotValueSets}
+ * @return {lep.MatrixWindow}
  * @static
  */
 lep.MatrixWindow.createMain = function(numTracks, numSends, numScenes, launcherSlotValueCreatorFn) {
