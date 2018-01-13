@@ -1,3 +1,5 @@
+/*global describe, it, beforeEach */
+
 var assert = require('chai').assert;
 
 // load lep-API and mocks into this context..
@@ -11,8 +13,15 @@ describe('ko-extensions.js', function() {
         var _co = ko.observable(),
             o1 = ko.observable(),
             o2 = ko.observable(),
-            c1 = ko.computed({read: _co, write: function(v) {_co(v)} });
-            c2 = ko.computed(function() {return null}),
+            c1 = ko.computed({
+                read: _co,
+                write: function(v) {
+                    _co(v);
+                }
+            }),
+            c2 = ko.computed(function() {
+                return null;
+            }),
             o1ToggleFn = o1.toggle;
 
         assert.isFunction(o1.toggle);
@@ -34,7 +43,7 @@ describe('ko-extensions.js', function() {
     it('defines a `toggleable` extender that adds toggle, toggleOn, toggleOff methods', function() {
         var o1 = ko.observable(),
             o2 = ko.observable().extend({toggleable: true}),
-            o3 = ko.observable(123).extend({toggleable: true})
+            o3 = ko.observable(123).extend({toggleable: true});
 
         assert.isDefined(o1.toggle); // toggle stemming from prototype
         assert.isDefined(o2.toggle); // toggle added by extender
@@ -103,7 +112,7 @@ describe('ko-extensions.js', function() {
             registerAsyncUpdater = function(obs) {
                 timer = setInterval(function() {
                     obs(obs()+1);
-                }, 10)
+                }, 10);
             },
             o = ko.observable(1).updatedBy(function(obs) {
                 registerAsyncUpdater(obs);

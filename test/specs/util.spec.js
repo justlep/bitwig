@@ -1,3 +1,6 @@
+/*global describe, it, beforeEach */
+
+
 var assert = require('chai').assert;
 
 // load lep-API and mocks into this context..
@@ -15,11 +18,10 @@ describe('util.js', function() {
             lep.util.assert(0);
         });
         assert.throw(function() {
-            lep.util.assertDefined(dlkgkdsfghsdkfjg);
+            lep.util.assertDefined( {}.x );
         });
-        dlkgkdsfghsdkfjg = 1;
         assert.doesNotThrow(function() {
-            lep.util.assertDefined(dlkgkdsfghsdkfjg);
+            lep.util.assertDefined({x:123}.x );
         });
         assert.throw(function() {
             lep.util.assertBoolean('true');
@@ -110,7 +112,7 @@ describe('util.js', function() {
     it('throws nicely formatted errors on assertion failures', function() {
         assert.throw(
             function(){
-                lep.util.assert(false, '123{}456', 'xx')
+                lep.util.assert(false, '123{}456', 'xx');
             },
             '123xx456'
         );
@@ -217,7 +219,7 @@ describe('util.js', function() {
     });
 
     it('extends objects using extend()', function() {
-        var o1 = {a: 1, b: {c: 3}, getA: function(){return this.a}},
+        var o1 = {a: 1, b: {c: 3}, getA: function(){return this.a;}},
             o2 = {a: 5, x: 666};
 
         assert.strictEqual(o1.getA(), 1);

@@ -1,3 +1,5 @@
+/*global describe, it, beforeEach */
+
 var assert = require('chai').assert;
 
 // load lep-API and mocks into this context..

@@ -1,4 +1,6 @@
-let chai = require('chai'),
+/*global describe, it, beforeEach, RangedValueMock */
+
+var chai = require('chai'),
     assert = chai.assert,
     spies = require('chai-spies'),
     expect = chai.expect;
@@ -16,7 +18,7 @@ describe('lep.StandardRangedValue', function() {
     });
 
     it('follows received absolute values when takeover is disabled', function() {
-        let rangedValue = new RangedValueMock(),
+        var rangedValue = new RangedValueMock(),
             s = new lep.StandardRangedValue({
                 name: 'myStdRgdValue',
                 rangedValue: rangedValue
@@ -31,7 +33,7 @@ describe('lep.StandardRangedValue', function() {
     });
 
     it('follows received absolute values from BIdirectional control with takeover ENABLED', function() {
-        let rangedValue = new RangedValueMock(),
+        var rangedValue = new RangedValueMock(),
             s = new lep.StandardRangedValue({
                 name: 'myStdRgdValue',
                 rangedValue: rangedValue,
@@ -64,7 +66,7 @@ describe('lep.StandardRangedValue', function() {
     it('follows received absolute values from UNIdirectional control with takeover ENABLED', function() {
         // lep.setLogLevel(lep.LOGLEVEL.DEV);
 
-        let rangedValue = new RangedValueMock(),
+        var rangedValue = new RangedValueMock(),
             s = new lep.StandardRangedValue({
                 name: 'myStdRgdValue',
                 rangedValue: rangedValue,
@@ -95,7 +97,7 @@ describe('lep.StandardRangedValue', function() {
     it('re-calculates takeover-range upon all non-controller-changes', function() {
         // lep.setLogLevel(lep.LOGLEVEL.DEV);
 
-        let rangedValue = new RangedValueMock(),
+        var rangedValue = new RangedValueMock(),
             s = new lep.StandardRangedValue({
                 name: 'myStdRgdValue',
                 rangedValue: rangedValue,
@@ -134,7 +136,7 @@ describe('lep.StandardRangedValue', function() {
     it('follows received absolute values from UNIdirectional control with takeover DISABLED', function() {
         // lep.setLogLevel(lep.LOGLEVEL.DEV);
 
-        let rangedValue = new RangedValueMock(),
+        var rangedValue = new RangedValueMock(),
             s = new lep.StandardRangedValue({
                 name: 'myStdRgdValue',
                 rangedValue: rangedValue
@@ -165,7 +167,7 @@ describe('lep.StandardRangedValue', function() {
     it('can toggle takeover for ALL existing instances via static globalTakeoverEnabled()', function() {
         // lep.setLogLevel(lep.LOGLEVEL.DEV);
 
-        let rangedValue = new RangedValueMock(),
+        var rangedValue = new RangedValueMock(),
             s = new lep.StandardRangedValue({
                 name: 'myStdRgdValue',
                 rangedValue: rangedValue
