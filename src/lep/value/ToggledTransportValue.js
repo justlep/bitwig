@@ -48,7 +48,13 @@ lep.ToggledTransportValue = lep.util.extendClass(lep.BaseValue, {
 /** @static */
 lep.ToggledTransportValue._instances = {};
 
-// add static lep.ToggledTransportValue.getXXXInstance() methods...
+// Generate a bunch of static lep.ToggledTransportValue.getXXXInstance() methods, where XXX is 'Play' etc.
+// Each generated getter function has exactly one optional parameter:
+// a function to calculate its velocity depending on its true/false state, i.e. ({boolean}) => {number}
+// Usage example :
+//    var playVal = lep.ToggledTransportValue.getPlayInstance();   OR
+//        playVal = lep.ToggledTransportValue.getPlayInstance( function(isOn){ return isOn ? 123 : 0 } );
+//
 (function(makeInstanceGetter) {
 
     lep.ToggledTransportValue.getPlayInstance = makeInstanceGetter('Play', 'isPlaying');
