@@ -26,7 +26,7 @@ ko.subscribable.fn.updatedBy = function(updaterFunction) {
 
 /**
  * @param {Function} subscriberFn, e.g. function(newVal){..}
- * @param {?Object} ctx
+ * @param {?Object} [ctx] - optional this-content for execution
  * @return {ko.subscribable}
  */
 ko.subscribable.fn.withSubscription = function(subscriberFn, ctx) {
