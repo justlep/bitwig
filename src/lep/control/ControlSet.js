@@ -18,8 +18,7 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
 
     var self = this,
         _valueSet = ko.observable(),
-        _valuePage = ko.observable(0),
-        _muted = ko.observable(false);
+        _valuePage = ko.observable(0);
 
     this.id = lep.util.nextId();
     this.name = name;
@@ -31,19 +30,11 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
         this.controls.push(control);
     }
 
-    this.muted = ko.computed({
-        read: _muted,
-        write: function(isMuted) {
-            for (var i = 0; i < self.controls.length; i++) {
-                self.controls[i].setMuted(isMuted);
-            }
-            _muted(isMuted);
+    this.muted = ko.observable(false).withSubscription(function(newIsMuted) {
+        for (var i = 0; i < self.controls.length; i++) {
+            this.controls[i].setMuted(newIsMuted);
         }
-    });
-
-    this.toggleMuted = function() {
-        self.muted(!self.muted());
-    };
+    }, this).extend({toggleable:true});
 
     this.valueSet = ko.computed({
         read: _valueSet,

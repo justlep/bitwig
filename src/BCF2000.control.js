@@ -495,7 +495,7 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
                     }),
                     onClick: function() {
                         if (isShiftPressed()) {
-                            CONTROLSET.FADERS.toggleMuted();
+                            CONTROLSET.FADERS.muted.toggle();
                         } else {
                             transport.stop();
                         }

@@ -504,7 +504,7 @@ lep.BCR2000 = function(bcrPresetNumber, bcfMidiChannel) {
                     }),
                     onClick: function() {
                         if (isShiftPressed()) {
-                            CONTROLSET.FADERS.toggleMuted();
+                            CONTROLSET.FADERS.muted.toggle();
                         } else {
                             transport.stop();
                         }
