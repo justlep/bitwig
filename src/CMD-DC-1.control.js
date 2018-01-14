@@ -219,6 +219,7 @@ lep.DC1 = function() {
                     },
                     onClick: function(padIndex) {
                         var snapshotIndex = (displayedSnapshotPage() * 16) + padIndex,
+                            /** @type {number } */
                             snapshotToSaveOrLoad;
 
                         lastClickedSnapshotIndex = snapshotIndex;
@@ -231,6 +232,7 @@ lep.DC1 = function() {
                             lep.logDebug('Saved snapshot {} in slot {}', snapshotToSaveOrLoad.toString(16), snapshotIndex);
                         } else {
                             // load snapshot..
+                            /** @type {number} */
                             snapshotToSaveOrLoad = savedSnapshots()[snapshotIndex];
                             if (typeof snapshotToSaveOrLoad === 'number') {
                                 currentSnapshot(snapshotToSaveOrLoad);
@@ -315,7 +317,7 @@ lep.DC1 = function() {
     }
 
     /**
-     * @param nextOrPrev (number) positive or negative
+     * @param {number} nextOrPrev - positive or negative
      */
     function loadNextOrPrevSnapshot(nextOrPrev) {
         const TOTAL_SNAPSHOTS = 8 * 16;
@@ -341,7 +343,7 @@ lep.DC1 = function() {
 
     function initPushEncoder() {
         // 'clicking' the push encoder resets the bank and/or preset..
-        eventDispatcher.onNote(NOTE.PUSH_ENCODER_CLICK, function(note, value, channel) {
+        eventDispatcher.onNote(NOTE.PUSH_ENCODER_CLICK, function(note, value /*, channel */) {
             isPushEncoderPressed = !!value;
 
             if (isPushEncoderPressed) {
@@ -356,7 +358,7 @@ lep.DC1 = function() {
         });
 
         // 'twisting' the push encoder..
-        eventDispatcher.onCC(CC.PUSH_ENCODER, function(cc, value, channel){
+        eventDispatcher.onCC(CC.PUSH_ENCODER, function(cc, value /*, channel */){
             var targetObservable = pushEncoderTarget(),
                 diff = (value - 64);
 

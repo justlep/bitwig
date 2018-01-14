@@ -4,11 +4,11 @@
  * Author: Lennart Pegel - https://github.com/justlep
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  *
- * @param name {String}
- * @param numTracks {Number}
- * @param numSends {Number}
- * @param [numScenes] {Number} optional; must be 0 or empty if no `trackBank` is given
- * @param [trackBank] {TrackBank} if null, a MainTrackBank with 0 scenes will be created
+ * @param {string} name
+ * @param {number} numTracks
+ * @param {number} numSends
+ * @param {?number} [numScenes] - optional; must be 0 or empty if no `trackBank` is given
+ * @param {?TrackBank} [trackBank] - if null, a MainTrackBank with 0 scenes will be created
  * @constructor
  */
 lep.TrackWindow = function(name, numTracks, numSends, numScenes, trackBank) {
@@ -70,9 +70,10 @@ lep.TrackWindow.MAX_SENDS = 16;
 lep.TrackWindow.MAX_SCENES = 16;
 
 /**
- *  Creates a TrackWindow instance with a main track bank (and zero scenes).
- * @param numTracks {Number}
- * @param numSends {Number}
+ * Creates a TrackWindow instance with a main track bank (and zero scenes).
+ * @param {number} numTracks
+ * @param {number} numSends
+ * @return {lep.TrackWindow}
  * @static
  */
 lep.TrackWindow.createMain = function(numTracks, numSends) {

@@ -14,7 +14,7 @@
 if (typeof setTimeout !== 'function' && typeof host === 'object') {
     setTimeout = function(fn, delay) {
         // println('set timeout ' + delay);
-        host.scheduleTask(fn, null, delay);
+        host.scheduleTask(fn, delay);
     };
     clearTimeout = function(){
         throw new Error('clearTimeout is unavailable');

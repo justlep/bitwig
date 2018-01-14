@@ -2,8 +2,7 @@
  * Base class representing a single value than can be connected to both Bitwig and
  * a hardware controller's element (encoder and such) via BaseControl.js or subclass.
  *
- * @param opts (Object)
- *   - name (String)
+ * @param {Object} opts - *   - name (String)
  *
  * Author: Lennart Pegel - https://github.com/justlep
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
@@ -17,6 +16,8 @@ lep.BaseValue = function(opts) {
     this.name = opts.name;
 
     this.value = opts.value || 0;
+
+    /** @type {lep.BaseControl} */
     this.controller = null;
 };
 
@@ -29,7 +30,10 @@ lep.BaseValue.prototype = {
             this.controller.syncToMidi();
         }
     },
-    /** @final */
+    /**
+     * @param {lep.BaseControl} controller
+     * @final
+     */
     onAttach: function(controller) {
         lep.util.assertBaseControl(controller, 'Invalid controller for BaseValue.onAttach()');
         this.controller = controller;

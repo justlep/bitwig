@@ -31,7 +31,6 @@ var NOTE_MAPPING = {
     VELOCITY_MODES = ['ADD-20', 'ADD-30', 'FIX-30', 'FIX-60', 'FIX-90', 'FIX-110', 'FIX-127', 'GAMMA-2', 'GAMMA-3', 'GAMMA-4', 'LINEAR'],
     DEFAULT_VELOCITY_MODE = 'GAMMA-2';
 
-
 function init() {
     var inPort = host.getMidiInPort(0),
         noteInput = inPort.createNoteInput('Pads', '000000'), // block everything and let midiCallback do the talking
@@ -54,6 +53,8 @@ function init() {
                     targetVelocity = velocityTranslationTable[data2];
                     // println('Note (orig/target): ' + data1 + '/' + targetNote + ', Vel (orig/target): ' + data2 + '/' + targetVelocity);
                     noteInput.sendRawMidiEvent(0x90, targetNote, targetVelocity);
+
+                    // FIXME -> signature of host.scheduleTask has changed :(
                     host.scheduleTask(HANDLERS.TIMED_NOTE_OFF, [targetNote], gateTimeInMillis);
                 }
             },

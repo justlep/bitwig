@@ -2,11 +2,10 @@
  * Represents a set of BaseValue (or subclass) objects
  * which can be attached to an instance of {@link lep.ControlSet}.
  *
- * @param name (String)
- * @param cols (Number) the number of Values to create per row
- * @param rows (Number) the number of rows to generate values for
- * @param valueCreationFn (function) creating a value,
- *                                   e.g. function(colIndex, rowIndex, totalIndex){...; return new lep.BaseValue(..);}
+ * @param {string} name
+ * @param {number} cols - the number of Values to create per row
+ * @param {number} rows - the number of rows to generate values for
+ * @param {valueCreationFn} valueCreationFn - creating a value, e.g. function(colIndex, rowIndex, totalIndex){.. return new lep.BaseValue(..);}
  *
  * Author: Lennart Pegel - https://github.com/justlep
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
@@ -38,7 +37,10 @@ lep.ValueSet = function(name, cols, rows, valueCreationFn) {
     lep.ValueSet.instancesByName[this.name] = this;
 };
 
-/** @static */
+/**
+ * @static
+ * @type {lep.ValueSet[]}
+ */
 lep.ValueSet.instancesByName = {};
 
 /** @static */
@@ -52,6 +54,7 @@ lep.ValueSet.MAX_SIZE = 100;
 lep.ValueSet.prototype = {
     /**
      * Returns true if the tihs valueSet is currently assigned to any ControlSet.
+     * @return {boolean}
      */
     isControlled: function() {
         return !!lep.ControlSet.instanceByValueSetId[this.id];
@@ -59,13 +62,21 @@ lep.ValueSet.prototype = {
     /**
      * Returns this valueSet's id which may not necessarily be constant.
      * To be overridden by derived device-specific ValueSet (see {@link ParamsValueSet}.
+     * @return {string}
      */
     dynamicId: function() {
         return this.id + '_' + this.name;
     }
 };
 
-/** @static */
+/**
+ * @param {ChannelBank} trackBank
+ * @param {number} windowSize
+ * @param {Object} prefs
+ * @param {boolean} prefs.soloExclusive
+ * @return {lep.ValueSet}
+ * @static
+ */
 lep.ValueSet.createSoloValueSet = function(trackBank, windowSize, prefs) {
     lep.util.assertObject(trackBank, 'Invalid trackBank for ValueSet.createSoloValueSet');
     lep.util.assertNumberInRange(windowSize, 1, 1000, 'Invalid windowSize {} for ValueSet.createSoloValueSet', windowSize);
@@ -77,7 +88,12 @@ lep.ValueSet.createSoloValueSet = function(trackBank, windowSize, prefs) {
     });
 };
 
-/** @static */
+/**
+ * @param {ChannelBank} trackBank
+ * @param {number} windowSize
+ * @return {lep.ValueSet}
+ * @static
+ */
 lep.ValueSet.createMuteValueSet = function(trackBank, windowSize) {
     lep.util.assertObject(trackBank, 'Invalid trackBank for ValueSet.createMuteValueSet');
     lep.util.assertNumberInRange(windowSize, 1, 1000, 'Invalid windowSize {} for ValueSet.createMuteValueSet', windowSize);
@@ -87,7 +103,12 @@ lep.ValueSet.createMuteValueSet = function(trackBank, windowSize) {
     });
 };
 
-/** @static */
+/**
+ * @param {ChannelBank} trackBank
+ * @param {number} windowSize
+ * @return {lep.ValueSet}
+ * @static
+ */
 lep.ValueSet.createArmValueSet = function(trackBank, windowSize) {
     lep.util.assertObject(trackBank, 'Invalid trackBank for ValueSet.createArmValueSet');
     lep.util.assertNumberInRange(windowSize, 1, 1000, 'Invalid windowSize {} for ValueSet.createArmValueSet', windowSize);
@@ -97,7 +118,12 @@ lep.ValueSet.createArmValueSet = function(trackBank, windowSize) {
     });
 };
 
-/** @static */
+/**
+ * @param {ChannelBank} trackBank
+ * @param {number} windowSize
+ * @return {lep.ValueSet}
+ * @static
+ */
 lep.ValueSet.createSelectValueSet = function(trackBank, windowSize) {
     lep.util.assertObject(trackBank, 'Invalid trackBank for ValueSet.createSelectValueSet');
     lep.util.assertNumberInRange(windowSize, 1, 1000, 'Invalid windowSize {} for ValueSet.createSelectValueSet', windowSize);
@@ -107,7 +133,12 @@ lep.ValueSet.createSelectValueSet = function(trackBank, windowSize) {
     });
 };
 
-/** @static */
+/**
+ * @param {ChannelBank} trackBank
+ * @param {number} windowSize
+ * @return {lep.ValueSet}
+ * @static
+ */
 lep.ValueSet.createVolumeValueSet = function(trackBank, windowSize) {
     lep.util.assertObject(trackBank, 'Invalid trackBank for ValueSet.createVolumeValueSet');
     lep.util.assertNumberInRange(windowSize, 1, 1000, 'Invalid windowSize {} for ValueSet.createVolumeValueSet', windowSize);
@@ -117,7 +148,12 @@ lep.ValueSet.createVolumeValueSet = function(trackBank, windowSize) {
     });
 };
 
-/** @static */
+/**
+ * @param {ChannelBank} trackBank
+ * @param {number} windowSize
+ * @return {lep.ValueSet}
+ * @static
+ */
 lep.ValueSet.createPanValueSet = function(trackBank, windowSize) {
     lep.util.assertObject(trackBank, 'Invalid trackBank for ValueSet.createPanValueSet');
     lep.util.assertNumberInRange(windowSize, 1, 1000, 'Invalid windowSize {} for ValueSet.createPanValueSet', windowSize);
@@ -127,7 +163,14 @@ lep.ValueSet.createPanValueSet = function(trackBank, windowSize) {
     });
 };
 
-/** @static */
+/**
+ * @param {ChannelBank} trackBank
+ * @param {number} numberOfSends
+ * @param {number} windowSize
+ * @param {boolean} [allowSecondInstance]
+ * @return {lep.ValueSet}
+ * @static
+ */
 lep.ValueSet.createSendsValueSet = function(trackBank, numberOfSends, windowSize, allowSecondInstance) {
     lep.util.assertObject(trackBank, 'Invalid trackBank for ValueSet.createSendsValueSet');
     lep.util.assertNumberInRange(numberOfSends, 1, 20, 'Invalid numberOfSends {} for ValueSet.createSendsValueSet', numberOfSends);
@@ -141,17 +184,20 @@ lep.ValueSet.createSendsValueSet = function(trackBank, numberOfSends, windowSize
 };
 
 /**
- * @static
- * @param  labelPattern (String) label with TWO '{}' placeholders for (1) the 1-based page, (2) the 1-based index within the page
+ * @param {number} numberOfPages
+ * @param {number} userControlsPerPage
+ * @param {string} labelPattern - label with TWO '{}' placeholders for (1) the 1-based page, (2) the 1-based index within the page
  *                               i.e. a given labelPattern 'UC-{}-{}' will result in UserControls with labels
  *                                 "UC-1-1" to "UC-<numberOfPages>-<userControlsPerPage>"
+ * @return {lep.ValueSet}
+ * @static
  */
 lep.ValueSet.createUserControlsValueSet = function(numberOfPages, userControlsPerPage, labelPattern) {
     lep.util.assertNumberInRange(numberOfPages, 1, 20, 'Invalid numberOfPages {} for ValueSet.createUserControlsValueSet', numberOfPages);
     lep.util.assertNumberInRange(userControlsPerPage, 1, 20, 'Invalid userControlsPerPage {} for ValueSet.createUserControlsValueSet',
                                                              userControlsPerPage);
     lep.util.assertString(labelPattern, 'Invalid labelPattern {labelPattern} for ValueSet.createUserControlsValueSet', labelPattern);
-    lep.util.assert(/\{\}.*\{\}/.test(labelPattern), 'Missing placeholders in "{}" for ValueSet.createUserControlsValueSet', labelPattern);
+    lep.util.assert(/{}.*{}/.test(labelPattern), 'Missing placeholders in "{}" for ValueSet.createUserControlsValueSet', labelPattern);
 
     var userControlBank = host.createUserControls(numberOfPages * userControlsPerPage);
 
@@ -160,3 +206,11 @@ lep.ValueSet.createUserControlsValueSet = function(numberOfPages, userControlsPe
         return lep.StandardRangedValue.createUserControlValue(userControlBank, indexInUcBank, label);
     });
 };
+
+/**
+ * @callback valueCreationFn
+ * @param {number} colIndex
+ * @param {number}rowIndex
+ * @param {number} totalIndex
+ * @return {lep.BaseValue}
+ */

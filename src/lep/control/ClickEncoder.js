@@ -1,8 +1,9 @@
 /**
  * Author: Lennart Pegel - https://github.com/justlep
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
-
+ *
  * @constructor
+ * @extends {lep.BaseControl}
  */
 lep.ClickEncoder = lep.util.extendClass(lep.BaseControl, {
     _init: function(opts) {
@@ -13,13 +14,13 @@ lep.ClickEncoder = lep.util.extendClass(lep.BaseControl, {
         this.resyncOnClickRelease = (opts.resyncOnClickRelease!==false);
         this.sendsDiffValues = (opts.sendsDiffValues!==false);
     },
-    /** @Override */
+    /** @override */
     onClickNotePressed: function() {
         if (this.sendsDiffValues) {
             this.setDiffValueRangeFine(true);
         }
     },
-    /** @Override */
+    /** @override */
     onClickNoteReleased: function() {
         if (this.sendsDiffValues) {
             this.setDiffValueRangeFine(false);

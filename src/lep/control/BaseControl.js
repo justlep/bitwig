@@ -93,6 +93,9 @@ lep.BaseControl.prototype = {
     setDiffValueRangeFine: function(useFine) {
         this.diffValueRange = useFine ? lep.BaseControl.DIFF_VALUE_RANGE.FINE : lep.BaseControl.DIFF_VALUE_RANGE.NORMAL;
     },
+    /**
+     * @param {boolean} isMuted
+     */
     setMuted: function(isMuted) {
         this.isMuted = isMuted;
         this.nextFeedbackLoopValue = null;
@@ -100,6 +103,9 @@ lep.BaseControl.prototype = {
             this.syncToMidi();
         }
     },
+    /**
+     * @param {lep.BaseValue} value
+     */
     attachValue: function(value) {
         lep.util.assertBaseValue(value, 'invalid value for BaseControl<{}>.attachValue()', this.name);
         this.nextFeedbackLoopValue = null;
@@ -122,7 +128,7 @@ lep.BaseControl.prototype = {
     },
     /**
      * Sends the BaseValue's numerical value (or an explicitely given value) to the device.
-     * @param [valueOverride] (Number) optional value to send instead of the BaseValue's value
+     * @param {number} [valueOverride] - optional value to send instead of the BaseValue's value
      */
     syncToMidi: function(valueOverride) {
         if (this.isMuted || this.isUnidirectional || (!this.value && !arguments.length)) return;
@@ -155,6 +161,10 @@ lep.BaseControl.prototype = {
             sendNoteOn(this.midiChannel, this.clickNote, valueToSend);
         }
     },
+    /**
+     * @param {number} noteOrCC
+     * @param {number} receivedValue
+     */
     onValueReceived: function(noteOrCC, receivedValue) {
         if (!this.value) return;
         if (this.sendsDiffValues) {
@@ -166,6 +176,10 @@ lep.BaseControl.prototype = {
             this.value.onAbsoluteValueReceived(receivedValue, this.isUnidirectional);
         }
     },
+    /**
+     * @param {number} clickNote
+     * @param {number} receivedValue
+     */
     onClickNoteReceived: function(clickNote, receivedValue) {
         this.isClicked = !!receivedValue;
 

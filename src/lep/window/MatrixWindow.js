@@ -5,13 +5,13 @@
  * Author: Lennart Pegel - https://github.com/justlep
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  *
- * @param name {String}
- * @param numTracks {Number}
- * @param numSends {Number}
- * @param [numScenes] {Number} optional; must be 0 or empty if no `trackBank` is given
- * @param [trackBank] {TrackBank|null} if null, a MainTrackBank with 0 scenes will be created
- * @extends lep.TrackWindow
+ * @param {string} name
+ * @param {number} numTracks
+ * @param {number} numSends
+ * @param {?number} [numScenes] - optional; must be 0 or empty if no `trackBank` is given
+ * @param {?TrackBank} [trackBank] - if null, a MainTrackBank with 0 scenes will be created
  * @constructor
+ * @extends lep.TrackWindow
  */
 lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
     _init: function(name, numTracks, numSends, numScenes, trackBank) {
@@ -21,11 +21,13 @@ lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
         var self = this,
             totalLauncherSlots = numTracks * numScenes,
             // sceneBank = trackBank.sceneBank(),
+            /** @type {ClipLauncherSlotBank[]} */
             slotBanksByTrack = this.tracks.map(function(track) {
                 var slotBank = track.clipLauncherSlotBank();
                 slotBank.setIndication(true);
                 return slotBank;
             }),
+            /** @type {lep.LauncherSlot[]} */
             launcherSlots = lep.util.generateArrayTableBased(numTracks, numScenes, function(trackIndex, sceneIndex, index) {
                 return new lep.LauncherSlot(trackIndex, sceneIndex, slotBanksByTrack[trackIndex]);
             }),
@@ -141,8 +143,8 @@ lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
 
         /**
          * Generates a ControlSet instance that fits all launcherSlots of this MatrixWindow.
-         * @param controlCreatorFn {function} a function that creates the controls, e.g. function(colIndex, rowIndex, absoluteIndex){}
-         * @returns {lep.ControlSet}
+         * @param {function} controlCreatorFn - a function that creates the controls, e.g. function(colIndex, rowIndex, absoluteIndex){}
+         * @return {lep.ControlSet}
          */
         this.createMatrixControlSet = function(controlCreatorFn) {
             return new lep.ControlSet('Matrix', totalLauncherSlots, function(index) {
@@ -156,7 +158,7 @@ lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
         /**
          * Returns one of the LauncherSlot valuesets which have been prepared by {@link prepareLauncherSlotValueSets}.
          * The returned set depends on the current orientation.
-         * @returns {ValueSet}
+         * @return {lep.ValueSet}
          */
         this.launcherSlotValueSet = ko.computed(function() {
             var isTracksByScenes = self.isOrientationTracksByScenes(),
@@ -176,8 +178,7 @@ lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
          * will SHARE the first ValueSet's values.
          * The generated ValueSets can later be obtained via the
          *
-         * @param valueCreatorFn {function} a function supposed to return the {@link BaseValue} instances for the set,
-         *                                  e.g. function(launcherSlot) { return new BaseValue(..) }
+         * @param {launcherSlotValueCreatorFn} valueCreatorFn - a function returning a BaseValue instance for a given launcherSlot
          */
         this.prepareLauncherSlotValueSets = function(valueCreatorFn) {
             lep.util.assert(!_slotLauncherValueSets.tracksByScenes() && !_slotLauncherValueSets.scenesByTracks(),
@@ -203,13 +204,19 @@ lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
 });
 
 /**
+ * @callback launcherSlotValueCreatorFn
+ * @param {lep.LauncherSlot}
+ * @return {lep.BaseValue}
+ */
+
+/**
  * Creates a MatrixWindow instance with a main track bank.
  * Includes generating the launcher slot valuesets using the given creator function.
  *
- * @param numTracks {Number}
- * @param numSends {Number}
- * @param numScenes {Number}
- * @param launcherSlotValueCreatorFn {function} same callback as in {@link lep.MatrixWindow#prepareLauncherSlotValueSets}
+ * @param {number} numTracks
+ * @param {number} numSends
+ * @param {number} numScenes
+ * @param {launcherSlotValueCreatorFn} launcherSlotValueCreatorFn, e.g. function(
  * @return {lep.MatrixWindow}
  * @static
  */

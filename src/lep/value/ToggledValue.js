@@ -3,9 +3,19 @@
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  *
  * @constructor
+ * @extends {lep.BaseValue}
  */
 lep.ToggledValue = lep.util.extendClass(lep.BaseValue, {
-
+    /**
+     * @constructs
+     * @param {Object} opts
+     * @param {SettableBooleanValue} opts.togglableValue
+     * @param {boolean} [opts.toggleOnPressed]
+     * @param {string} opts.name
+     * @param {number} [opts.velocityValueOn]
+     * @param {number} [opts.velocityValueOff]
+     * @param {Object} [opts.prefs]
+     */
     _init: function(opts) {
         this._super(opts);
 
@@ -25,7 +35,7 @@ lep.ToggledValue = lep.util.extendClass(lep.BaseValue, {
             self.syncToController();
         });
     },
-    /** @Override */
+    /** @override */
     onAbsoluteValueReceived: function(absoluteValue /*, isTakeoverRequired */) {
         var isPressed = !!absoluteValue;
         if (this.toggleOnPressed === isPressed) {
@@ -56,21 +66,30 @@ lep.ToggledValue.VELOCITY_VALUES = {
     SOLO_OFF: 0
 };
 
-/** @static */
+/**
+ * @param {number} onValue
+ * @param {number} offValue
+ */
 lep.ToggledValue.setArmVelocityValues = function(onValue, offValue) {
     lep.util.extend(lep.ToggledValue.VELOCITY_VALUES, {
         ARM_ON: onValue,
         ARM_OFF: offValue
     });
 };
-/** @static */
+/**
+ * @param {number} onValue
+ * @param {number} offValue
+ */
 lep.ToggledValue.setMuteVelocityValues = function(onValue, offValue) {
     lep.util.extend(lep.ToggledValue.VELOCITY_VALUES, {
         MUTE_ON: onValue,
         MUTE_OFF: offValue
     });
 };
-/** @static */
+/**
+ * @param {number} onValue
+ * @param {number} offValue
+ */
 lep.ToggledValue.setSoloVelocityValues = function(onValue, offValue) {
     lep.util.extend(lep.ToggledValue.VELOCITY_VALUES, {
         SOLO_ON: onValue,
@@ -78,7 +97,12 @@ lep.ToggledValue.setSoloVelocityValues = function(onValue, offValue) {
     });
 };
 
-/** @static */
+/**
+ * @param {ChannelBank} channelBank
+ * @param {number} channelIndex
+ * @return {lep.ToggledValue}
+ * @static
+ */
 lep.ToggledValue.createArmValue = function(channelBank, channelIndex) {
     lep.util.assertObject(channelBank, 'Invalid channelBank for lep.ToggledValue.createArmValue');
     lep.util.assertNumber(channelIndex, 'Invalid channelIndex for lep.ToggledValue.createArmValue');
@@ -90,7 +114,12 @@ lep.ToggledValue.createArmValue = function(channelBank, channelIndex) {
     });
 };
 
-/** @static */
+/**
+ * @param {ChannelBank} channelBank
+ * @param {number} channelIndex
+ * @return {lep.ToggledValue}
+ * @static
+ */
 lep.ToggledValue.createMuteValue = function(channelBank, channelIndex) {
     lep.util.assertObject(channelBank, 'Invalid channelBank for lep.ToggledValue.createMuteValue');
     lep.util.assertNumber(channelIndex, 'Invalid channelIndex for lep.ToggledValue.createMuteValue');
@@ -102,7 +131,14 @@ lep.ToggledValue.createMuteValue = function(channelBank, channelIndex) {
     });
 };
 
-/** @static */
+/**
+ * @param {ChannelBank} channelBank
+ * @param {number} channelIndex
+ * @param {Object} prefs
+ * @param {boolean} prefs.soloExclusive
+ * @return {lep.ToggledValue}
+ * @static
+ */
 lep.ToggledValue.createSoloValue = function(channelBank, channelIndex, prefs) {
     lep.util.assertObject(channelBank, 'Invalid channelBank for lep.ToggledValue.createSoloValue');
     lep.util.assertNumber(channelIndex, 'Invalid channelIndex for lep.ToggledValue.createSoloValue');

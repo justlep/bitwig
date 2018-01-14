@@ -10,7 +10,7 @@
  *    - if the onClick callback is given, it is invoked
  *    - if NO onClick is given, the refObservable is set to ownValue
  *
- * @params opts (Object) same as {@link BaseValue}, plus
+ * @params {Object} opts same as {@link BaseValue}, plus
  *          - ownValue (mixed) the constant value represented by this KnockoutSyncedValue
  *          - refObservable (Observable) the Knockout Observable holding the reference value to compare ownValue to
  *          - [onClick] (function) (optional) function to call when an absolute value > 0 is received
@@ -25,9 +25,10 @@
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  *
  * @constructor
+ * @extends {lep.BaseValue}
  */
 lep.KnockoutSyncedValue = lep.util.extendClass(lep.BaseValue, {
-
+    /** @constructs */
     _init: function(opts) {
         this._super(opts);
 
@@ -86,10 +87,10 @@ lep.KnockoutSyncedValue = lep.util.extendClass(lep.BaseValue, {
     /** The time in millis after which a button-press is considered a 'long click' */
     LONG_CLICK_TIME: 300,
 
-    /** @Override */
+    /** @override */
     onRelativeValueReceived: lep.util.NOP,
 
-    /** @Override */
+    /** @override */
     onAbsoluteValueReceived: function(absoluteValue /*, isTakeoverRequired */) {
         if (this.ignoreClickIf && this.ignoreClickIf()) {
             lep.util.stopTimer(this.id, true);
@@ -105,7 +106,8 @@ lep.KnockoutSyncedValue = lep.util.extendClass(lep.BaseValue, {
                 this.refObservable(this._savedRefValue);
                 // lep.logDebug('KSV {} restoring old value {}', this.name, this._savedRefValue);
             }
-            return this.skipRestore();
+            this.skipRestore();
+            return;
         }
 
         if (this.toggleOnPressed !== isPressed) {

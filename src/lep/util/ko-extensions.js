@@ -1,7 +1,7 @@
 
 /**
- * @param bitwigValue {Value}
- * @returns {ko.subscribable}
+ * @param {Value} bitwigValue
+ * @return {ko.subscribable}
  */
 ko.subscribable.fn.updatedByBitwigValue = function(bitwigValue) {
     lep.util.assertFunction(bitwigValue && bitwigValue.addValueObserver, 'Invalid bitwigValue.addValueObserver, {}', bitwigValue);
@@ -15,8 +15,8 @@ ko.subscribable.fn.updatedByBitwigValue = function(bitwigValue) {
 };
 
 /**
- * @param updaterFunction {function} the function that gets this observable as first parameter, so it can update it
- * @returns {ko.subscribable}
+ * @param {function} updaterFunction - the function that gets this observable as first parameter, so it can update it
+ * @return {ko.subscribable}
  */
 ko.subscribable.fn.updatedBy = function(updaterFunction) {
     lep.util.assertFunction(updaterFunction, 'Invalid bitwigValue.updatedBy, {}', updaterFunction);
@@ -33,7 +33,7 @@ ko.subscribable.fn.toggle = function() {
 
 /**
  * An extender adding context-safe .toggle(), .toggleOn() and toggleOff() methods to the extended observable.
- * @param target {ko.observable}
+ * @param {ko.observable} target -
  */
 ko.extenders.toggleable = function(target /*, opts */) {
     lep.util.assert(ko.isWriteableObservable(target), 'Cannot use toggleable extender on readonly observables');
@@ -52,9 +52,10 @@ ko.extenders.toggleable = function(target /*, opts */) {
 };
 
 /**
- * An extender adding a context-safe .restore() method to a writeable observable,
- * that can be called to restore its value from before the last change.
- * @param target {ko.observable}
+ * An extender allowing to restore the previous value of a writeable observable after it was changed.
+ * Adds to the observable:
+ *   - {Function} restore()
+ *   - {*} previousValue
  */
 ko.extenders.restoreable = (function() {
     const DESCRIPTOR = {

@@ -4,12 +4,13 @@
  * deprecating old fixed pages (Common, Envelope, Modulation Source) and Macros.
  *
  * @constructor
+ * @extends {lep.ValueSet}
  */
 lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
     /**
-     * @param cursorDevice (CursorDevice)
-     * @param [followsSelectedPage] (boolean) (optional) if true (default), the ValueSet's current page follows the selection in the DAW
-     * @param [optParamsPerPage] (number) (optional, default: 8) number of parameters per page (1-8)
+     * @param {(CursorDevice|Device)} cursorDevice
+     * @param {boolean} [followsSelectedPage=true] - if true, the ValueSet's current page follows the selection in the DAW
+     * @param {number} [optParamsPerPage] - (optional, default: 8) number of parameters per page (1-8)
      */
     _init: function(cursorDevice, followsSelectedPage, optParamsPerPage) {
         lep.util.assertObject(cursorDevice, 'Invalid cursorDevice for ParamsValueSet');
@@ -47,7 +48,7 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
 
         this.deviceName = ko.observable('');
 
-        /** @Override */
+        /** @override */
         this.dynamicId = ko.computed(function() {
             return '' + self.id + '_' + self.name + '__' + self.deviceName();
         });
@@ -99,15 +100,14 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
             recallParamPageForDevice();
         });
 
-        cursorDevice.addNameObserver(40, 'unknown device', function(deviceName) {
+        cursorDevice.name().addValueObserver(function(deviceName) {
             lep.logDebug('Selected device: "{}"', deviceName);
-            self.deviceName(deviceName);
+            self.deviceName(deviceName || '_nodevname_');
             hasDeviceChanged = true;
         });
-
     }
 
 });
 
-/** @static */
+/** @type {lep.ParamsValueSet[]} */
 lep.ParamsValueSet.instances = [];

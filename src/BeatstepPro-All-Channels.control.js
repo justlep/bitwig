@@ -32,5 +32,5 @@ function init() {
     println('\n-------------\nBeatstepPro ready (all channels)');
 }
 
-/** @Override */
+/** @override */
 function exit() {}

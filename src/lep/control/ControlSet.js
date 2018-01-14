@@ -1,9 +1,9 @@
 /**
  * Represents a set of {@link lep.BaseControl} objects (or derived), e.g. one row of Fader objects.
  *
- * @param name (String)
- * @param numberOfControls (Number) number of Control objects to generate
- * @param controlCreationFn (function) function creating a control,  e.g. function(index){...; return new BaseControl(..);}
+ * @param {string} name
+ * @param {number} numberOfControls - number of BaseControl objects to generate
+ * @param {controlCreationFn} controlCreationFn - function creating a control, e.g. function(index){...; return new BaseControl(..);}
  *
  * Author: Lennart Pegel - https://github.com/justlep
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
@@ -141,8 +141,9 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
 
         if (dynamicId) {
             host.scheduleTask(function() {
+                // lep.logDev('recalling now'); // FIXME debug the recall is run twice when leaving device mode
                 self.recallSelectedPage();
-            }, null, 1);
+            }, 1);
             // self.recallSelectedPage(); // don't do this as it will create subscriptions to whatever happens in there
         }
 
@@ -161,13 +162,13 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
     lep.ControlSet.instancesByName[this.name] = this;
 };
 
-/** @static */
+/** @type {Object.<string,lep.ControlSet>} */
 lep.ControlSet.instancesByName = {};
 
-/** @static */
+/** @type {Object.<number,lep.ControlSet>} */
 lep.ControlSet.instanceByValueSetId = {};
 
-/** @static */
+/** @type {Object.<number,number>} */
 lep.ControlSet.lastSelectedPageByValueSetId = {};
 
 lep.ControlSet.prototype = {
@@ -191,7 +192,7 @@ lep.ControlSet.prototype = {
     },
     /**
      * Removes any values and/or valueSets attached to this ControlSets and its controls.
-     * @param [optionalResetValueToSend] (Number) optional value to send to the device to indicate OFF sttus (mostly 0)
+     * @param {number} [optionalResetValueToSend] - optional value to send to the device to indicate OFF sttus (mostly 0)
      *                                            (!) Will be sent only if there was a valueSet attached before reset.
      */
     reset: function(optionalResetValueToSend) {
@@ -207,6 +208,9 @@ lep.ControlSet.prototype = {
         }
     },
 
+    /**
+     * @param {lep.ValueSet} newValueSet
+     */
     setValueSet: function(newValueSet) {
         lep.util.assertValueSet(newValueSet, 'Invalid newValueSet "{}" for attachValueSet on ControlSet {}', newValueSet, this.name);
         if (newValueSet === this.valueSet()) return;
@@ -228,3 +232,9 @@ lep.ControlSet.prototype = {
         this.setValueSet(obs());
     }
 };
+
+/**
+ * @callback controlCreationFn
+ * @param {number} controlIndex
+ * @return {lep.BaseControl}
+ */

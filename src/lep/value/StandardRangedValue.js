@@ -3,6 +3,7 @@
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  *
  * @constructor
+ * @extends {lep.BaseValue}
  */
 lep.StandardRangedValue = lep.util.extendClass(lep.BaseValue, {
 
@@ -54,7 +55,7 @@ lep.StandardRangedValue = lep.util.extendClass(lep.BaseValue, {
             requiresMoveUp: false
         }) : null;
     },
-    /** @Override */
+    /** @override */
     afterDetach: function() {
         var takeover = this._takeover;
         if (takeover) {
@@ -62,19 +63,19 @@ lep.StandardRangedValue = lep.util.extendClass(lep.BaseValue, {
             takeover.recentSyncedValues = {};
         }
     },
-    /** @Override */
+    /** @override */
     setIndication: function(on) {
         // lep.logDebug('setIndications({}) for {}', on, this.name);
         this.indicateableValue.setIndication(on);
     },
-    /** @Override */
+    /** @override */
     onRelativeValueReceived: function(delta, range) {
         if (this._takeover) {
             this.setTakeoverEnabled(false);
         }
         this.rangedValue.inc(delta, range);
     },
-    /** @Override */
+    /** @override */
     onAbsoluteValueReceived: function(absoluteValue, isTakeoverAdvised) {
         // lep.logDebug('{} -> onAbsoluteValueReceived({}, {})', this.name, absoluteValue, isTakeoverAdvised);
         var takeover = this._takeover;
@@ -108,7 +109,7 @@ lep.StandardRangedValue = lep.util.extendClass(lep.BaseValue, {
     }
 });
 
-/** @static */
+/** @type {lep.StandardRangedValue[]} */
 lep.StandardRangedValue._instances = [];
 
 /** @static */
@@ -126,7 +127,12 @@ lep.StandardRangedValue.globalTakeoverEnabled = (function(_enabledObs, _allInsta
 })(ko.observable(false), lep.StandardRangedValue._instances);
 
 
-/** @static */
+/**
+ * @param {ChannelBank} channelBank
+ * @param {number} channelIndex
+ * @return {lep.StandardRangedValue}
+ * @static
+ */
 lep.StandardRangedValue.createVolumeValue = function(channelBank, channelIndex) {
     lep.util.assertObject(channelBank, 'Invalid channelBank for StandardRangedValue.createVolumeValue');
     lep.util.assertNumber(channelIndex, 'Invalid channelIndex for StandardRangedValue.createVolumeValue');
@@ -136,7 +142,12 @@ lep.StandardRangedValue.createVolumeValue = function(channelBank, channelIndex) 
     });
 };
 
-/** @static */
+/**
+ * @param channelBank {ChannelBank}
+ * @param channelIndex {number}
+ * @return {lep.StandardRangedValue}
+ * @static
+ */
 lep.StandardRangedValue.createPanValue = function(channelBank, channelIndex) {
     lep.util.assertObject(channelBank, 'Invalid channelBank for StandardRangedValue.createPanValue');
     lep.util.assertNumber(channelIndex, 'Invalid channelIndex for StandardRangedValue.createPanValue');
@@ -146,7 +157,13 @@ lep.StandardRangedValue.createPanValue = function(channelBank, channelIndex) {
     });
 };
 
-/** @static */
+/**
+ * @param {ChannelBank} channelBank
+ * @param {number} channelIndex
+ * @param {number} sendIndex
+ * @return {lep.StandardRangedValue}
+ * @static
+ */
 lep.StandardRangedValue.createSendValue = function(channelBank, channelIndex, sendIndex) {
     lep.util.assertObject(channelBank, 'Invalid channelBank for StandardRangedValue.createSendValue');
     lep.util.assertNumber(channelIndex, 'Invalid channelIndex for StandardRangedValue.createSendValue');
@@ -170,7 +187,12 @@ lep.StandardRangedValue.createParamValue = function(cursorDevice, paramIndex) {
     });
 };
 
-/** @static **/
+/**
+ * @param {RemoteControlsPage} remoteControlsPage
+ * @param {number} paramIndex
+ * @return {lep.StandardRangedValue}
+ * @static
+ */
 lep.StandardRangedValue.createRemoteControlValue = function(remoteControlsPage, paramIndex) {
     lep.util.assertObject(remoteControlsPage, 'Invalid remoteControlsPage for StandardRangedValue.createRemoteControlValue');
     lep.util.assertNumber(paramIndex, 'Invalid paramIndex for StandardRangedValue.createRemoteControlValue');
@@ -181,10 +203,13 @@ lep.StandardRangedValue.createRemoteControlValue = function(remoteControlsPage, 
 };
 
 /**
- * @static
- *
  * TODO: in Bitwig 2 these values do show NO indication marker + do not get any feedback from the daw
- **/
+ * @param {UserControlBank} userControlBank
+ * @param {number} controlIndex
+ * @param {string} label
+ * @return {lep.StandardRangedValue}
+ * @static
+ */
 lep.StandardRangedValue.createUserControlValue = function(userControlBank, controlIndex, label) {
     lep.util.assertObject(userControlBank, 'Invalid userControlBank for StandardRangedValue.createUserControlValue');
     lep.util.assertNumberInRange(controlIndex, 0, 127, 'Invalid controlIndex for StandardRangedValue.createUserControlValue');

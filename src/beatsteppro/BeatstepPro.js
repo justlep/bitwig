@@ -1,6 +1,6 @@
 /**
  * Arturia Beatstep Pro with either just the main inputs shown (S1, S2, DRUM, ALL) or inputs for all channels.
- * @param [mainChannelsOnly] (boolean) if true, only the main inputs are provided
+ * @param {boolean} [mainChannelsOnly] - if true, only the main inputs are provided
  *
  * Author: Lennart Pegel - https://github.com/justlep/bitwig
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)

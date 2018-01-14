@@ -14,8 +14,6 @@
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  */
 
-/** @var ControllerHost host */
-
 loadAPI(2);
 load('lep/api.js');
 
@@ -580,7 +578,7 @@ ApcMini.resetButtons = function(leaveExitPattern) {
     }
 };
 
-/** override */
+/** @override */
 function flush() {
     if (ApcMini.onFirstFlush) {
         ApcMini.onFirstFlush();

@@ -3,9 +3,9 @@
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  *
  * @constructor
+ * @extends {lep.BaseValue}
  */
 lep.ChannelSelectValue = lep.util.extendClass(lep.BaseValue, {
-
     _init: function(opts) {
         this._super(opts);
 
@@ -21,7 +21,7 @@ lep.ChannelSelectValue = lep.util.extendClass(lep.BaseValue, {
             self.syncToController();
         });
     },
-    /** @Override */
+    /** @override */
     onAbsoluteValueReceived: function(absoluteValue /*, isTakeoverRequired */) {
         var isPressed = !!absoluteValue;
         if (this.toggleOnPressed === isPressed) {
@@ -33,7 +33,10 @@ lep.ChannelSelectValue = lep.util.extendClass(lep.BaseValue, {
     velocityValueOff: 0
 });
 
-/** @static */
+/**
+ * @param {number} onValue
+ * @param {number} offValue
+ */
 lep.ChannelSelectValue.setVelocityValues = function(onValue, offValue) {
     lep.util.assertNumberInRange(onValue, 0, 127, 'Invalid onValue {} for ChannelSelectValue.setVelocityValues', onValue);
     lep.util.assertNumberInRange(offValue, 0, 127, 'Invalid offValue {} for ChannelSelectValue.setVelocityValues', offValue);
@@ -43,7 +46,12 @@ lep.ChannelSelectValue.setVelocityValues = function(onValue, offValue) {
     });
 };
 
-/** @static */
+/**
+ * @param {ChannelBank} channelBank
+ * @param {number} channelIndex
+ * @return {lep.ChannelSelectValue}
+ * @static
+ */
 lep.ChannelSelectValue.create = function(channelBank, channelIndex) {
     lep.util.assertObject(channelBank, 'Invalid channelBank for lep.ChannelSelectValue.create');
     lep.util.assertNumber(channelIndex, 'Invalid channelIndex for lep.ChannelSelectValue.create');

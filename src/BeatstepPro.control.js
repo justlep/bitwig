@@ -31,5 +31,5 @@ function init() {
     println('\n-------------\nBeatstepPro ready (main sequencers only)');
 }
 
-/** @Override */
+/** @override */
 function exit() {}

@@ -4,9 +4,9 @@
  * Author: Lennart Pegel - https://github.com/justlep/bitwig
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  *
- * @param trackIndex {Number} track position of the launcherSlot within the parent MatrixWindow
- * @param sceneIndex {Number} slot/scene position of the launcherSlot within its SceneBank
- * @param sceneBank {ClipLauncherSlotOrSceneBank} the scene bank this launcher slot belongs to
+ * @param {number} trackIndex - track position of the launcherSlot within the parent MatrixWindow
+ * @param {number} sceneIndex - slot/scene position of the launcherSlot within its SceneBank
+ * @param {ClipLauncherSlotOrSceneBank} sceneBank - the scene bank this launcher slot belongs to
  * @constructor
  */
 lep.LauncherSlot = function(trackIndex, sceneIndex, sceneBank) {
@@ -44,7 +44,10 @@ lep.LauncherSlot.prototype = {
     },
     /**
      * To be used by the {@link MatrixWindow} only to update this LauncherSlot with updated values from the Bitwig API.
-     * All params assumed to be {boolean}.
+     * @param {boolean} isStop
+     * @param {boolean} isPlay
+     * @param {boolean} isRecord
+     * @param {boolean} isQueued
      */
     updatePlayStateByFlags: function(isStop, isPlay, isRecord, isQueued) {
         // lep.logDev('Update state for {} -> isStop:{}, isPlay:{}, isRecord:{}, isQueued:{}',

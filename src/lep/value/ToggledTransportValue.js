@@ -6,8 +6,11 @@
  * (!) Use the lep.ToggledTransportValue.getXXXXInstance getters to obtain instances
  *
  * @constructor
+ * @extends {lep.BaseValue}
  */
 lep.ToggledTransportValue = lep.util.extendClass(lep.BaseValue, {
+
+    /** @constructs */
     _init: function(opts) {
         this._super(opts);
 
@@ -36,7 +39,7 @@ lep.ToggledTransportValue = lep.util.extendClass(lep.BaseValue, {
             self.syncToController();
         });
     },
-    /** @Override */
+    /** @override */
     onAbsoluteValueReceived: function(absoluteValue /*, isTakeoverRequired */) {
         var isPressed = !!absoluteValue;
         if (this.toggleOnPressed === isPressed) {
@@ -45,7 +48,7 @@ lep.ToggledTransportValue = lep.util.extendClass(lep.BaseValue, {
     }
 });
 
-/** @static */
+/** @type {Object.<string,lep.ToggledTransportValue>} */
 lep.ToggledTransportValue._instances = {};
 
 // Generate a bunch of static lep.ToggledTransportValue.getXXXInstance() methods, where XXX is 'Play' etc.
@@ -78,3 +81,9 @@ lep.ToggledTransportValue._instances = {};
         });
     };
 });
+
+/**
+ * @callback ToggledTransportValue~instanceColorFn
+ * @param {boolean} isOn
+ * @return {number} the velocity value for the isOn state
+ */

@@ -36,7 +36,6 @@ var lep = (typeof lep !== 'undefined') ? lep : {};
         };
     }
 
-    /** @static */
     lep.LOGLEVEL = {
         DEBUG: 10,
         INFO: 20,
@@ -45,16 +44,14 @@ var lep = (typeof lep !== 'undefined') ? lep : {};
         OFF: 40
     };
 
-    /** @static */
     lep.logDebug = loggingFn;
-    /** @static */
     lep.logInfo = loggingFn;
-    /** @static */
     lep.logDev = loggingFn;
-    /** @static */
     lep.logWarn = loggingFn;
 
-    /** @static */
+    /**
+     * @param {number} newLogLevel - one of the {@link lep.LOGLEVEL} values
+     */
     lep.setLogLevel = function(newLogLevel) {
         ['logDebug', 'logInfo','logDev','logWarn'].forEach(function(logMethodName) {
             var logLevelKey = logMethodName.toUpperCase().replace(/^LOG/, ''),
@@ -64,4 +61,3 @@ var lep = (typeof lep !== 'undefined') ? lep : {};
     };
 
 })();
-

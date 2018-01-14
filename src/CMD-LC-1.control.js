@@ -124,7 +124,7 @@ lep.LC1 = function() {
 
     function testColors() {
         var color = 0;
-        eventDispatcher.onCC(CC.ENCODER0, function(cc, value, channel){
+        eventDispatcher.onCC(CC.ENCODER0, function(cc, value /*, channel */){
             var diff = (value - 64);
             color = lep.util.limitToRange(color + diff, 0, 127);
             lep.logDev('new color: {}', color);

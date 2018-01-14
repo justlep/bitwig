@@ -14,7 +14,7 @@ function init() {
             midiChannel: 0,
             isUnidirectional: true
         }),
-        vol = new lep.StandardRangedValue.createVolumeValue(trackBank, 0);
+        vol = lep.StandardRangedValue.createVolumeValue(trackBank, 0);
 
     fader.attachValue(vol);
 

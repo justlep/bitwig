@@ -16,7 +16,7 @@ host.addDeviceNameBasedDiscoveryPair(['BCF2000 Port 1'], ['BCF2000 Port 1']);
 
 /**
  * Switches the BCF2000 into a given preset number.
- * @param presetNumber (Number) 1-based (!)
+ * @param {number} presetNumber - 1-based (!)
  */
 function switchBcfToPreset(presetNumber) {
     var digit1 = '' + Math.floor(presetNumber/10),
@@ -46,8 +46,8 @@ function exit() {
 
 /**
  * @constructor
- * @param bcfPresetNumber (Number) 1-based BCF2000 preset
- * @param bcfMidiChannel (Number) 0-based BCF2000 MIDI channel
+ * @param {number} bcfPresetNumber - BCF2000 preset (1-based)
+ * @param {number} bcfMidiChannel - BCF2000 MIDI channel (0-based)
  */
 lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
 
@@ -60,7 +60,6 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
 
     var WINDOW_SIZE = 8,
         SENDS_NUMBER = 6,
-        PARAM_PAGES_NUMBER = 12,
         USER_CONTROL_PAGES = 6,
         prefs = {
             soloExclusive: true
@@ -154,15 +153,15 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
             VALUESET.USERCONTROL
         ],
 
-        getNextFreeSwitchableValueSet = function() {
-            for (var i = 0, valueSet; i < SWITCHABLE_VALUESETS.length; i++) {
-                valueSet = SWITCHABLE_VALUESETS[i];
-                if (!valueSet.isControlled()) {
-                    return valueSet;
-                }
-            }
-            return null;
-        },
+        // getNextFreeSwitchableValueSet = function() {
+        //     for (var i = 0, valueSet; i < SWITCHABLE_VALUESETS.length; i++) {
+        //         valueSet = SWITCHABLE_VALUESETS[i];
+        //         if (!valueSet.isControlled()) {
+        //             return valueSet;
+        //         }
+        //     }
+        //     return null;
+        // },
 
         /**
          * Observable holding the VALUE_SET.* that is currently assigned to the encoders.

@@ -40,7 +40,7 @@
         };
 
     /**
-     * @param inPortNumber {Number} 0..100
+     * @param {number} inPortNumber - 0..100
      * @constructor
      */
     lep.MidiEventDispatcher = function(inPortNumber) {
@@ -166,11 +166,18 @@
         inPort.setSysexCallback(DISPATCH_HANDLER.SYSEX);
 
         /**
+         * @callback NoteOrCCMessageHandler
+         * @param {number} noteOrCc
+         * @param {number} message velocity value
+         * @param {number} midi channel (0-based)
+         */
+
+        /**
          * Binds an event handler for all NOTE ON messages independent of value.
-         * @param noteOrRange (Number|Array[2]) single note or array of min/max note to bind
-         * @param callback (function) e.g. function(note, value, channel){..}
-         * @param [context] (Object) (optional) this-context to use for invocation, can be falsy
-         * @param [channel] (Number) (optional) MIDI channel 0-15 to listen to exclusively
+         * @param {number|number[]} noteOrRange - single note or array of min & max note to bind
+         * @param {NoteOrCCMessageHandler} callback - e.g. function(note, value, channel){..}
+         * @param {Object} [context] - (optional) this-context to use for invocation, can be falsy
+         * @param {number} [channel] - (optional) MIDI channel 0-15 to listen to exclusively
          */
         this.onNote = function (noteOrRange, callback, context, channel) {
             addNoteOrCCHandler(handlers.note, noteOrRange, contextSafe(callback, context), channel);
@@ -178,10 +185,10 @@
 
         /**
          * Bind an event handler for NOTE ON messages with values > 0.
-         * @param noteOrRange (Number|Array[2]) single note or array of min/max note to bind
-         * @param callback (function) e.g. function(note, value, channel){..}
-         * @param [context] (Object) (optional) this-context to use for invocation, can be falsy
-         * @param [channel] (Number) (optional) MIDI channel 0-15 to listen to exclusively
+         * @param {number|number[]} noteOrRange - single note or array of min & max note to bind
+         * @param {NoteOrCCMessageHandler} callback - e.g. function(note, value, channel){..}
+         * @param {Object} [context] - (optional) this-context to use for invocation, can be falsy
+         * @param {number} [channel] - (optional) MIDI channel 0-15 to listen to exclusively
          */
         this.onNotePressed = function (noteOrRange, callback, context, channel) {
             addNoteOrCCHandler(handlers.notePressed, noteOrRange, contextSafe(callback, context), channel);
@@ -189,28 +196,28 @@
 
         /**
          * Bind an event handler for both NOTE OFF messages and NOTE ON with value=0.
-         * @param noteOrRange (Number|Array[2]) single note or array of min/max note to bind
-         * @param callback (function) e.g. function(note, value, channel){..},
-         * @param [context] (Object) (optional) this-context to use for invocation, can be falsy
-         * @param [channel] (Number) (optional) MIDI channel 0-15 to listen to exclusively
+         * @param {number|number[]} noteOrRange - single note or array of min & max note to bind
+         * @param {NoteOrCCMessageHandler} callback - e.g. function(note, value, channel){..},
+         * @param {Object} [context] - (optional) this-context to use for invocation, can be falsy
+         * @param {number} [channel] - (optional) MIDI channel 0-15 to listen to exclusively
          */
         this.onNoteReleased = function (noteOrRange, callback, context, channel) {
             addNoteOrCCHandler(handlers.noteReleased, noteOrRange, contextSafe(callback, context), channel);
         };
 
         /**
-         * @param ccOrRange (Number|Array[2]) single note or array of min/max note to bind
-         * @param callback (function) e.g. function(cc, value, channel){..}
-         * @param [context] (Object) (optional) this-context to use for invocation, can be falsy
-         * @param [channel] (Number) (optional) MIDI channel 0-15 to listen to exclusively
+         * @param {number|number[]} ccOrRange - single cc-value or array of min & max cc to bind
+         * @param {NoteOrCCMessageHandler} callback - e.g. function(cc, value, channel){..}
+         * @param {Object} [context] - (optional) this-context to use for invocation, can be falsy
+         * @param {number} [channel] - (optional) MIDI channel 0-15 to listen to exclusively
          */
         this.onCC = function (ccOrRange, callback, context, channel) {
             addNoteOrCCHandler(handlers.cc, ccOrRange, contextSafe(callback, context), channel);
         };
 
         /**
-         * @param callback (function) e.g. function(sysexData){..}
-         * @param [context] (Object) (optional) this-context to use for invocation, can be falsy
+         * @param {function} callback - e.g. function(sysexData){..}
+         * @param {Object} [context] - (optional) this-context to use for invocation, can be falsy
          */
         this.onSysex = function (callback, context) {
             handlers.sysex.push(contextSafe(callback, context));
@@ -219,9 +226,9 @@
         /**
          * Creates a note input for the inPort either for a specific channel or OMNI.
          * TODO make configurable which messages to filter
-         * @param inputName (String) name of the input; the shorter the better
-         * @param [channel] (Number) optional channel (0-15); non-number meaning OMNI
-         * @param [consumeEvents] (boolean) default=false
+         * @param {string} inputName - name of the input; the shorter the better
+         * @param {number} [channel] - optional channel (0-15); non-number meaning OMNI
+         * @param {boolean} [consumeEvents] - default=false
          * @return {NoteInput}
          */
         this.createNoteInput = function (inputName, channel, consumeEvents) {
@@ -245,7 +252,7 @@
          * If disabled (=default), both type of MIDI messages {NoteOff} AND {NoteOn@velocity=0} will
          * be interpreted as NoteOff (hence triggering any bound noteReleased-handlers).
          * Otherwise only explicit NoteOff midi messages will do.
-         * @param useStrict {boolean}
+         * @param {boolean} useStrict
          * @return {lep.MidiEventDispatcher} this instance
          */
         this.setStrictNoteOff = function(useStrict) {
@@ -259,7 +266,7 @@
      * Returns an instance of the MidiEventDispatcher responsible for one specific MidiInPort.
      * If a dispatcher for the given in-port was already created, the existing instance will be returned.
      *
-     * @param [midiInPort] {number} optional MidiInPort number to use (default: 0)
+     * @param {number} [midiInPort] - optional MidiInPort number to use (default: 0)
      * @return {lep.MidiEventDispatcher}
      * @static
      **/
