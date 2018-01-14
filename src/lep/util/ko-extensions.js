@@ -19,8 +19,19 @@ ko.subscribable.fn.updatedByBitwigValue = function(bitwigValue) {
  * @return {ko.subscribable}
  */
 ko.subscribable.fn.updatedBy = function(updaterFunction) {
-    lep.util.assertFunction(updaterFunction, 'Invalid bitwigValue.updatedBy, {}', updaterFunction);
+    lep.util.assertFunction(updaterFunction, 'Invalid updaterFunction for ko-extension updatedBy, {}', updaterFunction);
     updaterFunction(this);
+    return this;
+};
+
+/**
+ * @param {Function} subscriberFn, e.g. function(newVal){..}
+ * @param {?Object} ctx
+ * @return {ko.subscribable}
+ */
+ko.subscribable.fn.withSubscription = function(subscriberFn, ctx) {
+    lep.util.assertFunction(subscriberFn, 'Invalid subscriberFn for ko-extension withSubscription, {}', subscriberFn);
+    this.subscribe(subscriberFn, ctx || null);
     return this;
 };
 
