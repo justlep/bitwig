@@ -3,7 +3,7 @@
  *
  * @param {string} name
  * @param {number} numberOfControls - number of BaseControl objects to generate
- * @param {controlCreationFn} controlCreationFn - function creating a control, e.g. function(index){...; return new BaseControl(..);}
+ * @param {controlCreationFn} controlCreationFn - e.g. function(index){...; return new BaseControl(..);}
  *
  * Author: Lennart Pegel - https://github.com/justlep
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
@@ -118,14 +118,14 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
 
     this.nextValuePage = function() {
         if (self.hasNextValuePage()) {
-            self.valuePage(self.valuePage()+1);
+            self.valuePage(self.valuePage() + 1);
             lep.logDebug('Switch to next page {} of {}', self.valuePage(), self.name);
         }
     };
 
     this.prevValuePage = function() {
         if (self.hasPrevValuePage()) {
-            self.valuePage(self.valuePage()-1);
+            self.valuePage(self.valuePage() - 1);
             lep.logDebug('Switch to previous page {} of {}', self.valuePage(), self.name);
         }
     };

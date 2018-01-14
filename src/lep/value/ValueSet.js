@@ -2,14 +2,13 @@
  * Represents a set of BaseValue (or subclass) objects
  * which can be attached to an instance of {@link lep.ControlSet}.
  *
- * @param {string} name
- * @param {number} cols - the number of Values to create per row
- * @param {number} rows - the number of rows to generate values for
- * @param {valueCreationFn} valueCreationFn - creating a value, e.g. function(colIndex, rowIndex, totalIndex){.. return new lep.BaseValue(..);}
- *
  * Author: Lennart Pegel - https://github.com/justlep
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  *
+ * @param {string} name
+ * @param {number} cols - the number of Values to create per row
+ * @param {number} rows - the number of rows to generate values for
+ * @param {valueCreationFn} valueCreationFn - e.g. function(colIndex, rowIndex, totalIndex){.. return new lep.BaseValue(..);}
  * @constructor
  */
 lep.ValueSet = function(name, cols, rows, valueCreationFn) {
@@ -38,12 +37,14 @@ lep.ValueSet = function(name, cols, rows, valueCreationFn) {
 };
 
 /**
- * @static
- * @type {lep.ValueSet[]}
+ * @type {Object.<string,lep.ValueSet>}
  */
 lep.ValueSet.instancesByName = {};
 
-/** @static */
+/**
+ * @param {string} name - a value set name
+ * @return {boolean}
+ */
 lep.ValueSet.exists = function(name) {
     return !!lep.ValueSet.instancesByName[name];
 };
