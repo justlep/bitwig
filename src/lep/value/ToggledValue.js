@@ -10,7 +10,7 @@ lep.ToggledValue = lep.util.extendClass(lep.BaseValue, {
      * @constructs
      * @param {Object} opts
      * @param {SettableBooleanValue} opts.togglableValue
-     * @param {boolean} [opts.toggleOnPressed]
+     * @param {boolean} [opts.toggleOnPressed=true] - use explicit {false} to toggle upon "button release" instead of press
      * @param {string} opts.name
      * @param {number} [opts.velocityValueOn]
      * @param {number} [opts.velocityValueOff]
