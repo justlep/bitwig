@@ -24,14 +24,20 @@ lep.ValueSet = function(name, cols, rows, valueCreationFn) {
     this.name = name;
     this.values = []; // BaseValues, NOT numerical values
 
+    lep.logDebug("Creating values for ValueSet {}", this.name);
     for (var rowIndex = 0, totalIndex = 0, colIndex, value; rowIndex < rows; rowIndex++) {
         for (colIndex = 0; colIndex < cols; colIndex++, totalIndex++) {
             value = valueCreationFn(colIndex, rowIndex, totalIndex);
             lep.util.assertBaseValue(value, 'Invalid value returned by valueCreationFn in ValueSet');
-            lep.logDebug("Created {} for ValueSet {}", value.name, this.name);
+            lep.logDebug("Created value: {}", value.name, this.name);
             this.values.push(value);
         }
     }
+
+    this.controlSet = ko.observable().withSubscription(function(newControlSet) {
+        var message = newControlSet ? 'ValueSet {} now controlled by {}' : 'ValueSet {} is detached';
+        lep.logDebug(message, this.name, newControlSet && newControlSet.name || '???');
+    }, this);
 
     lep.ValueSet.instancesByName[this.name] = this;
 };
@@ -54,11 +60,11 @@ lep.ValueSet.MAX_SIZE = 100;
 
 lep.ValueSet.prototype = {
     /**
-     * Returns true if the tihs valueSet is currently assigned to any ControlSet.
+     * Returns true if the this valueSet is currently bound to any ControlSet.
      * @return {boolean}
      */
     isControlled: function() {
-        return !!lep.ControlSet.instanceByValueSetId[this.id];
+        return !!this.valueSet.peek();
     },
     /**
      * Returns this valueSet's id which may not necessarily be constant.

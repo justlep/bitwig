@@ -193,14 +193,14 @@ lep.BaseControl.prototype = {
         var eventDispatcher = lep.MidiEventDispatcher.getInstance(this.midiInPort);
         if (this.useValueNote) {
             eventDispatcher.onNote(this.valueNote, this.onValueReceived, this, this.listeningMidiChannel);
-            lep.logDebug('MIDI bound: {} -> note {} channel {}', this.name, this.valueNote, this.listeningMidiChannel);
+            lep.logDebug('MIDI bound: {} -> note {}, CH{}', this.name, this.valueNote, this.listeningMidiChannel);
         } else if (this.useValueCC) {
             eventDispatcher.onCC(this.valueCC, this.onValueReceived, this, this.listeningMidiChannel);
-            lep.logDebug('MIDI bound: {} -> CC {} channel {}', this.name, this.valueCC, this.listeningMidiChannel);
+            lep.logDebug('MIDI bound: {} -> CC {} CH{}', this.name, this.valueCC, this.listeningMidiChannel);
         }
         if (this.useClickNote) {
             eventDispatcher.onNote(this.clickNote, this.onClickNoteReceived, this, this.listeningMidiChannel);
-            lep.logDebug('MIDI clickNote bound: {} -> note {} channel {}', this.name, this.clickNote, this.listeningMidiChannel);
+            lep.logDebug('MIDI clickNote bound: {} -> note {} CH{}', this.name, this.clickNote, this.listeningMidiChannel);
         }
     }
 };

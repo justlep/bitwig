@@ -40,13 +40,13 @@ lep.BaseValue.prototype = {
         this.controller = controller;
         this.syncToController();
         this.setIndication(true);
-        lep.logDebug('Attached {} <> {}', this.controller.name, this.name);
+        lep.logDebug('Attached value {} -> {}', this.name, this.controller.name);
     },
     /** @final */
     onDetach: function() {
         // lep.logDebug('onDetach {}', this.name);
         if (this.controller) {
-            lep.logDebug('Detached {} <> {}', this.controller.name, this.name);
+            lep.logDebug('Detached value {} <- {}', this.name, this.controller.name);
             this.controller = null;
             this.setIndication(false);
             this.afterDetach();

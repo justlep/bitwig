@@ -462,13 +462,13 @@ function ApcMini() {
                 velocityValueOff: COLOR.OFF
             }),
             PREV_VALUEPAGE_FOR_FADERS = new lep.KnockoutSyncedValue({
-                name: 'FadersPrevValuePageBtn',
+                name: 'FadersPrevValuePage',
                 ownValue: true,
                 refObservable: CONTROLSET.FADER_ROW.hasPrevValuePage,
                 onClick: CONTROLSET.FADER_ROW.prevValuePage
             }),
             NEXT_VALUEPAGE_FOR_FADERS = new lep.KnockoutSyncedValue({
-                name: 'FadersNextValuePageBtn',
+                name: 'FadersNextValuePage',
                 ownValue: true,
                 refObservable: CONTROLSET.FADER_ROW.hasNextValuePage,
                 onClick: CONTROLSET.FADER_ROW.nextValuePage

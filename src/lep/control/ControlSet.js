@@ -48,25 +48,35 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
     this.valueSet = ko.computed({
         read: _valueSet,
         write: function(newValueSet) {
-            if (newValueSet === _valueSet()) return;
-
-            if (!newValueSet) {
-                if (_valueSet()) {
-                    lep.ControlSet.instanceByValueSetId[_valueSet().id] = null;
-                }
-                for (var i = 0; i < self.controls.length; i++) {
-                    self.controls[i].detachValue();
-                }
-                _valueSet(null);
-
+            var currentValueSet = _valueSet();
+            if (currentValueSet === newValueSet) {
                 return;
             }
 
-            lep.ControlSet.instanceByValueSetId[newValueSet.id] = self;
-            // if (newValueSet instanceof lep.ParamsValueSet) {
-            //     lep.util.assert(self.controls.length === 8,
-            //         'ParamsValueSet requires a ControlSet of size 8, actual size is {}', self.controls.length);
-            // }
+            // detach own current ValueSet if present..
+            if (currentValueSet) {
+                for (var i = 0; i < self.controls.length; i++) {
+                    self.controls[i].detachValue();
+                }
+                currentValueSet.controlSet(null);
+            }
+
+            if (!newValueSet) {
+                _valueSet(null);
+                return;
+            }
+
+            // From here we're supposed to assign a new ValueSet..
+
+            lep.util.assertValueSet(newValueSet, 'Invalid newValueSet "{}" for attachValueSet on ControlSet {}', newValueSet, self.name);
+            lep.util.assert(!(newValueSet instanceof lep.ParamsValueSet && self.controls.length !== 8),
+                'ParamsValueSet {} requires a ControlSet of size 8, actual size is {}', newValueSet.name, self.controls.length);
+
+            var oldControlSet = newValueSet.controlSet();
+            if (oldControlSet) {
+                oldControlSet.reset();
+            }
+            newValueSet.controlSet(self);
             _valueSet(newValueSet);
         }
     });
@@ -118,15 +128,15 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
 
     this.nextValuePage = function() {
         if (self.hasNextValuePage()) {
+            lep.logDebug('Switching to next page {} of {}', self.valuePage(), self.name);
             self.valuePage(self.valuePage() + 1);
-            lep.logDebug('Switch to next page {} of {}', self.valuePage(), self.name);
         }
     };
 
     this.prevValuePage = function() {
         if (self.hasPrevValuePage()) {
+            lep.logDebug('Switching to previous page {} of {}', self.valuePage(), self.name);
             self.valuePage(self.valuePage() - 1);
-            lep.logDebug('Switch to previous page {} of {}', self.valuePage(), self.name);
         }
     };
 
@@ -140,21 +150,20 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
             dynamicId = valueSet && valueSet.dynamicId();
 
         if (dynamicId) {
-            host.scheduleTask(function() {
-                // lep.logDev('recalling now'); // FIXME debug the recall is run twice when leaving device mode
+            // (!) Do not make the self.recallSelectedPage(); synchronous.
+            //     Deferred calling is important for not building
+            host.scheduleTask(function(){
                 self.recallSelectedPage();
             }, 1);
-            // self.recallSelectedPage(); // don't do this as it will create subscriptions to whatever happens in there
         }
 
         lep.logDebug('new value offset: {}', valueOffset);
-        for (var i = 0, value, control; i < numberOfControls; i++) {
-            value = _valueSet().values[valueOffset + i];
-            control = self.controls[i];
+        for (var i = 0, value, allValues = valueSet.values, allControls = self.controls; i < numberOfControls; i++) {
+            value = allValues[valueOffset + i];
             if (value) {
-                control.attachValue(value);
+                allControls[i].attachValue(value);
             } else {
-                control.detachValue();
+                allControls[i].detachValue();
             }
         }
     });
@@ -164,9 +173,6 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
 
 /** @type {Object.<string,lep.ControlSet>} */
 lep.ControlSet.instancesByName = {};
-
-/** @type {Object.<number,lep.ControlSet>} */
-lep.ControlSet.instanceByValueSetId = {};
 
 /** @type {Object.<number,number>} */
 lep.ControlSet.lastSelectedPageByValueSetId = {};
@@ -214,13 +220,7 @@ lep.ControlSet.prototype = {
     setValueSet: function(newValueSet) {
         lep.util.assertValueSet(newValueSet, 'Invalid newValueSet "{}" for attachValueSet on ControlSet {}', newValueSet, this.name);
         if (newValueSet === this.valueSet()) return;
-
-        var oldControlSet = lep.ControlSet.instanceByValueSetId[newValueSet.id];
-        if (oldControlSet) {
-            oldControlSet.reset();
-        }
-        this.reset();
-        lep.logDebug('Assigning {} to {}', newValueSet.name, this.name);
+        lep.logDebug('Attaching ValueSet {} -> {} ...', newValueSet.name, this.name);
         this.valueSet(newValueSet);
     },
 
