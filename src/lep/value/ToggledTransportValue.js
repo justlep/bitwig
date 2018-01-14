@@ -60,13 +60,21 @@ lep.ToggledTransportValue._instances = {};
 //
 (function(makeInstanceGetter) {
 
+    /** @type {ToggleTransportValue_instanceGetter} */
     lep.ToggledTransportValue.getPlayInstance = makeInstanceGetter('Play', 'isPlaying');
+    /** @type {ToggleTransportValue_instanceGetter} */
     lep.ToggledTransportValue.getMetronomeInstance = makeInstanceGetter('Metronome', 'isMetronomeEnabled');
+    /** @type {ToggleTransportValue_instanceGetter} */
     lep.ToggledTransportValue.getRecordInstance = makeInstanceGetter('Record', 'isArrangerRecordEnabled');
+    /** @type {ToggleTransportValue_instanceGetter} */
     lep.ToggledTransportValue.getPunchInInstance = makeInstanceGetter('PunchIn', 'isPunchInEnabled');
+    /** @type {ToggleTransportValue_instanceGetter} */
     lep.ToggledTransportValue.getPunchOutInstance = makeInstanceGetter('PunchOut', 'isPunchOutEnabled');
+    /** @type {ToggleTransportValue_instanceGetter} */
     lep.ToggledTransportValue.getOverdubInstance = makeInstanceGetter('Overdub', 'isArrangerOverdubEnabled');
+    /** @type {ToggleTransportValue_instanceGetter} */
     lep.ToggledTransportValue.getLoopInstance = makeInstanceGetter('Loop', 'isArrangerLoopEnabled');
+    /** @type {ToggleTransportValue_instanceGetter} */
     lep.ToggledTransportValue.getArrangerAutomationInstance = makeInstanceGetter('ArrangerAutomation', 'isArrangerAutomationWriteEnabled');
 
 })(function _makeInstanceGetter(instanceName, transportBooleanPropertyName) {
@@ -83,7 +91,13 @@ lep.ToggledTransportValue._instances = {};
 });
 
 /**
- * @callback ToggledTransportValue~instanceColorFn
- * @param {boolean} isOn
+ * @callback ToggleTransportValue_instanceGetter
+ * @param {ToggledTransportValue_booleanToColorFn} [booleanToColorCalcFn] - optional function converting a boolean to a midi velocity value
+ * @return {lep.ToggledTransportValue}
+ */
+
+/**
+ * @callback ToggledTransportValue_booleanToColorFn
+ * @param {boolean} the current toggle state
  * @return {number} the velocity value for the isOn state
  */

@@ -10,17 +10,6 @@
  *    - if the onClick callback is given, it is invoked
  *    - if NO onClick is given, the refObservable is set to ownValue
  *
- * @params {Object} opts same as {@link BaseValue}, plus
- *          - ownValue (mixed) the constant value represented by this KnockoutSyncedValue
- *          - refObservable (Observable) the Knockout Observable holding the reference value to compare ownValue to
- *          - [onClick] (function) (optional) function to call when an absolute value > 0 is received
- *          - [velocityValueOn] (number) (optional) velo midi value to send if ownValue matches refObservable
- *          - [velocityValueOff] (number) (optional) velo midi value to send if ownValue matches refObservable
- *          - [computedVelocity] (function|Observable) (optional) function returning the velocity value to send to the controller
- *            (!) If computedVelocity is given, it overrides any given velocityValueOn/velocityValueOff value.
- *          - [ignoreClickIf] (observable) if given, the `click` event
- *          - [forceRewrite] (boolean) if true, the refObservable will be written with `ownValue` even if it already has that value
- *
  * Author: Lennart Pegel - https://github.com/justlep
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  *
@@ -28,7 +17,26 @@
  * @extends {lep.BaseValue}
  */
 lep.KnockoutSyncedValue = lep.util.extendClass(lep.BaseValue, {
-    /** @constructs */
+    /**
+     * @param {Object} opts - same as {@link BaseValue}, plus
+     * @param {*} opts.ownValue - the constant value this KSV instance represents
+     * @param {ko.observable} opts.refObservable - the Knockout observable holding the reference value to compare `ownValue` to
+     * @param {number} [opts.velocityValueOn] - optional midi velocity value to send if ownValue equals refObservable
+     * @param {number} [opts.velocityValueOff] - optional midi velocity value to send if ownValue !equals refObservable
+     * @param {(Function|ko.observable)} [opts.computedVelocity] - a function returning the velocity value to send to the controller.
+*                                                                  If given, `velocityValueOn` and `velocityValueOff` are ignored.
+     * @param {ko.observable} [opts.ignoreClickIf] - if given, the `click` event, e.g. function(){..}()
+     * @param {boolean} [opts.forceRewrite=false] - if true, the refObservable will be written with `ownValue` even if it already has that value
+     * @param {Function} [opts.onClick] - optional function to call when an absolute value > 0 is received, e.g. function(ownVal) {..}
+     * @param {boolean} [opts.restoreRefAfterLongClick] - if true, the refObservable value will be restored to the value
+     *                                                    it had before this KSV instance pushed its ownValue into it, but only if
+     *                                                    the click-release-timespan exceeds {@link #LONG_CLICK_TIME}
+     * @param {boolean} [opts.isOnClickRestoreable] - double-confirmation flag indicating that a given onClick handler
+     *                                            was check to work nicely together with `restoreRefAfterLongClick` mechanism,
+     *                                            i.e. the `onClick` handler updates the refObservable() with ownValue
+     * @extends {lep.BaseValue}
+     * @constructs
+     **/
     _init: function(opts) {
         this._super(opts);
 
@@ -63,9 +71,16 @@ lep.KnockoutSyncedValue = lep.util.extendClass(lep.BaseValue, {
         this.ignoreClickIf = opts.ignoreClickIf;
         this.forceRewrite = !!opts.forceRewrite;
 
+        /**
+         * @type {number} the timestamp when the last click event occurred
+         * @private
+         */
+        this._lastClickTime = 0;
+
         if (this.restoreRefAfterLongClick) {
             lep.util.assert(this.toggleOnPressed, 'restoreRefAfterLongClick requires toggleOnPressed=true, {}', this.name);
-            lep.util.assert(!this.onClick, 'restoreRefAfterLongClick is not supported in conjunction with onClick, {}', this.name);
+            lep.util.assert(!this.onClick || opts.isOnClickRestoreable,
+                'Combined use of onClick + restoreRefAfterLongClick requires the isOnClickRestoreable flag to be explicitly set, {}', this.name);
         }
 
         ko.computed(function() {
@@ -80,33 +95,45 @@ lep.KnockoutSyncedValue = lep.util.extendClass(lep.BaseValue, {
         });
     },
 
-    skipRestore: function() {
-        delete this._savedRefValue;
-    },
-
     /** The time in millis after which a button-press is considered a 'long click' */
     LONG_CLICK_TIME: 300,
 
     /** @override */
     onRelativeValueReceived: lep.util.NOP,
 
+    /**
+     * @return {boolean} true if {@link _lastClickTime} is longer ago than {@link LONG_CLICK_TIME}
+     * @private
+     */
+    _checkAndResetLongClick: function() {
+        var now = Date.now(),
+            diff = now - (this._lastClickTime || (now + 1)),
+            isLongClick = diff > this.LONG_CLICK_TIME;
+
+        this._lastClickTime = 0;
+        return isLongClick;
+    },
+
     /** @override */
     onAbsoluteValueReceived: function(absoluteValue /*, isTakeoverRequired */) {
         if (this.ignoreClickIf && this.ignoreClickIf()) {
-            lep.util.stopTimer(this.id, true);
+            this._lastClickTime = 0;
             return;
         }
 
         var isPressed = !!absoluteValue,
-            isReleaseAfterLongClick = (!isPressed && this.restoreRefAfterLongClick && lep.util.stopTimer(this.id, true) > this.LONG_CLICK_TIME);
+            currentRefValue = this.refObservable.peek(),
+            ownValueEqualsRef = currentRefValue === this.ownValue,
+            isReleaseAfterLongClick = !isPressed && this.restoreRefAfterLongClick && this._checkAndResetLongClick(),
+            skipWriteRef = false;
 
         if (isReleaseAfterLongClick) {
             // only restore the refObservable if the refObservable still has the value it was given by this button
-            if (this.refObservable() === this.ownValue && typeof this._savedRefValue !== 'undefined') {
+            if (ownValueEqualsRef && typeof this._savedRefValue !== 'undefined') {
                 this.refObservable(this._savedRefValue);
                 // lep.logDebug('KSV {} restoring old value {}', this.name, this._savedRefValue);
             }
-            this.skipRestore();
+            delete this._savedRefValue;
             return;
         }
 
@@ -114,23 +141,23 @@ lep.KnockoutSyncedValue = lep.util.extendClass(lep.BaseValue, {
             return;
         }
 
-        // from here we have the "toggle-now!" case
+        // from now we have the "toggle-now!" case
 
         if (this.onClick) {
             this.onClick(this.ownValue);
-            return;
+            skipWriteRef = true;
         }
-        var isAlreadySelected = (this.refObservable() === this.ownValue);
 
         if (this.restoreRefAfterLongClick) {
-            lep.util.startTimer(this.id);
-            if (isAlreadySelected) {
-                this.skipRestore();
+            this._lastClickTime = Date.now();
+            if (ownValueEqualsRef) {
+                delete this._savedRefValue;
             } else {
-                this._savedRefValue = this.refObservable();
+                this._savedRefValue = currentRefValue;
             }
         }
-        if (!isAlreadySelected || this.forceRewrite) {
+
+        if (!skipWriteRef && (!ownValueEqualsRef || this.forceRewrite)) {
             this.refObservable(this.ownValue);
         }
     }

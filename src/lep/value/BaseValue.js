@@ -2,11 +2,12 @@
  * Base class representing a single value than can be connected to both Bitwig and
  * a hardware controller's element (encoder and such) via BaseControl.js or subclass.
  *
- * @param {Object} opts - *   - name (String)
- *
  * Author: Lennart Pegel - https://github.com/justlep
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  *
+ * @param {Object} opts
+ * @param {string} opts.name - a speaking name for this instance
+ * @param {*} [opts.value=0] - an underlying value that this BaseValue should wrap
  * @constructor
  */
 lep.BaseValue = function(opts) {

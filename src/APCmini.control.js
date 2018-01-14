@@ -316,6 +316,8 @@ function ApcMini() {
                 name: 'MatrixLauncherMode',
                 ownValue: MATRIX_MODE.LAUNCHERS,
                 refObservable: currentMatrixMode,
+                restoreRefAfterLongClick: true,
+                isOnClickRestoreable: true,
                 onClick: function() {
                     if (currentMatrixMode().isLaunchers) {
                         matrixWindow.rotate();
@@ -325,7 +327,7 @@ function ApcMini() {
                 },
                 computedVelocity: function() {
                     return (!currentMatrixMode().isLaunchers) ? COLOR.OFF :
-                        matrixWindow.isOrientationTracksByScenes() ? COLOR.GREEN: COLOR.GREEN_BLINK;
+                             matrixWindow.isOrientationTracksByScenes() ? COLOR.GREEN: COLOR.GREEN_BLINK;
                 }
             })
         });
