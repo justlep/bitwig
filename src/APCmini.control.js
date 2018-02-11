@@ -192,7 +192,7 @@ function ApcMini() {
             PAN: lep.ValueSet.createPanValueSet(matrixWindow.trackBank, 8),
             SEND: lep.ValueSet.createSendsValueSet(matrixWindow.trackBank, MATRIX_SENDS, 8),
             DEVICE_PARAMS: new lep.ParamsValueSet(cursorDevice),
-            CONFIG: new lep.ValueSet('ConfigValues', 8, 8, function(col, row) {
+            CONFIG: lep.ValueSet.createForMatrix('ConfigValues', 8, 8, function(col, row) {
                 if (row === 0) {
                     return new lep.KnockoutSyncedValue({
                         name: 'CfgTrackScrollSize' + (col + 1),
@@ -244,7 +244,7 @@ function ApcMini() {
                     value: COLOR.OFF
                 });
             }),
-            MIX: new lep.ValueSet('MixValues', 8, 8, function(col, row) {
+            MIX: lep.ValueSet.createForMatrix('MixValues', 8, 8, function(col, row) {
                 if (!row && !col) {
                     // init default colors once only
                     lep.ToggledValue.setArmVelocityValues(COLOR.RED_BLINK, COLOR.RED);
