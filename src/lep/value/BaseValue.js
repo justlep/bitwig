@@ -35,8 +35,8 @@ lep.BaseValue.prototype = {
      * @param {lep.BaseControl} controller
      * @final
      */
-    onAttach: function(controller) {
-        lep.util.assertBaseControl(controller, 'Invalid controller for BaseValue.onAttach()');
+    afterAttach: function(controller) {
+        lep.util.assertBaseControl(controller, 'Invalid controller for BaseValue.afterAttach()');
         this.controller = controller;
         this.syncToController();
         this.setIndication(true);

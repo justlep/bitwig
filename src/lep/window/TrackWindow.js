@@ -12,9 +12,7 @@
  * @constructor
  */
 lep.TrackWindow = function(name, numTracks, numSends, numScenes, trackBank) {
-    var self = this;
     lep.util.assertNonEmptyString(name, 'Invalid name for TrackWindow: {}', name);
-    this.name = name;
     lep.util.assertNumberInRange(numTracks, 1, lep.TrackWindow.MAX_TRACKS, 'Invalid numTracks for {}: {}', name, numTracks);
     lep.util.assertNumberInRange(numSends, 0, lep.TrackWindow.MAX_SENDS, 'Invalid numSends for {}: {}', name, numSends);
     if (!this._super) {
@@ -27,6 +25,8 @@ lep.TrackWindow = function(name, numTracks, numSends, numScenes, trackBank) {
         lep.util.assertFunction(trackBank.followCursorTrack, 'Invalid trackBank for {}: {}', name, trackBank);
     }
 
+    var self = this;
+    this.name = name;
     this.trackBank = trackBank || host.createMainTrackBank(numTracks, numSends, numScenes || 0);
     this.tracks = lep.util.generateArray(numTracks, function(trackIndex) {
         return self.trackBank.getChannel(trackIndex);

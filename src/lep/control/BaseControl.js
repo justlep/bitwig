@@ -117,7 +117,7 @@ lep.BaseControl.prototype = {
             this.detachValue();
         }
         this.value = value;
-        value.onAttach(this);
+        value.afterAttach(this);
     },
     detachValue: function() {
         this.nextFeedbackLoopValue = null;

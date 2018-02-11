@@ -9,19 +9,39 @@
  * @param {number} cols - the number of Values to create per row
  * @param {number} rows - the number of rows to generate values for
  * @param {valueCreationFn} valueCreationFn - e.g. function(colIndex, rowIndex, totalIndex){.. return new lep.BaseValue(..);}
+ * @param {number} [windowSize] - if given, the
  * @constructor
  */
-lep.ValueSet = function(name, cols, rows, valueCreationFn) {
+lep.ValueSet = function(name, cols, rows, valueCreationFn, windowSize) {
     lep.util.assertString(name, 'Invalid name for ValueSet');
-    lep.util.assert(!lep.ValueSet.exists(name), 'ValueSet with name "{}" already exists', name);
+    lep.ValueSet.register(name, this);
     lep.util.assertNumber(rows, 'Invalids rows for ValueSet: {}', rows);
     lep.util.assertNumber(cols, 'Invalid cols for ValueSet: {}', cols);
     lep.util.assertNumberInRange(rows * cols, 1, lep.ValueSet.MAX_SIZE, 'Invalid size for ValueSet (actual: {}, max: {})',
                                  rows * cols, lep.ValueSet.MAX_SIZE);
     lep.util.assertFunction(valueCreationFn, 'Invalid valueCreationFn for ValueSet');
+    lep.util.assert(typeof windowSize === 'undefined' || windowSize === cols || windowSize === (cols*rows), '' +
+        'Invalid windowSize "{}" for ValueSet {}', windowSize, name);
+
+    /**
+     * The total number of {@link lep.BaseValue} instances this ValueSet is using internally.
+     * @type {number}
+     * @private
+     */
+    this._totalStaticValues = cols * rows;
+    /**
+     * The fix number of values this ValueSet provides to a ControlSet via {@link #currentValues}.
+     * @type {number}
+     * @private
+     */
+    this._windowSize = windowSize || cols;
+
+    var self = this;
 
     this.id = lep.util.nextId();
     this.name = name;
+
+    /** @type {lep.BaseValue} */
     this.values = []; // BaseValues, NOT numerical values
 
     lep.logDebug("Creating values for ValueSet {}", this.name);
@@ -34,45 +54,65 @@ lep.ValueSet = function(name, cols, rows, valueCreationFn) {
         }
     }
 
-    this.controlSet = ko.observable().withSubscription(function(newControlSet) {
+    this.controlSet = ko.observable(null).withSubscription(function(newControlSet) {
         var message = newControlSet ? 'ValueSet {} now controlled by {}' : 'ValueSet {} is detached';
         lep.logDebug(message, this.name, newControlSet && newControlSet.name || '???');
     }, this);
 
-    lep.ValueSet.instancesByName[this.name] = this;
+    this.currentPage = ko.observable(0);
+    this.lastPage = ko.observable(Math.ceil(this._totalStaticValues / this._windowSize) - 1);
+
+    this.hasNextPage = ko.computed(function() {
+        return self.currentPage() < self.lastPage();
+    });
+
+    this.hasPrevPage = ko.computed(function() {
+        return self.currentPage() > 0;
+    });
+
+    this.currentValues = ko.computed(function() {
+        var valsPerPage = self._windowSize;
+        if (valsPerPage === self._totalStaticValues) {
+            return self.values;
+        }
+        var offs = self.currentPage() * valsPerPage,
+            vals = [];
+        for (var i=offs, last = offs + valsPerPage - 1; i <= last; i++) {
+            vals.push(self.values[i] || null);
+        }
+        return vals;
+    });
 };
 
-/**
- * @type {Object.<string,lep.ValueSet>}
- */
+/** @type {Object.<string,lep.ValueSet>} */
 lep.ValueSet.instancesByName = {};
 
-/**
- * @param {string} name - a value set name
- * @return {boolean}
- */
 lep.ValueSet.exists = function(name) {
     return !!lep.ValueSet.instancesByName[name];
+};
+
+lep.ValueSet.register = function(name, instance) {
+    lep.util.assert(!lep.ValueSet.exists(name), 'ValueSet with name "{}" already exists', name);
+    lep.ValueSet.instancesByName[name] = instance;
 };
 
 /** @static */
 lep.ValueSet.MAX_SIZE = 100;
 
 lep.ValueSet.prototype = {
-    /**
-     * Returns true if the this valueSet is currently bound to any ControlSet.
-     * @return {boolean}
-     */
-    isControlled: function() {
-        return !!this.valueSet.peek();
+    supportsControlSet: function(controlSet) {
+        var controlSetSize = controlSet.controls.length;
+        return controlSetSize === this._windowSize;
     },
-    /**
-     * Returns this valueSet's id which may not necessarily be constant.
-     * To be overridden by derived device-specific ValueSet (see {@link ParamsValueSet}.
-     * @return {string}
-     */
-    dynamicId: function() {
-        return this.id + '_' + this.name;
+    gotoNextPage: function() {
+        if (this.hasNextPage()) {
+            this.currentPage(this.currentPage() + 1);
+        }
+    },
+    gotoPrevPage: function() {
+        if (this.hasPrevPage()) {
+            this.currentPage(this.currentPage() - 1);
+        }
     }
 };
 
@@ -183,8 +223,10 @@ lep.ValueSet.createSendsValueSet = function(trackBank, numberOfSends, windowSize
     lep.util.assertNumberInRange(numberOfSends, 1, 20, 'Invalid numberOfSends {} for ValueSet.createSendsValueSet', numberOfSends);
     lep.util.assertNumberInRange(windowSize, 1, 1000, 'Invalid windowSize {} for ValueSet.createSendsValueSet', windowSize);
 
-    var name = (lep.ValueSet.exists('Sends') && allowSecondInstance) ? 'Sends2' : 'Sends';
+    var firstInstanceExists = lep.ValueSet.exists('Sends'),
+        name = firstInstanceExists  ? 'Sends2' : 'Sends';
 
+    lep.util.assert(!firstInstanceExists || allowSecondInstance, 'Use allowSecondInstance to allow multiple Send ValueSets');
     return new lep.ValueSet(name, windowSize, numberOfSends, function(channelIndex, sendIndex) {
         return lep.StandardRangedValue.createSendValue(trackBank, channelIndex, sendIndex);
     });

@@ -194,7 +194,7 @@ lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
                 // generate a swapped-axis version of the `tracksByScenesValueSet`
                 scenesByTrackValueSet = new lep.ValueSet('LauncherSlotValues(SbT)', numScenes, numTracks, function(sceneIndex, trackIndex) {
                     return tracksByScenesValueSet.values[ (sceneIndex * numTracks) + trackIndex ];
-                });
+                }, totalLauncherSlots);
                 lep.logDev('Prepared ValueSet: {}', scenesByTrackValueSet.name);
             }
             _slotLauncherValueSets.tracksByScenes(tracksByScenesValueSet);

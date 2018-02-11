@@ -169,7 +169,7 @@ lep.StandardRangedValue.createSendValue = function(channelBank, channelIndex, se
     lep.util.assertNumber(channelIndex, 'Invalid channelIndex for StandardRangedValue.createSendValue');
     lep.util.assertNumber(sendIndex, 'Invalid sendIndex for StandardRangedValue.createSendValue');
     return new lep.StandardRangedValue({
-        name: lep.util.formatString('Send{}/CH{}', sendIndex, channelIndex),
+        name: lep.util.formatString('Send{}/Track{}', sendIndex, channelIndex),
         rangedValue: channelBank.getChannel(channelIndex).getSend(sendIndex)
     });
 };

@@ -17,11 +17,12 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
     lep.util.assertFunction(controlCreationFn, 'Invalid controlCreationFn for ControlSet {}', name);
 
     var self = this,
-        _valueSet = ko.observable(),
-        _valuePage = ko.observable(0);
+        _valueSet = ko.observable();
 
     this.id = lep.util.nextId();
     this.name = name;
+
+    /** @type {lep.BaseControl[]} */
     this.controls = [];
 
     for (var controlIndex = 0, control; controlIndex < numberOfControls; controlIndex++) {
@@ -29,12 +30,6 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
         lep.util.assertBaseControl(control, 'controlCreationFn returned invalid BaseControl {} for ControlSet {}', control, name);
         this.controls.push(control);
     }
-
-    this.muted = ko.observable(false).withSubscription(function(newIsMuted) {
-        for (var i = 0; i < self.controls.length; i++) {
-            this.controls[i].setMuted(newIsMuted);
-        }
-    }, this).extend({toggleable:true});
 
     this.valueSet = ko.computed({
         read: _valueSet,
@@ -44,8 +39,8 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
                 return;
             }
 
-            // detach own current ValueSet if present..
             if (currentValueSet) {
+                // detach own current ValueSet if present..
                 for (var i = 0; i < self.controls.length; i++) {
                     self.controls[i].detachValue();
                 }
@@ -59,9 +54,8 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
 
             // From here we're supposed to assign a new ValueSet..
 
-            lep.util.assertValueSet(newValueSet, 'Invalid newValueSet "{}" for attachValueSet on ControlSet {}', newValueSet, self.name);
-            lep.util.assert(!(newValueSet instanceof lep.ParamsValueSet && self.controls.length !== 8),
-                'ParamsValueSet {} requires a ControlSet of size 8, actual size is {}', newValueSet.name, self.controls.length);
+            lep.util.assertValueSet(newValueSet, 'Invalid newValueSet "{}" for ControlSet {}', newValueSet, self.name);
+            lep.util.assert(newValueSet.supportsControlSet(self), 'ValueSet "{}" incompatible to ControlSet {}', newValueSet.name, self.name);
 
             var oldControlSet = newValueSet.controlSet();
             if (oldControlSet) {
@@ -72,92 +66,57 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
         }
     });
 
-    this.hasParamsValueSet = ko.computed(function() {
-        var isParamsValueSet = _valueSet() instanceof lep.ParamsValueSet;
-        if (isParamsValueSet) {
-            _valuePage(_valueSet().currentPage());
+    ko.computed(function() {
+        var valueSet = self.valueSet();
+        return valueSet ? valueSet.currentValues() : [];
+    }).subscribe(function(newCurrentValues) {
+        for (var i = newCurrentValues.length-1; i>= 0; i--) {
+            self.controls[i].attachValue(newCurrentValues[i]);
         }
-        return isParamsValueSet;
     });
 
     this.valuePage = ko.computed({
-        read: _valuePage,
+        read: ko.computed(function() {
+            var valueSet = _valueSet();
+            return valueSet ? valueSet.currentPage() : -1;
+        }),
         write: function(newValuePage) {
-            if (self.hasParamsValueSet()) {
-                /**
-                 * If we have a ParamsValueSet, the new page must NOT be set directly via _valuePage(..), but indirectly
-                 * over {@link ParamsValueSet.currentPage}.
-                 * ParamsValueSet.currentPage(..) will set its actual currentPage to a consolidated value (i.e. taking into account
-                 * the actual number of custom param pages).
-                 * Finally, a change in ParamValueSet.currentPage triggers the {@link ControlSet.hasParamsValueSet}-computed,
-                 * which will then update {@link _valuePage} to the consolidated value.
-                 */
-                _valueSet().currentPage(newValuePage);
-            } else {
-                var newPageEffective = Math.max(0, Math.min(self.lastValuePage(), newValuePage));
-                _valuePage(newPageEffective);
+            var valueSet = _valueSet();
+            if (valueSet) {
+                valueSet.currentPage(newValuePage);
             }
-            self.saveSelectedPage();
         }
     });
 
-    this.lastValuePage = ko.computed(function() {
-        var valueSet = _valueSet();
-
-        return valueSet ? (
-                self.hasParamsValueSet() ? valueSet.lastPage() : Math.max(0, Math.ceil(valueSet.values.length / numberOfControls) - 1)
-            ) : 0;
-    });
-
     this.hasPrevValuePage = ko.computed(function() {
-        return !!self.valuePage();
+        var valueSet = _valueSet() || false;
+        return valueSet && valueSet.hasPrevPage();
     });
 
     this.hasNextValuePage = ko.computed(function() {
-        return self.valuePage() < self.lastValuePage();
+        var valueSet = _valueSet() || false;
+        return valueSet && valueSet.hasNextPage();
     });
 
     this.nextValuePage = function() {
-        if (self.hasNextValuePage()) {
-            lep.logDebug('Switching to next page {} of {}', self.valuePage(), self.name);
-            self.valuePage(self.valuePage() + 1);
+        var valueSet = _valueSet();
+        if (valueSet) {
+            valueSet.gotoNextPage();
         }
     };
 
     this.prevValuePage = function() {
-        if (self.hasPrevValuePage()) {
-            lep.logDebug('Switching to previous page {} of {}', self.valuePage(), self.name);
-            self.valuePage(self.valuePage() - 1);
+        var valueSet = _valueSet();
+        if (valueSet) {
+            valueSet.gotoPrevPage();
         }
     };
 
-    ko.computed(function() {
-        var valueSet = _valueSet();
-        if (!valueSet) {
-            return;
+    this.muted = ko.observable(false).withSubscription(function(newIsMuted) {
+        for (var i = 0; i < self.controls.length; i++) {
+            this.controls[i].setMuted(newIsMuted);
         }
-
-        var valueOffset = self.hasParamsValueSet() ? 0 : (self.valuePage() * numberOfControls),
-            dynamicId = valueSet && valueSet.dynamicId();
-
-        if (dynamicId) {
-            // (!) Do not make the self.recallSelectedPage(); synchronous.
-            //     Deferred calling is important for not building
-            host.scheduleTask(function(){
-                self.recallSelectedPage();
-            }, 1);
-        }
-
-        lep.logDebug('new value offset: {}', valueOffset);
-        for (var i = 0, value, allValues = valueSet.values, allControls = self.controls; i < numberOfControls; i++) {
-            value = allValues[valueOffset + i];
-            if (value) {
-                allControls[i].attachValue(value);
-            } else {
-                allControls[i].detachValue();
-            }
-        }
-    });
+    }, this).extend({toggleable:true});
 
     lep.ControlSet.instancesByName[this.name] = this;
 };
@@ -165,28 +124,7 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
 /** @type {Object.<string,lep.ControlSet>} */
 lep.ControlSet.instancesByName = {};
 
-/** @type {Object.<number,number>} */
-lep.ControlSet.lastSelectedPageByValueSetId = {};
-
 lep.ControlSet.prototype = {
-    /**
-     * Saves the currently selected page number of the current valueSet for later recall.
-     */
-    saveSelectedPage: function() {
-        var valueSet = this.valueSet();
-        if (valueSet) {
-            lep.ControlSet.lastSelectedPageByValueSetId[valueSet.dynamicId()] = this.valuePage();
-        }
-    },
-    /**
-     * Restores the page number last saved for the current valueSet.
-     */
-    recallSelectedPage: function() {
-        var dynamicId = this.valueSet().dynamicId(),
-            page = lep.ControlSet.lastSelectedPageByValueSetId[dynamicId] || 0;
-        lep.logDebug('Recalling selected page {} for {}', page, dynamicId);
-        this.valuePage(page);
-    },
     /**
      * Removes any values and/or valueSets attached to this ControlSets and its controls.
      * @param {number} [optionalResetValueToSend] - optional value to send to the device to indicate OFF sttus (mostly 0)
@@ -204,22 +142,25 @@ lep.ControlSet.prototype = {
             }
         }
     },
-
     /**
+     * TODO unused, replace usages with direct usage of this.valueSet(..)
      * @param {lep.ValueSet} newValueSet
      */
     setValueSet: function(newValueSet) {
         lep.util.assertValueSet(newValueSet, 'Invalid newValueSet "{}" for attachValueSet on ControlSet {}', newValueSet, this.name);
-        if (newValueSet === this.valueSet()) return;
-        lep.logDebug('Attaching ValueSet {} -> {} ...', newValueSet.name, this.name);
-        this.valueSet(newValueSet);
+        if (newValueSet !== this.valueSet()) {
+            this.valueSet(newValueSet);
+        }
     },
-
+    /**
+     * Can be called ONCE only
+     * @param {ko.observable} obs
+     */
     setObservableValueSet: function(obs) {
         lep.util.assert(!this._isFollingObservable, 'ControlSet.setObservableValueSet already called for {}', this.name);
         lep.util.assertObservable(obs, 'Invalid observable for ControlSet.setObservableValueSet. {}', this.name);
         this._isFollingObservable = true;
-        obs.subscribe(this.setValueSet, this);
+        obs.subscribe(this.valueSet, this);
         this.setValueSet(obs());
     }
 };
