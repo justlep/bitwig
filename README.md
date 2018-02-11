@@ -1,11 +1,12 @@
 # LeP's controller scripts for Bitwig [![Build Status](https://travis-ci.org/justlep/bitwig.svg?branch=master)](https://travis-ci.org/justlep/bitwig)
 ##### Available scripts (BWS2-ready):
-* [LeP's Behringer BCF2000](./doc/Behringer%20BCF2000/)
-* [LeP's Behringer BCR2000](./doc/Behringer%20BCR2000/)
+* [AKAI APC mini](./doc/APCmini/)
+* [Behringer BCF2000](./doc/Behringer%20BCF2000/)
+* [Behringer BCR2000](./doc/Behringer%20BCR2000/)
 * [Arturia Beatstep Pro](./doc/ArturiaBeatstepPro/)
 * Roland A-49
 * [Alesis PerformancePad](./doc/Alesis%20PerformancePad/)
-* [Behringer CMD DC-1](./doc/Behringer%20CMD%20DC-1) (as Program Change generator)
+* [Behringer CMD DC-1](./doc/Behringer%20CMD%20DC-1) (as simple Program Change generator)
 
 ### Download & Installation
 Go to the [stable-version-for-download](./stable-version-for-download/)-directory and follow the instructions there.  

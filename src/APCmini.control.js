@@ -17,7 +17,7 @@
 loadAPI(2);
 load('lep/api.js');
 
-host.defineController('Akai', 'APC mini', '0.1', '086a5ace-94b9-11e7-abc4-cec278b6b50a', 'Lennart Pegel');
+host.defineController('Akai', 'APC mini', '1.0', '086a5ace-94b9-11e7-abc4-cec278b6b50a', 'Lennart Pegel');
 host.defineMidiPorts(1, 1);
 
 /** @override */
