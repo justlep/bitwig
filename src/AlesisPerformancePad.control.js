@@ -41,6 +41,13 @@ function init() {
         velocitySetting = preferences.getEnumSetting('Velocity Curve', 'Preferences', VELOCITY_MODES, DEFAULT_VELOCITY_MODE),
         notesRemapSetting = preferences.getEnumSetting('Remap pads', 'Preferences', ['C1 to G1','NO'], 'C1 to G1'),
         isNoteRemapEnabled = true,
+        activeNotes = [],
+        switchOffNextNote = function() {
+            var note = activeNotes.shift();
+            if (note !== undefined) {
+                noteInput.sendRawMidiEvent(0x80, note, 0);
+            }
+        },
         HANDLERS = {
             MIDI: function(status, data1, data2) {
                 // printMidi(status, data1, data2);
@@ -53,13 +60,9 @@ function init() {
                     targetVelocity = velocityTranslationTable[data2];
                     // println('Note (orig/target): ' + data1 + '/' + targetNote + ', Vel (orig/target): ' + data2 + '/' + targetVelocity);
                     noteInput.sendRawMidiEvent(0x90, targetNote, targetVelocity);
-
-                    // FIXME -> signature of host.scheduleTask has changed :(
-                    host.scheduleTask(HANDLERS.TIMED_NOTE_OFF, [targetNote], gateTimeInMillis);
+                    activeNotes[activeNotes.length] = targetNote;
+                    host.scheduleTask(switchOffNextNote, gateTimeInMillis);
                 }
-            },
-            TIMED_NOTE_OFF: function(note) {
-                noteInput.sendRawMidiEvent(0x80, note, 0);
             }
         };
 
