@@ -9,7 +9,9 @@
  * @param {number} cols - the number of Values to create per row
  * @param {number} rows - the number of rows to generate values for
  * @param {valueCreationFn} valueCreationFn - e.g. function(colIndex, rowIndex, totalIndex){.. return new lep.BaseValue(..);}
- * @param {number} [windowSize] - if given, the
+ * @param {number} [windowSize] - optionally the size of concurrent values provided by {@link lep.ValueSet.currentValues}.
+ *                                By default, the value from {@param cols} is used. Useful when the values are created
+ *                                col/row-wise but *all* values are always used concurrently, e.g. on a button matrix.
  * @constructor
  */
 lep.ValueSet = function(name, cols, rows, valueCreationFn, windowSize) {
@@ -26,12 +28,14 @@ lep.ValueSet = function(name, cols, rows, valueCreationFn, windowSize) {
     /**
      * The total number of {@link lep.BaseValue} instances this ValueSet is using internally.
      * @type {number}
+     * @const
      * @private
      */
     this._totalStaticValues = cols * rows;
     /**
-     * The fix number of values this ValueSet provides to a ControlSet via {@link #currentValues}.
+     * The fix number of values this ValueSet provides to a ControlSet by {@link lep.ValueSet.currentValues}
      * @type {number}
+     * @const
      * @private
      */
     this._windowSize = windowSize || cols;
@@ -94,6 +98,20 @@ lep.ValueSet.exists = function(name) {
 lep.ValueSet.register = function(name, instance) {
     lep.util.assert(!lep.ValueSet.exists(name), 'ValueSet with name "{}" already exists', name);
     lep.ValueSet.instancesByName[name] = instance;
+};
+
+/**
+ * Creates a new ValueSet whose windowSize set to its entire size.
+ * Same parameters as the ValueSet constructor.
+ * @param {string} name
+ * @param {number} cols
+ * @param {number} rows
+ * @param {valueCreationFn} valueCreationFn
+ * @return {lep.ValueSet}
+ * @static
+ */
+lep.ValueSet.createForMatrix = function(name, cols, rows, valueCreationFn) {
+    return new lep.ValueSet(name, cols, rows, valueCreationFn, cols*rows);
 };
 
 /** @static */

@@ -183,7 +183,8 @@ lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
         this.prepareLauncherSlotValueSets = function(valueCreatorFn) {
             lep.util.assert(!_slotLauncherValueSets.tracksByScenes() && !_slotLauncherValueSets.scenesByTracks(),
                             'Multiple call of MatrixWindow.prepareLauncherSlotValueSets');
-            var tracksByScenesValueSet = new lep.ValueSet('LauncherSlotValues(TbS)', totalLauncherSlots, 1, function(launcherSlotIndex) {
+            var tracksByScenesValueSet = lep.ValueSet.createForMatrix('LauncherSlotValues(TbS)', totalLauncherSlots, 1,
+                function(launcherSlotIndex) {
                     return valueCreatorFn( launcherSlots[launcherSlotIndex] );
                 }),
                 scenesByTrackValueSet = null;
@@ -192,9 +193,10 @@ lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
 
             if (self.canRotate()) {
                 // generate a swapped-axis version of the `tracksByScenesValueSet`
-                scenesByTrackValueSet = new lep.ValueSet('LauncherSlotValues(SbT)', numScenes, numTracks, function(sceneIndex, trackIndex) {
-                    return tracksByScenesValueSet.values[ (sceneIndex * numTracks) + trackIndex ];
-                }, totalLauncherSlots);
+                scenesByTrackValueSet = lep.ValueSet.createForMatrix('LauncherSlotValues(SbT)', numScenes, numTracks,
+                    function(sceneIndex, trackIndex) {
+                        return tracksByScenesValueSet.values[ (sceneIndex * numTracks) + trackIndex ];
+                    });
                 lep.logDev('Prepared ValueSet: {}', scenesByTrackValueSet.name);
             }
             _slotLauncherValueSets.tracksByScenes(tracksByScenesValueSet);
