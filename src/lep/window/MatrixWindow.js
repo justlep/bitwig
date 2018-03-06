@@ -9,12 +9,12 @@
  * @param {number} numTracks
  * @param {number} numSends
  * @param {?number} [numScenes] - optional; must be 0 or empty if no `trackBank` is given
- * @param {?TrackBank} [trackBank] - if null, a MainTrackBank with 0 scenes will be created
+ * @param {?TrackBank} [trackBankOrNull] - if null, a MainTrackBank with 0 scenes will be created
  * @constructor
  * @extends lep.TrackWindow
  */
 lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
-    _init: function(name, numTracks, numSends, numScenes, trackBank) {
+    _init: function(name, numTracks, numSends, numScenes, trackBankOrNull) {
         lep.util.assertNumberInRange(numScenes, 2, lep.TrackWindow.MAX_SCENES, 'Invalid numScenes={} for MatrixWindow {}', numScenes, name);
         this._super.apply(this, arguments);
 
@@ -30,10 +30,6 @@ lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
             /** @type {lep.LauncherSlot[]} */
             launcherSlots = lep.util.generateArrayTableBased(numTracks, numScenes, function(trackIndex, sceneIndex, index) {
                 return new lep.LauncherSlot(trackIndex, sceneIndex, slotBanksByTrack[trackIndex]);
-            }),
-            totalSelectableScenes = ko.observable(1000), // FIXME it is even possible to determine this number?
-            maxScrollPosition = ko.computed(function() {
-                return totalSelectableScenes() - numScenes;
             }),
             _slotLauncherValueSets = {
                 tracksByScenes: ko.observable(null),
@@ -60,17 +56,17 @@ lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
             });
         });
 
-        this.sceneScrollSize = (function(_obs) {
-            return ko.computed({
-                read: _obs,
-                write: function(newScrollSize) {
-                    lep.util.assertNumberInRange(newScrollSize, 1, numScenes, 'Invalid new sceneScrollSize "{}" for {}',
-                                                                              newScrollSize, self.name);
-                    _obs(newScrollSize);
-                    host.showPopupNotification('Scenes per scroll: ' + newScrollSize);
-                }
-            });
-        })(ko.observable(1));
+        var _sceneScrollable = new lep.ScrollableView(this.name, numScenes, this.trackBank.sceneBank());
+
+        this.sceneScrollSize = _sceneScrollable.scrollSize;
+        this.totalScenes = _sceneScrollable.totalItems;
+        this.canMoveSceneBack = _sceneScrollable.canMoveBack;
+        this.canMoveSceneForth = _sceneScrollable.canMoveForth;
+
+        this.moveSceneForth = _sceneScrollable.moveForth;
+        this.moveScenePageForth = _sceneScrollable.movePageForth;
+        this.moveSceneBack = _sceneScrollable.moveBack;
+        this.moveScenePageBack = _sceneScrollable.movePageBack;
 
         this.canRotate = ko.computed(function() {
             return (numTracks === numScenes);
@@ -87,30 +83,6 @@ lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
         })( ko.observable(true) ).extend({toggleable: true});
 
         this.rotate = this.isOrientationTracksByScenes.toggle;
-
-        this.sceneScrollPosition = ko.observable(0).updatedBy(function(obs) {
-            // TODO use sceneBank
-            self.trackBank.addSceneScrollPositionObserver(obs, 0);
-        });
-        this.canMoveSceneBack = ko.computed(function() {
-            return !!self.sceneScrollPosition();
-        });
-        this.canMoveSceneForth = ko.computed(function() {
-            return self.sceneScrollPosition() < maxScrollPosition();
-        });
-
-        this.moveSceneForth = function() {
-            self.trackBank.scrollToScene( self.sceneScrollPosition() + self.sceneScrollSize() );
-        };
-        this.moveScenePageForth = function() {
-            self.trackBank.scrollScenesPageDown();
-        };
-        this.moveSceneBack = function() {
-            self.trackBank.scrollToScene( Math.max(0, self.sceneScrollPosition() - self.sceneScrollSize()) );
-        };
-        this.moveScenePageBack = function() {
-            self.trackBank.scrollToScene( Math.max(0, self.sceneScrollPosition() - numScenes) );
-        };
 
         this.canMoveMatrixUp = ko.computed(function(){
             return self.isOrientationTracksByScenes() ? self.canMoveSceneBack() : self.canMoveChannelBack();

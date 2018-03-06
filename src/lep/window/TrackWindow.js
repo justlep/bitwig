@@ -26,53 +26,23 @@ lep.TrackWindow = function(name, numTracks, numSends, numScenes, trackBank) {
     }
 
     var self = this;
+
     this.name = name;
     this.trackBank = trackBank || host.createMainTrackBank(numTracks, numSends, numScenes || 0);
     this.tracks = lep.util.generateArray(numTracks, function(trackIndex) {
         return self.trackBank.getItemAt(trackIndex);
     });
 
-    this.trackScrollSize = (function(_obs) {
-        return ko.computed({
-            read: _obs,
-            write: function(newScrollSize) {
-                lep.util.assertNumberInRange(newScrollSize, 1, numTracks, 'Invalid new trackScrollSize "{}" for {}', newScrollSize, self.name);
-                // ChannelBank#setChannelScrollStepSize() is still broken in Bitwig 2.2.3
-                _obs(newScrollSize);
-                host.showPopupNotification('Tracks per scroll: ' + newScrollSize);
-            }
-        });
-    })(ko.observable(1));
+    var _scrollable = new lep.ScrollableView(name, numTracks, this.trackBank);
 
-    var _settableScrollPosition = this.trackBank.scrollPosition(),
-        _currentPosition = ko.observable(0).updatedByBitwigValue(_settableScrollPosition),
-        /**
-         * Scroll the bank forth or back while keeping in valid bounds
-         * @param {number}relScrollSize
-         * @private
-         */
-        _scrollBy = function(relScrollSize) {
-            var safeNewPos = Math.max(0, Math.min(_currentPosition() + relScrollSize, self.totalChannels() - numTracks));
-            // lep.logDev('safeNewPos for TrackWindow = ' + safeNewPos);
-            _settableScrollPosition.set(safeNewPos);
-        };
-
-    this.totalChannels = ko.observable(0).updatedByBitwigValue(this.trackBank.itemCount());
-    this.canMoveChannelBack = ko.observable(false).updatedByBitwigValue(this.trackBank.canScrollChannelsUp());
-    this.canMoveChannelForth = ko.observable(false).updatedByBitwigValue(this.trackBank.canScrollChannelsDown());
-
-    this.moveChannelForth = function() {
-        _scrollBy(self.trackScrollSize());
-    };
-    this.moveChannelPageForth = function() {
-        _scrollBy(numTracks);
-    };
-    this.moveChannelBack = function() {
-        _scrollBy(-self.trackScrollSize());
-    };
-    this.moveChannelPageBack = function() {
-        _scrollBy(-numTracks);
-    };
+    this.trackScrollSize = _scrollable.scrollSize;
+    this.totalChannels = _scrollable.totalItems;
+    this.canMoveChannelBack = _scrollable.canMoveBack;
+    this.canMoveChannelForth = _scrollable.canMoveForth;
+    this.moveChannelForth = _scrollable.moveForth;
+    this.moveChannelPageForth = _scrollable.movePageForth;
+    this.moveChannelBack = _scrollable.moveBack;
+    this.moveChannelPageBack = _scrollable.movePageBack;
 };
 
 /** @static */

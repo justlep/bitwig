@@ -15,6 +15,7 @@ load('../lib/knockout-stripped.js');
 load('util/log.js');
 load('util/util.js');
 load('util/ko-extensions.js');
+load('util/ScrollableView.js');
 
 load('midi/MidiEventDispatcher.js');
 
