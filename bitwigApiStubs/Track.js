@@ -1,4 +1,4 @@
-/* API Version - 2.2.3 */
+/* API Version - 2.3.1 */
 
 /**
  * Instances of this interface represent tracks in Bitwig Studio.
@@ -30,33 +30,33 @@ Track.prototype.clipLauncherSlotBank = function() {};
  * Returns an object that provides access to the arm state of the track.
  *
  * @return {SettableBooleanValue} a boolean value object
- * @since API version 1
+ * @since API version 5
  */
-Track.prototype.getArm = function() {};
+Track.prototype.arm = function() {};
 
 /**
  * Returns an object that provides access to the monitoring state of the track.
  *
  * @return {SettableBooleanValue} a boolean value object
- * @since API version 1
+ * @since API version 5
  */
-Track.prototype.getMonitor = function() {};
+Track.prototype.monitor = function() {};
 
 /**
  * Returns an object that provides access to the auto-monitoring state of the track.
  *
  * @return {SettableBooleanValue} a boolean value object
- * @since API version 1
+ * @since API version 5
  */
-Track.prototype.getAutoMonitor = function() {};
+Track.prototype.autoMonitor = function() {};
 
 /**
  * Returns an object that provides access to the cross-fade mode of the track.
  *
  * @return {SettableEnumValue} an enum value object that has three possible states: "A", "B", or "AB"
- * @since API version 1
+ * @since API version 5
  */
-Track.prototype.getCrossFadeMode = function() {};
+Track.prototype.crossFadeMode = function() {};
 
 /**
  * Value that reports if this track is currently stopped. When a track is stopped it is not playing content
@@ -80,9 +80,9 @@ Track.prototype.isQueuedForStop = function() {};
  * Studio and lists either note or audio sources or both depending on the track type.
  *
  * @return {SourceSelector} a source selector object
- * @since API version 1
+ * @since API version 5
  */
-Track.prototype.getSourceSelector = function() {};
+Track.prototype.sourceSelector = function() {};
 
 /**
  * Stops playback of the track.
@@ -186,17 +186,17 @@ Track.prototype.isGroup = function() {};
  * Returns an object that indicates if the track may contain notes.
  *
  * @return {SettableBooleanValue} a boolean value object
- * @since API version 1
+ * @since API version 5
  */
-Track.prototype.getCanHoldNoteData = function() {};
+Track.prototype.canHoldNoteData = function() {};
 
 /**
  * Returns an object that indicates if the track may contain audio events.
  *
  * @return {SettableBooleanValue} a boolean value object
- * @since API version 1
+ * @since API version 5
  */
-Track.prototype.getCanHoldAudioData = function() {};
+Track.prototype.canHoldAudioData = function() {};
 
 /**
  * Returns an object that provides access to the cursor item of the track's device selection as shown in

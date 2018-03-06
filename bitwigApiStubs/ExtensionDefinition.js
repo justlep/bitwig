@@ -1,4 +1,4 @@
-/* API Version - 2.2.3 */
+/* API Version - 2.3.1 */
 
 /**
  * Base class for defining any kind of extension for Bitwig Studio.

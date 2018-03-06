@@ -1,4 +1,4 @@
-/* API Version - 2.2.3 */
+/* API Version - 2.3.1 */
 
 /**
  * This interface builds the foundation for storing custom settings in Bitwig Studio documents or in the
@@ -76,3 +76,17 @@ Settings.prototype.getEnumSetting = function(label, category, options, initialVa
 @since API version 1
  */
 Settings.prototype.getStringSetting = function(label, category, numChars, initialText) {};
+
+/**
+ * Returns a color setting that is shown in the Bitwig Studio user interface.
+ *
+ * @param label
+          the name of the setting, must not be `null`
+ * @param category
+          the name of the category, may not be `null`
+ * @param initialColor
+          the initial color value of the setting
+ * @return {SettableColorValue} the object that encapsulates the requested string setting
+ * @since API version 5
+ */
+Settings.prototype.getColorSetting = function(label, category, initialColor) {};

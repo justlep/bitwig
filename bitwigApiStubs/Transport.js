@@ -1,4 +1,4 @@
-/* API Version - 2.2.3 */
+/* API Version - 2.3.1 */
 
 /**
  * An interface representing the transport section in Bitwig Studio.
@@ -305,17 +305,17 @@ Transport.prototype.getOutPosition = function() {};
  * specified on the Bitwig Studio tracks.
  *
  * @return {Parameter}
- * @since API version 1
+ * @since API version 5
  */
-Transport.prototype.getCrossfade = function() {};
+Transport.prototype.crossfade = function() {};
 
 /**
  * Returns an object that provides access to the transport time signature.
  *
  * @return {TimeSignatureValue} the time signature value object that represents the transport time signature.
- * @since API version 1
+ * @since API version 5
  */
-Transport.prototype.getTimeSignature = function() {};
+Transport.prototype.timeSignature = function() {};
 
 /**
  * Value that reports the current clip launcher post recording action. Possible values are `"off"`,

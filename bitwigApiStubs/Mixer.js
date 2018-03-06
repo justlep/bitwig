@@ -1,4 +1,4 @@
-/* API Version - 2.2.3 */
+/* API Version - 2.3.1 */
 
 /**
  * An interface used to access various commands that can be performed on the Bitwig Studio mixer panel.<br/>

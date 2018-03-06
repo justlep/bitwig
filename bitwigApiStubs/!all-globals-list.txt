@@ -1,7 +1,7 @@
 
 *****************************************************************
 Last result of `grunt generateJshintConfig`
-API version 2.2.3 | 161 files | 142 classes | 42 global functions
+API version 2.3.1 | 177 files | 158 classes | 42 global functions
 *****************************************************************
 
 Global functions: 
@@ -71,6 +71,7 @@ Global classes:
  - BrowserResultsItemBank
  - BrowsingSessionBank
  - Callback
+ - ChainSelector
  - Channel
  - ChannelBank
  - Clip
@@ -79,12 +80,15 @@ Global classes:
  - ClipLauncherSlotBankPlaybackStateChangedCallback
  - ClipLauncherSlotOrScene
  - ClipLauncherSlotOrSceneBank
+ - Color
  - ColorValue
  - ColorValueChangedCallback
  - ConnectionEstablishedCallback
  - ControllerExtension
  - ControllerExtensionDefinition
  - ControllerHost
+ - CueMarker
+ - CueMarkerBank
  - Cursor
  - CursorBrowserFilterColumn
  - CursorBrowserFilterItem
@@ -140,6 +144,18 @@ Global classes:
  - ObjectArrayValue
  - ObjectProxy
  - ObjectValueChangedCallback
+ - OscAddressSpace
+ - OscBundle
+ - OscConnection
+ - OscIOException
+ - OscInvalidArgumentTypeException
+ - OscMessage
+ - OscMethod
+ - OscMethodCallback
+ - OscModule
+ - OscNode
+ - OscPacket
+ - OscPacketSizeExceededException
  - Parameter
  - ParameterBank
  - PinnableCursor

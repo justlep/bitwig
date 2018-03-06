@@ -1,4 +1,4 @@
-/* API Version - 2.2.3 */
+/* API Version - 2.3.1 */
 
 /**
  * Interface for an object that can be 'subscribed' or not. A subscribed object will notify any observers when

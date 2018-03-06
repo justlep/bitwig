@@ -1,4 +1,4 @@
-/* API Version - 2.2.3 */
+/* API Version - 2.3.1 */
 
 /**
  * Instances of this interface are used to navigate a column in the Bitwig Studio browser.
@@ -9,15 +9,6 @@ function BrowserColumn() {}
 
 BrowserColumn.prototype = new ObjectProxy();
 BrowserColumn.prototype.constructor = BrowserColumn;
-
-/**
- * Registers an observer that reports if the column exists.
- *
- * @param callback
-          a callback function that receives a single boolean parameter
- * @since API version 1
- */
-BrowserColumn.prototype.addExistsObserver = function(callback) {};
 
 /**
  * Value that reports the underlying total count of column entries (not the size of the column window).

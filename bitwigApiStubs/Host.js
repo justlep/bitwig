@@ -1,4 +1,4 @@
-/* API Version - 2.2.3 */
+/* API Version - 2.3.1 */
 
 /**
  * Defines the interface through which an extension can talk to the host application.
@@ -58,3 +58,11 @@ Host.prototype.getPlatformType = function() {};
  * @since API version 2
  */
 Host.prototype.setErrorReportingEMail = function(address) {};
+
+/**
+ * Gets the OpenSoundControl module.
+ *
+ * @return {OscModule}
+ * @since API version 5
+ */
+Host.prototype.getOscModule = function() {};

@@ -1,4 +1,4 @@
-/* API Version - 2.2.3 */
+/* API Version - 2.3.1 */
 
 /**
  * The foundation of all interfaces that contain devices, such as tracks, device layers, drum pads or FX

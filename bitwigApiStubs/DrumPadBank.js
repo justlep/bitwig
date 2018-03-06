@@ -1,4 +1,4 @@
-/* API Version - 2.2.3 */
+/* API Version - 2.3.1 */
 
 /**
  * Drum pads are features of special Bitwig Studio devices (currently only the Bitwig Drum Machine

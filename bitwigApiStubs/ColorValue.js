@@ -1,4 +1,4 @@
-/* API Version - 2.2.3 */
+/* API Version - 2.3.1 */
 
 function ColorValue() {}
 
@@ -33,6 +33,6 @@ ColorValue.prototype.blue = function() {};
  * Gets the alpha component of the current value.
  *
  * @return {float}
- * @since API version 4
+ * @since API version 5
  */
 ColorValue.prototype.alpha = function() {};

@@ -1,4 +1,4 @@
-/* API Version - 2.2.3 */
+/* API Version - 2.3.1 */
 
 /**
  * An interface representing various commands which can be performed on the Bitwig Studio arranger.<br/>
@@ -76,3 +76,13 @@ Arranger.prototype.isIoSectionVisible = function() {};
  * @since API version 1
  */
 Arranger.prototype.areEffectTracksVisible = function() {};
+
+/**
+ * Returns an object that provides access to a bank of successive cue markers using a window configured with
+ * the given size, that can be scrolled over the list of markers.
+ *
+ * @param size
+          the number of simultaneously accessible items
+ * @return {CueMarkerBank} the requested item bank object
+ */
+Arranger.prototype.createCueMarkerBank = function(size) {};

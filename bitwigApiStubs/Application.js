@@ -1,4 +1,4 @@
-/* API Version - 2.2.3 */
+/* API Version - 2.3.1 */
 
 /**
  * An interface that provides methods for accessing the most common global application commands.<br/>

@@ -1,4 +1,4 @@
-/* API Version - 2.2.3 */
+/* API Version - 2.3.1 */
 
 /**
  * An interface representing the host application to the script. A singleton instance of this interface is
@@ -407,39 +407,6 @@ ControllerHost.prototype.createEffectTrackBank = function(numTracks, numScenes) 
 ControllerHost.prototype.createMasterTrack = function(numScenes) {};
 
 /**
- * Returns an object that represents the cursor item of the arranger track selection.
- *
- * @param numSends
-          the number of sends for bank-wise navigation of the sends that are associated with the track
-          selection
- * @param numScenes
-          the number of scenes for bank-wise navigation of the clip launcher slots that are associated
-          with the track selection
- * @return {CursorTrack} an object representing the currently selected arranger track (in the future also multiple
-        tracks)
- * @since API version 1
- */
-ControllerHost.prototype.createArrangerCursorTrack = function(numSends, numScenes) {};
-
-/**
- * Returns an object that represents a named cursor track, that is independent from the arranger or mixer
- * track selection in the user interface of Bitwig Studio.
- *
- * @param name
-          the name of the track cursor
- * @param numSends
-          the number of sends for bank-wise navigation of the sends that are associated with the track
-          selection
- * @param numScenes
-          the number of scenes for bank-wise navigation of the clip launcher slots that are associated
-          with the track selection
- * @return {CursorTrack} an object representing the currently selected arranger track (in the future also multiple
-        tracks).
- * @since API version 1
- */
-ControllerHost.prototype.createCursorTrack = function(name, numSends, numScenes) {};
-
-/**
  * Returns an object that represents a named cursor track, that is independent from the arranger or mixer
  * track selection in the user interface of Bitwig Studio.
  *
@@ -473,21 +440,6 @@ ControllerHost.prototype.createCursorTrack = function(id, name, numSends, numSce
  * @since API version 1
  */
 ControllerHost.prototype.createSceneBank = function(numScenes) {};
-
-/**
- * Returns an object that represents the cursor device in devices selections made by the user in Bitwig
- * Studio. Calling this method is equal to the following code: {@code
- * var cursorTrack = createArrangerCursorTrack(numSends, numScenes);
- * var cursorDevice = cursorTrack.createCursorDevice();
- * } To create a custom device selection that is not connected to the main device selection in the user
- * interface, call {@link Track#createCursorDevice(String) cursorTrack.createCursorDevice(String name)}.
- *
- * @param numSends
-          the number of sends that are simultaneously accessible in nested channels.
- * @return {CursorDevice} an object representing the currently selected device.
- * @since API version 1
- */
-ControllerHost.prototype.createEditorCursorDevice = function(numSends) {};
 
 /**
  * Returns a clip object that represents the cursor of the launcher clip selection. The gridWidth and

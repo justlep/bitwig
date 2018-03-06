@@ -1,4 +1,4 @@
-/* API Version - 2.2.3 */
+/* API Version - 2.3.1 */
 
 /**
  * Devices layers are features of special Bitwig Studio devices, more specifically the Layer Instrument and
@@ -17,14 +17,3 @@ function DeviceLayerBank() {}
 
 DeviceLayerBank.prototype = new ChannelBank();
 DeviceLayerBank.prototype.constructor = DeviceLayerBank;
-
-/**
- * Returns the device layer at the given index.
- *
- * @param indexInBank
-          the device layer index within this bank, not the index within the list of all device layers as
-          shown in Bitwig Studio layer devices. Must be in the range [0..sizeOfBank-1].
- * @return {DeviceLayer} the device layer object
- * @since API version 1
- */
-DeviceLayerBank.prototype.getChannel = function(indexInBank) {};

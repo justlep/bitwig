@@ -1,4 +1,4 @@
-/* API Version - 2.2.3 */
+/* API Version - 2.3.1 */
 
 /**
  * Interface for something that can be scrolled.
@@ -43,7 +43,7 @@ Scrollable.prototype.scrollBackwards = function() {};
  * @param amount
           The number of pages to scroll by (positive is forwards and negative is backwards).
  */
-Scrollable.prototype.scrollByPages = function(pages) {};
+Scrollable.prototype.scrollByPages = function(amount) {};
 
 /**
  * Scrolls forwards by one page.

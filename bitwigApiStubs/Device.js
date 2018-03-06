@@ -1,4 +1,4 @@
-/* API Version - 2.2.3 */
+/* API Version - 2.3.1 */
 
 /**
  * This interface represents a device in Bitwig Studio, both internal devices and plugins.
@@ -15,9 +15,9 @@ Device.prototype.constructor = Device;
  * are tracks, device layers, drums pads, or FX slots.
  *
  * @return {DeviceChain} the requested device chain object
- * @since API version 1
+ * @since API version 5
  */
-Device.prototype.getDeviceChain = function() {};
+Device.prototype.deviceChain = function() {};
 
 /**
  * Value that reports the position of the device within the parent device chain.
@@ -186,42 +186,6 @@ Device.prototype.presetCategory = function() {};
 Device.prototype.presetCreator = function() {};
 
 /**
- * Registers an observer that reports the currently selected parameter page.
- *
- * @param valueWhenUnassigned
-          the default page index that gets reported when the device is not associated with a device
-          instance in Bitwig Studio yet.
- * @param callback
-          a callback function that receives a single page index parameter (integer)
- * @since API version 1
- */
-Device.prototype.addSelectedPageObserver = function(valueWhenUnassigned, callback) {};
-
-/**
- * Registers an observer that reports the name of the active modulation source.
- *
- * @param len
-          the maximum length of the name. Longer names will get truncated.
- * @param textWhenUnassigned
-          the default name that gets reported when the device is not associated with a Bitwig Studio
-          device yet.
- * @param callback
-          a callback function that receives a single name parameter (string)
- * @since API version 1
- */
-Device.prototype.addActiveModulationSourceObserver = function(len, textWhenUnassigned, callback) {};
-
-/**
- * Registers an observer that reports the names of the devices parameter pages.
- *
- * @param callback
-          a callback function that receives a single string array parameter containing the names of the
-          parameter pages
- * @since API version 1
- */
-Device.prototype.addPageNamesObserver = function(callback) {};
-
-/**
  * Value that reports if the device is enabled.
  *
  * @return {SettableBooleanValue}
@@ -230,8 +194,8 @@ Device.prototype.addPageNamesObserver = function(callback) {};
 Device.prototype.isEnabled = function() {};
 
 /**
- * Indicates if the device has nested device chains in FX slots. Use {@link #addSlotsObserver(Callable)
- * addSlotsObserver(Callable)} to get a list of available slot names, and navigate to devices in those
+ * Indicates if the device has nested device chain slots. Use {@link #slotNames()}
+ * to get a list of available slot names, and navigate to devices in those
  * slots using the {@link CursorDevice} interface.
  *
  * @return {BooleanValue} a value object that indicates if the device has nested device chains in FX slots.
@@ -282,6 +246,12 @@ Device.prototype.hasDrumPads = function() {};
 
 /**
  * Create a bank for navigating the nested layers of the device using a fixed-size window.
+ * 
+ * This bank will work over the following devices:
+ *  - Instrument Layer
+ *  - Effect Layer
+ *  - Instrument Selector
+ *  - Effect Selector
  *
  * @param numChannels
           the number of channels that the device layer bank should be configured with
@@ -302,12 +272,27 @@ Device.prototype.createDrumPadBank = function(numPads) {};
 
 /**
  * Returns a device layer instance that can be used to navigate the layers or drum pads of the device, in
- * case it has any.
+ * case it has any
+ * 
+ * This is the selected layer from the user interface.
  *
  * @return {CursorDeviceLayer} a cursor device layer instance
  * @since API version 1
  */
 Device.prototype.createCursorLayer = function() {};
+
+/**
+ * Creates a ChainSelector object which will give you control over the current device if it is
+ * an Instrument Selector or an Effect Selector.
+ * 
+ * To check if the device is currently a ChainSelector, use {@link ChainSelector.exists()}.
+ * 
+ * If you want to have access to all the chains, use {@link #createLayerBank(int)}.
+ *
+ * @return {ChainSelector} a chain selector instance
+ * @since API version 6
+ */
+Device.prototype.createChainSelector = function() {};
 
 /**
  * Adds an observer on a list of all parameters for the device.

@@ -1,4 +1,4 @@
-/* API Version - 2.2.3 */
+/* API Version - 2.3.1 */
 
 /**
  * Instances of this interface represent time signature values.
@@ -32,22 +32,22 @@ TimeSignatureValue.prototype.set = function(name) {};
  * Returns an object that provides access to the time signature numerator.
  *
  * @return {SettableIntegerValue} an integer value object that represents the time signature numerator.
- * @since API version 1
+ * @since API version 5
  */
-TimeSignatureValue.prototype.getNumerator = function() {};
+TimeSignatureValue.prototype.numerator = function() {};
 
 /**
  * Returns an object that provides access to the time signature denominator.
  *
  * @return {SettableIntegerValue} an integer value object that represents the time signature denominator.
- * @since API version 1
+ * @since API version 5
  */
-TimeSignatureValue.prototype.getDenominator = function() {};
+TimeSignatureValue.prototype.denominator = function() {};
 
 /**
  * Returns an object that provides access to the time signature tick subdivisions.
  *
  * @return {SettableIntegerValue} an integer value object that represents the time signature ticks.
- * @since API version 1
+ * @since API version 5
  */
-TimeSignatureValue.prototype.getTicks = function() {};
+TimeSignatureValue.prototype.ticks = function() {};

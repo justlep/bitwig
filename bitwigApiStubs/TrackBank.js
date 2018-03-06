@@ -1,4 +1,4 @@
-/* API Version - 2.2.3 */
+/* API Version - 2.3.1 */
 
 /**
  * A track bank provides access to a range of tracks and their scenes (clip launcher slots) in Bitwig Studio.
@@ -19,17 +19,6 @@ function TrackBank() {}
 
 TrackBank.prototype = new ChannelBank();
 TrackBank.prototype.constructor = TrackBank;
-
-/**
- * Returns the track at the given index within the bank.
- *
- * @param indexInBank
-          the track index within this bank, not the index within the list of all Bitwig Studio tracks.
-          Must be in the range [0..sizeOfBank-1].
- * @return {Track} the requested track object
- * @since API version 1
- */
-TrackBank.prototype.getChannel = function(indexInBank) {};
 
 /**
  * {@link SceneBank} that represents a view on the scenes in this {@link TrackBank}.
@@ -68,18 +57,6 @@ TrackBank.prototype.scrollScenesDown = function() {};
  * @since API version 1
  */
 TrackBank.prototype.scrollToScene = function(position) {};
-
-/**
- * Registers an observer that reports the current scene scroll position.
- *
- * @param callback
-          a callback function that takes a single integer parameter
- * @param valueWhenUnassigned
-          the default value that gets reports when the track bank is not yet connected to a Bitwig
-          Studio document
- * @since API version 1
- */
-TrackBank.prototype.addSceneScrollPositionObserver = function(callback, valueWhenUnassigned) {};
 
 /**
  * Causes this bank to follow the supplied cursor. When the cursor moves to a new item the bank will be

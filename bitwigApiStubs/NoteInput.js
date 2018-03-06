@@ -1,4 +1,4 @@
-/* API Version - 2.2.3 */
+/* API Version - 2.3.1 */
 
 /**
  * Instances of this interface implement note input functionality used for recording notes in Bitwig Studio

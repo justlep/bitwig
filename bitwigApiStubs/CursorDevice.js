@@ -1,4 +1,4 @@
-/* API Version - 2.2.3 */
+/* API Version - 2.3.1 */
 
 /**
  * A special kind of selection cursor used for devices.
@@ -15,9 +15,9 @@ CursorDevice.prototype.constructor = CursorDevice;
  * cursor track instance.
  *
  * @return {Channel} the track or cursor track object that was used for creation of this cursor device.
- * @since API version 1
+ * @since API version 5
  */
-CursorDevice.prototype.getChannel = function() {};
+CursorDevice.prototype.channel = function() {};
 
 /**
  * Selects the parent device if there is any.

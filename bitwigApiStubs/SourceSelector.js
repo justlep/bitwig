@@ -1,4 +1,4 @@
-/* API Version - 2.2.3 */
+/* API Version - 2.3.1 */
 
 /**
  * Instance of this class represent sources selectors in Bitwig Studio, which are shown as choosers in the
@@ -18,14 +18,14 @@ SourceSelector.prototype.constructor = SourceSelector;
  * Returns an object that indicates if the source selector has note inputs enabled.
  *
  * @return {SettableBooleanValue} a boolean value object
- * @since API version 1
+ * @since API version 5
  */
-SourceSelector.prototype.getHasNoteInputSelected = function() {};
+SourceSelector.prototype.hasNoteInputSelected = function() {};
 
 /**
  * Returns an object that indicates if the source selector has audio inputs enabled.
  *
  * @return {SettableBooleanValue} a boolean value object
- * @since API version 1
+ * @since API version 5
  */
-SourceSelector.prototype.getHasAudioInputSelected = function() {};
+SourceSelector.prototype.hasAudioInputSelected = function() {};

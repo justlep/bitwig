@@ -1,4 +1,4 @@
-/* API Version - 2.2.3 */
+/* API Version - 2.3.1 */
 
 /**
  * This interface is used for navigation of device chains in Bitwig Studio. Instances are configured with a
@@ -72,15 +72,6 @@ DeviceBank.prototype.scrollDown = function() {};
  * @since API version 1
  */
 DeviceBank.prototype.scrollTo = function(position) {};
-
-/**
- * Registers an observer that reports if the device window can be scrolled further down.
- *
- * @param callback
-          a callback function that takes a single boolean parameter
- * @since API version 1
- */
-DeviceBank.prototype.addCanScrollDownObserver = function(callback) {};
 
 /**
  * Browses for content to insert a device at the given index inside this bank.

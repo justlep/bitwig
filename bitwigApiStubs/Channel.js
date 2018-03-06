@@ -1,4 +1,4 @@
-/* API Version - 2.2.3 */
+/* API Version - 2.3.1 */
 
 /**
  * This interface defines access to the common attributes and operations of channels, such as tracks or nested
@@ -23,25 +23,25 @@ Channel.prototype.isActivated = function() {};
  * Gets a representation of the channels volume control.
  *
  * @return {Parameter} an object that provides access to the channels volume control.
- * @since API version 1
+ * @since API version 5
  */
-Channel.prototype.getVolume = function() {};
+Channel.prototype.volume = function() {};
 
 /**
  * Gets a representation of the channels pan control.
  *
  * @return {Parameter} an object that provides access to the channels pan control.
- * @since API version 1
+ * @since API version 5
  */
-Channel.prototype.getPan = function() {};
+Channel.prototype.pan = function() {};
 
 /**
  * Gets a representation of the channels mute control.
  *
  * @return {SettableBooleanValue} an object that provides access to the channels mute control.
- * @since API version 1
+ * @since API version 5
  */
-Channel.prototype.getMute = function() {};
+Channel.prototype.mute = function() {};
 
 /**
  * Gets a representation of the channels solo control.
@@ -49,7 +49,7 @@ Channel.prototype.getMute = function() {};
  * @return {SoloValue} an object that provides access to the channels solo control.
  * @since API version 1
  */
-Channel.prototype.getSolo = function() {};
+Channel.prototype.solo = function() {};
 
 /**
  * Registers an observer for the VU-meter of this track.
