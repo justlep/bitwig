@@ -1,7 +1,7 @@
 
 /**
  * @param {Value} bitwigValue
- * @return {ko.subscribable}
+ * @return {ko.writableObservable}
  */
 ko.subscribable.fn.updatedByBitwigValue = function(bitwigValue) {
     lep.util.assertFunction(bitwigValue && bitwigValue.addValueObserver, 'Invalid bitwigValue.addValueObserver, {}', bitwigValue);

@@ -5,7 +5,7 @@
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  */
 
-loadAPI(2);
+loadAPI(6);
 load('lep/api.js');
 
 host.defineController('Behringer', 'BCR2000', '2.1', 'fe5a1578-0fbd-11e6-a148-3e1d05defe78', 'Lennart Pegel');
@@ -103,7 +103,7 @@ lep.BCR2000 = function(bcrPresetNumber, bcfMidiChannel) {
 
         transport = lep.util.getTransport(),
         trackBank = host.createMainTrackBank(WINDOW_SIZE, SENDS_NUMBER, 0),
-        cursorDevice = host.createEditorCursorDevice(SENDS_NUMBER),
+        cursorDevice = host.createEditorCursorDevice(0),
         eventDispatcher = lep.MidiEventDispatcher.getInstance(),
 
         isShiftPressed = ko.observable(false),
@@ -114,14 +114,14 @@ lep.BCR2000 = function(bcrPresetNumber, bcfMidiChannel) {
                 if (isShiftPressed()) {
                     cursorDevice.selectNext();
                 } else {
-                    trackBank.scrollChannelsPageDown();
+                    trackBank.scrollPageForwards();
                 }
             },
             PREV_DEVICE_OR_CHANNEL_PAGE: function() {
                 if (isShiftPressed()) {
                     cursorDevice.selectPrevious();
                 } else {
-                    trackBank.scrollChannelsPageUp();
+                    trackBank.scrollPageBackwards();
                 }
             },
             SHIFT_CHANGE: function(note, value) {
@@ -512,7 +512,7 @@ lep.BCR2000 = function(bcrPresetNumber, bcfMidiChannel) {
                 })
             });
 
-            transport.addIsPlayingObserver(HANDLERS.PLAYING_STATUS_CHANGED);
+            transport.isPlaying().addValueObserver(HANDLERS.PLAYING_STATUS_CHANGED);
         };
 
     eventDispatcher.onNotePressed(NOTE_ACTION.NEXT_DEVICE_OR_CHANNEL_PAGE, HANDLERS.NEXT_DEVICE_OR_CHANNEL_PAGE);

@@ -57,6 +57,6 @@ lep.ChannelSelectValue.create = function(channelBank, channelIndex) {
     lep.util.assertNumber(channelIndex, 'Invalid channelIndex for lep.ChannelSelectValue.create');
     return new lep.ChannelSelectValue({
         name: lep.util.formatString('Select{}', channelIndex),
-        channel: channelBank.getChannel(channelIndex)
+        channel: channelBank.getItemAt(channelIndex)
     });
 };

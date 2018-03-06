@@ -5,7 +5,7 @@
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  */
 
-loadAPI(2);
+loadAPI(6);
 
 host.defineController('Roland', 'A-49', '2.0', '381d879c-9a0a-11e5-8994-feff819cdc9f', 'Lennart Pegel');
 host.defineMidiPorts(1, 0);

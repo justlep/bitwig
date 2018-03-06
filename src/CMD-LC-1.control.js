@@ -5,7 +5,7 @@
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  */
 
-loadAPI(2);
+loadAPI(6);
 load('lep/api.js');
 
 host.defineController('Behringer', 'CMD LC-1', '2.1', 'b6ad3828-8a3d-11e5-af63-feff819cdc9f', 'Lennart Pegel');
@@ -65,7 +65,7 @@ lep.LC1 = function() {
         WINDOW_SIZE = 4,
         trackBank = host.createTrackBank(WINDOW_SIZE, SENDS_NUMBER, SCENES_NUMBER),
 
-        cursorDevice = host.createEditorCursorDevice(SENDS_NUMBER),
+        cursorDevice = host.createEditorCursorDevice(0),
         eventDispatcher = lep.MidiEventDispatcher.getInstance(),
         isShiftPressed = ko.observable(false),
 
@@ -79,14 +79,14 @@ lep.LC1 = function() {
                 if (isShiftPressed()) {
                     cursorDevice.selectNext();
                 } else {
-                    trackBank.scrollChannelsPageDown();
+                    trackBank.scrollPageForwards();
                 }
             },
             PREV_DEVICE_OR_CHANNEL_PAGE: function() {
                 if (isShiftPressed()) {
                     cursorDevice.selectPrevious();
                 } else {
-                    trackBank.scrollChannelsPageUp();
+                    trackBank.scrollPageBackwards();
                 }
             },
             SHIFT_CHANGE: function(note, value) {
@@ -182,8 +182,8 @@ lep.LC1 = function() {
         var hasNextPage = ko.observable(false),
             hasPrevPage = ko.observable(false);
 
-        trackBank.addCanScrollChannelsDownObserver(hasNextPage);
-        trackBank.addCanScrollChannelsUpObserver(hasPrevPage);
+        trackBank.canScrollChannelsDown().addValueObserver(hasNextPage);
+        trackBank.canScrollChannelsUp().addValueObserver(hasPrevPage);
 
         new lep.Button({
             name: 'PrevPageBtn',

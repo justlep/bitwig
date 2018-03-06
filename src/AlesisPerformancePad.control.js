@@ -11,7 +11,7 @@
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  */
 
-loadAPI(2);
+loadAPI(6);
 
 host.defineController('Alesis', 'PerformancePad', '2.1', 'c6cc8a34-a36e-11e5-bf7f-feff819cdc9f', 'Lennart Pegel');
 host.defineMidiPorts(1, 0);

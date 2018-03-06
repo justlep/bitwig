@@ -89,6 +89,7 @@ lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
         this.rotate = this.isOrientationTracksByScenes.toggle;
 
         this.sceneScrollPosition = ko.observable(0).updatedBy(function(obs) {
+            // TODO use sceneBank
             self.trackBank.addSceneScrollPositionObserver(obs, 0);
         });
         this.canMoveSceneBack = ko.computed(function() {

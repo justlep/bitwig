@@ -29,12 +29,8 @@ lep.TrackWindow = function(name, numTracks, numSends, numScenes, trackBank) {
     this.name = name;
     this.trackBank = trackBank || host.createMainTrackBank(numTracks, numSends, numScenes || 0);
     this.tracks = lep.util.generateArray(numTracks, function(trackIndex) {
-        return self.trackBank.getChannel(trackIndex);
+        return self.trackBank.getItemAt(trackIndex);
     });
-
-    this.trackScrollPosition = ko.observable(0).updatedByBitwigValue(this.trackBank.channelScrollPosition());
-    this.canMoveChannelBack = ko.observable(false).updatedByBitwigValue(this.trackBank.canScrollChannelsUp());
-    this.canMoveChannelForth = ko.observable(false).updatedByBitwigValue(this.trackBank.canScrollChannelsDown());
 
     this.trackScrollSize = (function(_obs) {
         return ko.computed({
@@ -48,17 +44,34 @@ lep.TrackWindow = function(name, numTracks, numSends, numScenes, trackBank) {
         });
     })(ko.observable(1));
 
+    var _settableScrollPosition = this.trackBank.scrollPosition(),
+        _currentPosition = ko.observable(0).updatedByBitwigValue(_settableScrollPosition),
+        /**
+         * Scroll the bank forth or back while keeping in valid bounds
+         * @param {number}relScrollSize
+         * @private
+         */
+        _scrollBy = function(relScrollSize) {
+            var safeNewPos = Math.max(0, Math.min(_currentPosition() + relScrollSize, self.totalChannels() - numTracks));
+            // lep.logDev('safeNewPos for TrackWindow = ' + safeNewPos);
+            _settableScrollPosition.set(safeNewPos);
+        };
+
+    this.totalChannels = ko.observable(0).updatedByBitwigValue(this.trackBank.itemCount());
+    this.canMoveChannelBack = ko.observable(false).updatedByBitwigValue(this.trackBank.canScrollChannelsUp());
+    this.canMoveChannelForth = ko.observable(false).updatedByBitwigValue(this.trackBank.canScrollChannelsDown());
+
     this.moveChannelForth = function() {
-        self.trackBank.scrollToChannel( self.trackScrollPosition() + self.trackScrollSize() );
+        _scrollBy(self.trackScrollSize());
     };
     this.moveChannelPageForth = function() {
-        self.trackBank.scrollChannelsPageDown();
+        _scrollBy(numTracks);
     };
     this.moveChannelBack = function() {
-        self.trackBank.scrollToChannel( Math.max(0, self.trackScrollPosition() - self.trackScrollSize()) );
+        _scrollBy(-self.trackScrollSize());
     };
     this.moveChannelPageBack = function() {
-        self.trackBank.scrollChannelsPageUp();
+        _scrollBy(-numTracks);
     };
 };
 

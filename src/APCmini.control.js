@@ -14,7 +14,7 @@
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  */
 
-loadAPI(2);
+loadAPI(6);
 load('lep/api.js');
 
 host.defineController('Akai', 'APC mini', '1.0', '086a5ace-94b9-11e7-abc4-cec278b6b50a', 'Lennart Pegel');
@@ -180,11 +180,11 @@ function ApcMini() {
             })( ko.observable(true).extend({toggleable: true}) ),
             MASTER_VOLUME: new lep.StandardRangedValue({
                 name: 'MasterVol',
-                rangedValue: masterTrack.getVolume()
+                rangedValue: masterTrack.volume()
             }),
             MASTER_PAN: new lep.StandardRangedValue({
                 name: 'MasterVol',
-                rangedValue: masterTrack.getPan()
+                rangedValue: masterTrack.pan()
             })
         },
         VALUESET = {

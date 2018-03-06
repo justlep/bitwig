@@ -43,7 +43,6 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
             read: _effectiveCurrentPage,
             write: function(_newPageIndex) {
                 var newPageIndex = lep.util.limitToRange(_newPageIndex, 0, self.lastPage());
-                lep.logDev('New page for {} -> proposed: {}, effective: {}', self.name, newPageIndex, newPageIndex);
                 lep.logDev('setParameterPage({})', newPageIndex);
                 remoteControlsPage.selectedPageIndex().set(newPageIndex);
             }

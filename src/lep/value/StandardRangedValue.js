@@ -138,7 +138,7 @@ lep.StandardRangedValue.createVolumeValue = function(channelBank, channelIndex) 
     lep.util.assertNumber(channelIndex, 'Invalid channelIndex for StandardRangedValue.createVolumeValue');
     return new lep.StandardRangedValue({
         name: lep.util.formatString('Vol{}', channelIndex),
-        rangedValue: channelBank.getChannel(channelIndex).getVolume()
+        rangedValue: channelBank.getItemAt(channelIndex).volume()
     });
 };
 
@@ -153,7 +153,7 @@ lep.StandardRangedValue.createPanValue = function(channelBank, channelIndex) {
     lep.util.assertNumber(channelIndex, 'Invalid channelIndex for StandardRangedValue.createPanValue');
     return new lep.StandardRangedValue({
         name: lep.util.formatString('Pan{}', channelIndex),
-        rangedValue: channelBank.getChannel(channelIndex).getPan()
+        rangedValue: channelBank.getItemAt(channelIndex).pan()
     });
 };
 
@@ -170,7 +170,8 @@ lep.StandardRangedValue.createSendValue = function(channelBank, channelIndex, se
     lep.util.assertNumber(sendIndex, 'Invalid sendIndex for StandardRangedValue.createSendValue');
     return new lep.StandardRangedValue({
         name: lep.util.formatString('Send{}/Track{}', sendIndex, channelIndex),
-        rangedValue: channelBank.getChannel(channelIndex).getSend(sendIndex)
+        rangedValue: channelBank.getItemAt(channelIndex).getSend(sendIndex)
+        // TODO use SendBank
     });
 };
 

@@ -5,7 +5,7 @@
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  */
 
-loadAPI(2);
+loadAPI(6);
 load('lep/api.js');
 
 host.defineController('Behringer', 'CMD DC-1', '2.1', '047f0d84-8ace-11e5-af63-feff819cdc9f', 'Lennart Pegel');

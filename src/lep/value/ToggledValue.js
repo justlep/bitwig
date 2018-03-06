@@ -108,7 +108,7 @@ lep.ToggledValue.createArmValue = function(channelBank, channelIndex) {
     lep.util.assertNumber(channelIndex, 'Invalid channelIndex for lep.ToggledValue.createArmValue');
     return new lep.ToggledValue({
         name: lep.util.formatString('Arm{}', channelIndex),
-        togglableValue: channelBank.getChannel(channelIndex).getArm(),
+        togglableValue: channelBank.getItemAt(channelIndex).arm(),
         velocityValueOn: lep.ToggledValue.VELOCITY_VALUES.ARM_ON,
         velocityValueOff: lep.ToggledValue.VELOCITY_VALUES.ARM_OFF
     });
@@ -125,7 +125,7 @@ lep.ToggledValue.createMuteValue = function(channelBank, channelIndex) {
     lep.util.assertNumber(channelIndex, 'Invalid channelIndex for lep.ToggledValue.createMuteValue');
     return new lep.ToggledValue({
         name: lep.util.formatString('Mute{}', channelIndex),
-        togglableValue: channelBank.getChannel(channelIndex).getMute(),
+        togglableValue: channelBank.getItemAt(channelIndex).mute(),
         velocityValueOn: lep.ToggledValue.VELOCITY_VALUES.MUTE_ON,
         velocityValueOff: lep.ToggledValue.VELOCITY_VALUES.MUTE_OFF
     });
@@ -146,7 +146,7 @@ lep.ToggledValue.createSoloValue = function(channelBank, channelIndex, prefs) {
     lep.util.assertBoolean(prefs.soloExclusive, 'Missing prefs.soloExclusive for lep.ToggledValue.createSoloValue');
     return new lep.ToggledValue({
         name: lep.util.formatString('Solo{}', channelIndex),
-        togglableValue: channelBank.getChannel(channelIndex).getSolo(),
+        togglableValue: channelBank.getItemAt(channelIndex).solo(),
         prefs: prefs,
         velocityValueOn: lep.ToggledValue.VELOCITY_VALUES.SOLO_ON,
         velocityValueOff: lep.ToggledValue.VELOCITY_VALUES.SOLO_OFF

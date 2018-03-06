@@ -5,7 +5,7 @@
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  */
 
-loadAPI(2);
+loadAPI(6);
 load('lep/api.js');
 
 host.defineController('Behringer', 'BCF2000', '2.1', 'd26515a4-571b-11e5-885d-feff819cdc9f', 'Lennart Pegel');
@@ -36,7 +36,7 @@ function switchBcfToPreset(presetNumber) {
 }
 
 function init() {
-    lep.setLogLevel(lep.LOGLEVEL.INFO);
+    lep.setLogLevel(lep.LOGLEVEL.WARN);
     new lep.BCF2000(28, 12);
     // new lep.BCF2000(29, 13);
 }
@@ -95,7 +95,7 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
 
         transport = lep.util.getTransport(),
         trackBank = host.createMainTrackBank(WINDOW_SIZE, SENDS_NUMBER, 0),
-        cursorDevice = host.createEditorCursorDevice(SENDS_NUMBER),
+        cursorDevice = host.createEditorCursorDevice(0),
         eventDispatcher = lep.MidiEventDispatcher.getInstance(),
 
         isShiftPressed = ko.observable(false),
@@ -106,14 +106,14 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
                 if (isShiftPressed()) {
                     cursorDevice.selectNext();
                 } else {
-                    trackBank.scrollChannelsPageDown();
+                    trackBank.scrollPageForwards();
                 }
             },
             PREV_DEVICE_OR_CHANNEL_PAGE: function() {
                 if (isShiftPressed()) {
                     cursorDevice.selectPrevious();
                 } else {
-                    trackBank.scrollChannelsPageUp();
+                    trackBank.scrollPageBackwards();
                 }
             },
             SHIFT_CHANGE: function(note, value) {
