@@ -56,7 +56,8 @@ lep.SendsValueSet = lep.util.extendClass(lep.ValueSet, {
         
         _scrollable.currentPosition.subscribe(_effectiveCurrentPage);
         _scrollable.totalItems.subscribe(function(total) {
-            Math.max(0, self.lastPage(total - 1));
+            var lastPage = Math.max(0, total - 1);
+            self.lastPage(lastPage);
         });
 
         lep.SendsValueSet._firstInstanceExists = true;
