@@ -30,6 +30,7 @@ load('value/BaseValue.js');
 load('value/StandardRangedValue.js');
 load('value/ValueSet.js');
 load('value/ParamsValueSet.js');
+load('value/SendsValueSet.js');
 load('value/ToggledValue.js');
 load('value/ChannelSelectValue.js');
 load('value/ToggledTransportValue.js');

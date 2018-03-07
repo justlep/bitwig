@@ -134,8 +134,8 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
         VALUESET = {
             VOLUME: lep.ValueSet.createVolumeValueSet(trackBank, WINDOW_SIZE),
             PAN:    lep.ValueSet.createPanValueSet(trackBank, WINDOW_SIZE),
-            SEND:   lep.ValueSet.createSendsValueSet(trackBank, SENDS_NUMBER, WINDOW_SIZE),
-            SEND2:   lep.ValueSet.createSendsValueSet(trackBank, SENDS_NUMBER, WINDOW_SIZE, true),
+            SEND:   lep.SendsValueSet.createFromTrackBank(trackBank),
+            SEND2:   lep.SendsValueSet.createFromTrackBank(trackBank),
             PARAM:  new lep.ParamsValueSet(cursorDevice),
             USERCONTROL: lep.ValueSet.createUserControlsValueSet(USER_CONTROL_PAGES, WINDOW_SIZE, 'BCF-UC-{}-{}'),
             SOLO:   lep.ValueSet.createSoloValueSet(trackBank, WINDOW_SIZE, prefs),

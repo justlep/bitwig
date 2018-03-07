@@ -7,6 +7,14 @@
  */
 lep.StandardRangedValue = lep.util.extendClass(lep.BaseValue, {
 
+    /**
+     * @param {Object} opts
+     * @param {string} opts.name
+     * @param {RangedValue} opts.rangedValue
+     * @param {?RangedValue} [opts.indicateableValue] - defaults to opts.rangedValue
+     * @param {?boolean} [opts.isTakeoverEnabled]
+     * @constructs
+     */
     _init: function(opts) {
         this._super(opts);
 
@@ -154,24 +162,6 @@ lep.StandardRangedValue.createPanValue = function(channelBank, channelIndex) {
     return new lep.StandardRangedValue({
         name: lep.util.formatString('Pan{}', channelIndex),
         rangedValue: channelBank.getItemAt(channelIndex).pan()
-    });
-};
-
-/**
- * @param {ChannelBank} channelBank
- * @param {number} channelIndex
- * @param {number} sendIndex
- * @return {lep.StandardRangedValue}
- * @static
- */
-lep.StandardRangedValue.createSendValue = function(channelBank, channelIndex, sendIndex) {
-    lep.util.assertObject(channelBank, 'Invalid channelBank for StandardRangedValue.createSendValue');
-    lep.util.assertNumber(channelIndex, 'Invalid channelIndex for StandardRangedValue.createSendValue');
-    lep.util.assertNumber(sendIndex, 'Invalid sendIndex for StandardRangedValue.createSendValue');
-    return new lep.StandardRangedValue({
-        name: lep.util.formatString('Send{}/Track{}', sendIndex, channelIndex),
-        rangedValue: channelBank.getItemAt(channelIndex).getSend(sendIndex)
-        // TODO use SendBank
     });
 };
 

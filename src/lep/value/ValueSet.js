@@ -229,28 +229,6 @@ lep.ValueSet.createPanValueSet = function(trackBank, windowSize) {
 };
 
 /**
- * @param {ChannelBank} trackBank
- * @param {number} numberOfSends
- * @param {number} windowSize
- * @param {boolean} [allowSecondInstance]
- * @return {lep.ValueSet}
- * @static
- */
-lep.ValueSet.createSendsValueSet = function(trackBank, numberOfSends, windowSize, allowSecondInstance) {
-    lep.util.assertObject(trackBank, 'Invalid trackBank for ValueSet.createSendsValueSet');
-    lep.util.assertNumberInRange(numberOfSends, 1, 20, 'Invalid numberOfSends {} for ValueSet.createSendsValueSet', numberOfSends);
-    lep.util.assertNumberInRange(windowSize, 1, 1000, 'Invalid windowSize {} for ValueSet.createSendsValueSet', windowSize);
-
-    var firstInstanceExists = lep.ValueSet.exists('Sends'),
-        name = firstInstanceExists  ? 'Sends2' : 'Sends';
-
-    lep.util.assert(!firstInstanceExists || allowSecondInstance, 'Use allowSecondInstance to allow multiple Send ValueSets');
-    return new lep.ValueSet(name, windowSize, numberOfSends, function(channelIndex, sendIndex) {
-        return lep.StandardRangedValue.createSendValue(trackBank, channelIndex, sendIndex);
-    });
-};
-
-/**
  * @param {number} numberOfPages
  * @param {number} userControlsPerPage
  * @param {string} labelPattern - label with TWO '{}' placeholders for (1) the 1-based page, (2) the 1-based index within the page

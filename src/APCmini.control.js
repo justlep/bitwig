@@ -190,7 +190,7 @@ function ApcMini() {
         VALUESET = {
             VOLUME: lep.ValueSet.createVolumeValueSet(matrixWindow.trackBank, 8),
             PAN: lep.ValueSet.createPanValueSet(matrixWindow.trackBank, 8),
-            SEND: lep.ValueSet.createSendsValueSet(matrixWindow.trackBank, MATRIX_SENDS, 8),
+            SEND: lep.SendsValueSet.createFromTrackBank(matrixWindow.trackBank),
             DEVICE_PARAMS: new lep.ParamsValueSet(cursorDevice),
             CONFIG: lep.ValueSet.createForMatrix('ConfigValues', 8, 8, function(col, row) {
                 if (row === 0) {
