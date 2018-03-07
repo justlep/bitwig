@@ -21,13 +21,13 @@ lep.SendsValueSet = lep.util.extendClass(lep.ValueSet, {
         const self = this;
 
         var _allSettableScrollPositions = [],
-            _firstSendBank = null;
+            _scrollable = null;
 
         this._super(name, tracks.length, 1, function(trackIndex) {
             var sendBank = tracks[trackIndex].sendBank();
 
             if (!trackIndex) {
-                _firstSendBank = sendBank;
+                _scrollable = new lep.ScrollableView(name, 1, sendBank);
             }
             _allSettableScrollPositions.push(sendBank.scrollPosition());
 
@@ -37,8 +37,7 @@ lep.SendsValueSet = lep.util.extendClass(lep.ValueSet, {
             });
         });
 
-        var _scrollable = new lep.ScrollableView(name, 1, _firstSendBank),
-            _effectiveCurrentPage = this.currentPage;
+        var _effectiveCurrentPage = this.currentPage; // do not move up since `currentPage` is set by super-call
 
         /**
          * @override
