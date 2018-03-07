@@ -38,6 +38,8 @@ lep.XTouchCompact = function(xtcMidiChannel) {
             TOP_ENCODER: 10,
             FIRST_FADER_MOVE: 1,
             FIRST_FADER_TOUCH: 101,
+            MASTER_FADER_MOVE: 9,
+            MASTER_FADER_TOUCH: 109,
             RIGHT_ENCODER: 18
         },
         NOTE = {
@@ -76,6 +78,7 @@ lep.XTouchCompact = function(xtcMidiChannel) {
         cursorDevice = host.createEditorCursorDevice(0),
         eventDispatcher = lep.MidiEventDispatcher.getInstance(),
         trackWindow = new lep.TrackWindow('Tracks', 8, 0, 0, trackBank),
+        masterTrack = host.createMasterTrack(0),
         isShiftPressed = ko.observable(false).updatedBy(function(obs) {
             eventDispatcher.onNote(NOTE_ACTION.SHIFT, function(noteOrCc, velocity /*, channel*/) {
                 obs(!!velocity);
@@ -131,7 +134,12 @@ lep.XTouchCompact = function(xtcMidiChannel) {
             VALUESET.PARAM,
             VALUESET.USERCONTROL
         ],
-
+        VALUE = {
+            MASTER_VOLUME: new lep.StandardRangedValue({
+                name: 'MasterVol',
+                rangedValue: masterTrack.volume()
+            })
+        },
         // getNextFreeSwitchableValueSet = function() {
         //     for (var i = 0, valueSet; i < SWITCHABLE_VALUESETS.length; i++) {
         //         valueSet = SWITCHABLE_VALUESETS[i];
@@ -407,6 +415,13 @@ lep.XTouchCompact = function(xtcMidiChannel) {
                     clearPunchOnStop(!clearPunchOnStop());
                 }
             })
+        },
+        CONTROL = {
+            MASTER_FADER: new lep.Fader({
+                name: 'MasterFader',
+                valueCC: CC.MASTER_FADER_MOVE,
+                midiChannel: MIDI_CHANNEL
+            })
         };
 
     function initPreferences() {
@@ -470,6 +485,7 @@ lep.XTouchCompact = function(xtcMidiChannel) {
                 onClick: function() {
                     if (isShiftPressed()) {
                         CONTROLSET.FADERS.muted.toggle();
+                        CONTROL.MASTER_FADER.setMuted(CONTROLSET.FADERS.muted.peek());
                     } else {
                         transport.stop();
                     }
@@ -490,6 +506,7 @@ lep.XTouchCompact = function(xtcMidiChannel) {
         initEncoderModeButtons();
         currentEncoderValueSetObservable(VALUESET.PAN);
         currentFaderValueSetObservable(VALUESET.VOLUME);
+        CONTROL.MASTER_FADER.attachValue(VALUE.MASTER_VOLUME);
         println('\n-------------\nX-Touch Compact ready');
     });
 
