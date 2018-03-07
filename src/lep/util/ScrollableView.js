@@ -17,18 +17,18 @@ lep.ScrollableView = function(ownerName, scrolledWindowSize, scrollable) {
     var self = this,
         _name = 'ScrollableView[' + ownerName +']',
         _settableScrollPosition = scrollable.scrollPosition(),
-        _currentPosition = ko.observable(0).updatedByBitwigValue(_settableScrollPosition),
         /**
          * Scroll the bank forth or back while keeping it in valid bounds
          * @param {number} relScrollSize
          * @private
          */
         _scrollBy = function(relScrollSize) {
-            var safeNewPos = Math.max(0, Math.min(_currentPosition() + relScrollSize, self.totalItems() - scrolledWindowSize));
+            var safeNewPos = Math.max(0, Math.min(self.currentPosition() + relScrollSize, self.totalItems() - scrolledWindowSize));
             // lep.logDev('safeNewPos for TrackWindow = ' + safeNewPos);
             _settableScrollPosition.set(safeNewPos);
         };
 
+    this.currentPosition = ko.observable(0).updatedByBitwigValue(_settableScrollPosition);
     this.totalItems = ko.observable(0).updatedByBitwigValue(scrollable.itemCount());
 
     this.scrollSize = (function(_obs) {
