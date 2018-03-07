@@ -168,8 +168,8 @@
         /**
          * @callback NoteOrCCMessageHandler
          * @param {number} noteOrCc
-         * @param {number} message velocity value
-         * @param {number} midi channel (0-based)
+         * @param {number} velocity value
+         * @param {number} channel (0-based)
          */
 
         /**
