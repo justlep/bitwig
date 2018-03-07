@@ -1,7 +1,5 @@
 /**
  * Represents a ValueSet of parameters from the Device Pages.
- * Since Bitwig 2, access is unified over the CursorRemoteControlsPage,
- * deprecating old fixed pages (Common, Envelope, Modulation Source) and Macros.
  *
  * @constructor
  * @extends {lep.ValueSet}
