@@ -546,16 +546,13 @@ function ApcMini() {
 
     lep.StandardRangedValue.globalTakeoverEnabled(true);
 
-    ApcMini.onFirstFlush = function() {
-        ApcMini.onFirstFlush = null;
-
+    lep.util.onFirstFlush(function() {
         initButtons();
         initScrollButtons();
         initFaders();
         initMatrix();
-
         lep.logDev('ApcMini ready.');
-    };
+    });
 
     lep.logDev('Awaiting initial MIDI flush...');
 }
@@ -579,13 +576,6 @@ ApcMini.resetButtons = function(leaveExitPattern) {
         }
     }
 };
-
-/** @override */
-function flush() {
-    if (ApcMini.onFirstFlush) {
-        ApcMini.onFirstFlush();
-    }
-}
 
 /** @override */
 function exit() {
