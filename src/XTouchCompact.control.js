@@ -38,8 +38,8 @@ lep.XTouchCompact = function(xtcMidiChannel) {
             TOP_ENCODER: 10,
             FIRST_FADER_MOVE: 1,
             FIRST_FADER_TOUCH: 101,
-            MASTER_FADER_MOVE: 9,
-            MASTER_FADER_TOUCH: 109,
+            MAIN_FADER_MOVE: 9,
+            MAIN_FADER_TOUCH: 109,
             RIGHT_ENCODER: 18
         },
         NOTE = {
@@ -162,7 +162,7 @@ lep.XTouchCompact = function(xtcMidiChannel) {
                     var oldValueSet = _valueSet(),
                         otherObservable = currentFaderValueSetObservable;
                     _valueSet(newValueSet);
-                    CONTROLSET.ENCODERS.setValueSet(newValueSet);
+                    CONTROLSET.TOP_ENCODERS.setValueSet(newValueSet);
                     if (newValueSet === otherObservable()) {
                         otherObservable(oldValueSet);
                     }
@@ -191,11 +191,19 @@ lep.XTouchCompact = function(xtcMidiChannel) {
         })(),
 
         CONTROLSET = {
-            ENCODERS: new lep.ControlSet('ClickEncoders', WINDOW_SIZE, function(index) {
+            TOP_ENCODERS: new lep.ControlSet('TopEncoders', WINDOW_SIZE, function(index) {
                 return new lep.ClickEncoder({
-                    name: 'ClickEncoder' + index,
+                    name: 'TopEncoder' + index,
                     valueCC: CC.TOP_ENCODER + index,
                     clickNote: NOTE.ENC_TOP_FIRST_CLICK + index,
+                    midiChannel: MIDI_CHANNEL
+                });
+            }),
+            RIGHT_ENCODERS: new lep.ControlSet('RightEncoders', WINDOW_SIZE, function(index) {
+                return new lep.ClickEncoder({
+                    name: 'RightEncoder' + index,
+                    valueCC: CC.RIGHT_ENCODER + index,
+                    clickNote: NOTE.ENC_RIGHT_FIRST_CLICK + index,
                     midiChannel: MIDI_CHANNEL
                 });
             }),
@@ -206,17 +214,31 @@ lep.XTouchCompact = function(xtcMidiChannel) {
                     midiChannel: MIDI_CHANNEL
                 });
             }),
-            UPPER_BUTTONS: new lep.ControlSet('Upper Buttons', WINDOW_SIZE, function(index) {
+            TOP1_BUTTONS: new lep.ControlSet('Top1Buttons', WINDOW_SIZE, function(index) {
                 return new lep.Button({
-                    name: 'UpperBtn' + index,
+                    name: 'Top1Btn' + index,
                     clickNote: NOTE.BTN_TOP1_FIRST + index,
                     midiChannel: MIDI_CHANNEL
                 });
             }),
-            LOWER_BUTTONS: new lep.ControlSet('Lower Buttons', WINDOW_SIZE, function(index) {
+            TOP2_BUTTONS: new lep.ControlSet('Top2Buttons', WINDOW_SIZE, function(index) {
                 return new lep.Button({
-                    name: 'LowerBtn' + index,
+                    name: 'Top2Btn' + index,
+                    clickNote: NOTE.BTN_TOP2_FIRST + index,
+                    midiChannel: MIDI_CHANNEL
+                });
+            }),
+            TOP3_BUTTONS: new lep.ControlSet('Top3Buttons', WINDOW_SIZE, function(index) {
+                return new lep.Button({
+                    name: 'Top3Btn' + index,
                     clickNote: NOTE.BTN_TOP3_FIRST + index,
+                    midiChannel: MIDI_CHANNEL
+                });
+            }),
+            BOTTOM_BUTTONS: new lep.ControlSet('BottomButtons', WINDOW_SIZE, function(index) {
+                return new lep.Button({
+                    name: 'BottomBtn' + index,
+                    clickNote: NOTE.BTN_BOTTOM_FIRST + index,
                     midiChannel: MIDI_CHANNEL
                 });
             })
@@ -237,16 +259,16 @@ lep.XTouchCompact = function(xtcMidiChannel) {
                     return new lep.KnockoutSyncedValue({
                         name: 'EncoderPrevValuePageBtn',
                         ownValue: true,
-                        refObservable: CONTROLSET.ENCODERS.hasPrevValuePage,
-                        onClick: CONTROLSET.ENCODERS.prevValuePage
+                        refObservable: CONTROLSET.TOP_ENCODERS.hasPrevValuePage,
+                        onClick: CONTROLSET.TOP_ENCODERS.prevValuePage
                     });
                 }
                 if (isNextPageBtn) {
                     return new lep.KnockoutSyncedValue({
                         name: 'EncoderNextValuePageBtn',
                         ownValue: true,
-                        refObservable: CONTROLSET.ENCODERS.hasNextValuePage,
-                        onClick: CONTROLSET.ENCODERS.nextValuePage
+                        refObservable: CONTROLSET.TOP_ENCODERS.hasNextValuePage,
+                        onClick: CONTROLSET.TOP_ENCODERS.nextValuePage
                     });
                 }
                 if (switchableValueSet) {
@@ -304,7 +326,7 @@ lep.XTouchCompact = function(xtcMidiChannel) {
                 return new lep.KnockoutSyncedValue({
                     name: 'EncoderValuePageSelect-' + index,
                     ownValue: index,
-                    refObservable: CONTROLSET.ENCODERS.valuePage
+                    refObservable: CONTROLSET.TOP_ENCODERS.valuePage
                 });
             }),
             FOR_FADERS: new lep.ValueSet('FaderValuePageSelect', WINDOW_SIZE, 1, function(index) {
@@ -335,10 +357,10 @@ lep.XTouchCompact = function(xtcMidiChannel) {
                         lowerButtonValueSet = buttonValueSets.lower;
 
                     if (buttonValueSets.upper) {
-                        CONTROLSET.UPPER_BUTTONS.setValueSet(buttonValueSets.upper);
+                        CONTROLSET.TOP1_BUTTONS.setValueSet(buttonValueSets.upper);
                     }
                     if (lowerButtonValueSet) {
-                        CONTROLSET.LOWER_BUTTONS.setValueSet(lowerButtonValueSet);
+                        CONTROLSET.TOP3_BUTTONS.setValueSet(lowerButtonValueSet);
                     }
                 }
             });
@@ -417,9 +439,9 @@ lep.XTouchCompact = function(xtcMidiChannel) {
             })
         },
         CONTROL = {
-            MASTER_FADER: new lep.Fader({
-                name: 'MasterFader',
-                valueCC: CC.MASTER_FADER_MOVE,
+            MAIN_FADER: new lep.Fader({
+                name: 'MainFader',
+                valueCC: CC.MAIN_FADER_MOVE,
                 midiChannel: MIDI_CHANNEL
             })
         };
@@ -485,7 +507,7 @@ lep.XTouchCompact = function(xtcMidiChannel) {
                 onClick: function() {
                     if (isShiftPressed()) {
                         CONTROLSET.FADERS.muted.toggle();
-                        CONTROL.MASTER_FADER.setMuted(CONTROLSET.FADERS.muted.peek());
+                        CONTROL.MAIN_FADER.setMuted(CONTROLSET.FADERS.muted.peek());
                     } else {
                         transport.stop();
                     }
@@ -506,7 +528,7 @@ lep.XTouchCompact = function(xtcMidiChannel) {
         initEncoderModeButtons();
         currentEncoderValueSetObservable(VALUESET.PAN);
         currentFaderValueSetObservable(VALUESET.VOLUME);
-        CONTROL.MASTER_FADER.attachValue(VALUE.MASTER_VOLUME);
+        CONTROL.MAIN_FADER.attachValue(VALUE.MASTER_VOLUME);
         println('\n-------------\nX-Touch Compact ready');
     });
 
