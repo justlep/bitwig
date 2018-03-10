@@ -1,5 +1,5 @@
 /**
- * Loads all lep-API files in the right order.
+ * Loads all lep-framework files in the right order.
  *
  * Author: Lennart Pegel - https://github.com/justlep
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
@@ -36,6 +36,6 @@ load('value/ChannelSelectValue.js');
 load('value/ToggledTransportValue.js');
 load('value/KnockoutSyncedValue.js');
 
-load('window/TrackWindow.js');
-load('window/LauncherSlot.js');
-load('window/MatrixWindow.js');
+load('view/TracksView.js');
+load('view/LauncherSlot.js');
+load('view/MatrixView.js');

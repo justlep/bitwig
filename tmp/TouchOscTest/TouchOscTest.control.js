@@ -4,14 +4,14 @@
  *
  * See https://justlep.github.io/quickedit4touchosc/
  *
- * Requires TouchOSC Bridge running + the lep-api in place.
+ * Requires TouchOSC Bridge running + the lep-framework in place.
  *
  * Author: Lennart Pegel - https://github.com/justlep/bitwig
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  */
 
 loadAPI(2);
-load('lep/api.js');
+load('lep-framework/complete.js');
 
 host.defineController('LeP', 'TouchOscTest', '2.0', '4a77e824-10dd-11e7-93ae-92361f002671', 'Lennart Pegel <github@justlep.net>');
 host.defineMidiPorts(1, 1);

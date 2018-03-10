@@ -11,11 +11,11 @@
  * @param {?number} [numScenes] - optional; must be 0 or empty if no `trackBank` is given
  * @param {?TrackBank} [trackBankOrNull] - if null, a MainTrackBank with 0 scenes will be created
  * @constructor
- * @extends lep.TrackWindow
+ * @extends lep.TracksView
  */
-lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
+lep.MatrixView = lep.util.extendClass(lep.TracksView, {
     _init: function(name, numTracks, numSends, numScenes, trackBankOrNull) {
-        lep.util.assertNumberInRange(numScenes, 2, lep.TrackWindow.MAX_SCENES, 'Invalid numScenes={} for MatrixWindow {}', numScenes, name);
+        lep.util.assertNumberInRange(numScenes, 2, lep.TracksView.MAX_SCENES, 'Invalid numScenes={} for MatrixView {}', numScenes, name);
         this._super.apply(this, arguments);
 
         var self = this,
@@ -115,7 +115,7 @@ lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
         };
 
         /**
-         * Generates a ControlSet instance that fits all launcherSlots of this MatrixWindow.
+         * Generates a ControlSet instance that fits all launcherSlots of this MatrixView.
          * @param {function} controlCreatorFn - a function that creates the controls, e.g. function(colIndex, rowIndex, absoluteIndex){}
          * @return {lep.ControlSet}
          */
@@ -138,7 +138,7 @@ lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
                 valueSet = isTracksByScenes ? _slotLauncherValueSets.tracksByScenes() : _slotLauncherValueSets.scenesByTracks();
 
             if (!valueSet) {
-                lep.logWarn('MatrixWindow.prepareLauncherSlotValueSets() should be called prior to launcherSlotValueSet');
+                lep.logWarn('MatrixView.prepareLauncherSlotValueSets() should be called prior to launcherSlotValueSet');
             }
             host.showPopupNotification('APCmini axis: ' + (isTracksByScenes ? '↓ Scenes · Tracks →' : '↓ Tracks · Scenes →'));
             return valueSet;
@@ -155,7 +155,7 @@ lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
          */
         this.prepareLauncherSlotValueSets = function(valueCreatorFn) {
             lep.util.assert(!_slotLauncherValueSets.tracksByScenes() && !_slotLauncherValueSets.scenesByTracks(),
-                            'Multiple call of MatrixWindow.prepareLauncherSlotValueSets');
+                            'Multiple call of MatrixView.prepareLauncherSlotValueSets');
             var tracksByScenesValueSet = lep.ValueSet.createForMatrix('LauncherSlotValues(TbS)', totalLauncherSlots, 1,
                 function(launcherSlotIndex) {
                     return valueCreatorFn( launcherSlots[launcherSlotIndex] );
@@ -185,19 +185,19 @@ lep.MatrixWindow = lep.util.extendClass(lep.TrackWindow, {
  */
 
 /**
- * Creates a MatrixWindow instance with a main track bank.
+ * Creates a MatrixView instance with a main track bank.
  * Includes generating the launcher slot valuesets using the given creator function.
  *
  * @param {number} numTracks
  * @param {number} numSends
  * @param {number} numScenes
  * @param {launcherSlotValueCreatorFn} launcherSlotValueCreatorFn, e.g. function(
- * @return {lep.MatrixWindow}
+ * @return {lep.MatrixView}
  * @static
  */
-lep.MatrixWindow.createMain = function(numTracks, numSends, numScenes, launcherSlotValueCreatorFn) {
-    lep.util.assertFunction(launcherSlotValueCreatorFn, 'Invalid launcherSlotValueCreatorFn for MatrixWindow.createMain');
-    var matrixWindow = new lep.MatrixWindow('MainMatrixWindow', numTracks, numSends, numScenes);
-    matrixWindow.prepareLauncherSlotValueSets(launcherSlotValueCreatorFn);
-    return matrixWindow;
+lep.MatrixView.createMain = function(numTracks, numSends, numScenes, launcherSlotValueCreatorFn) {
+    lep.util.assertFunction(launcherSlotValueCreatorFn, 'Invalid launcherSlotValueCreatorFn for MatrixView.createMain');
+    var matrixView = new lep.MatrixView('MainMatrixView', numTracks, numSends, numScenes);
+    matrixView.prepareLauncherSlotValueSets(launcherSlotValueCreatorFn);
+    return matrixView;
 };

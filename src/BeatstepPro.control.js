@@ -17,7 +17,7 @@
  */
 
 loadAPI(6);
-load('lep/api.js');
+load('lep-framework/complete.js');
 load('beatsteppro/BeatstepPro.js');
 
 host.defineController('Arturia', 'Beatstep Pro [Mains]', '2.1', '6fff1a34-3310-11e5-a151-feff819cdc9f', 'Lennart Pegel');

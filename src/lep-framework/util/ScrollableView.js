@@ -24,7 +24,7 @@ lep.ScrollableView = function(ownerName, scrolledWindowSize, scrollable) {
          */
         _scrollBy = function(relScrollSize) {
             var safeNewPos = Math.max(0, Math.min(self.currentPosition() + relScrollSize, self.totalItems() - scrolledWindowSize));
-            // lep.logDev('safeNewPos for TrackWindow = ' + safeNewPos);
+            // lep.logDev('safeNewPos for TracksView = ' + safeNewPos);
             _settableScrollPosition.set(safeNewPos);
         };
 

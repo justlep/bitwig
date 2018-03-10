@@ -6,7 +6,7 @@
  */
 
 loadAPI(6);
-load('lep/api.js');
+load('lep-framework/complete.js');
 
 host.defineController('Behringer', 'CMD DC-1', '2.1', '047f0d84-8ace-11e5-af63-feff819cdc9f', 'Lennart Pegel');
 host.defineMidiPorts(1, 1);

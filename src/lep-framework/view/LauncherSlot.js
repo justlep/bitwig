@@ -1,10 +1,10 @@
 /**
- * Represents a launcher slot managed by a MatrixWindow.
+ * Represents a launcher slot managed by a MatrixView.
  *
  * Author: Lennart Pegel - https://github.com/justlep/bitwig
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  *
- * @param {number} trackIndex - track position of the launcherSlot within the parent MatrixWindow
+ * @param {number} trackIndex - track position of the launcherSlot within the parent MatrixView
  * @param {number} sceneIndex - slot/scene position of the launcherSlot within its SceneBank
  * @param {ClipLauncherSlotOrSceneBank} sceneBank - the scene bank this launcher slot belongs to
  * @constructor
@@ -43,7 +43,7 @@ lep.LauncherSlot.prototype = {
         }
     },
     /**
-     * To be used by the {@link MatrixWindow} only to update this LauncherSlot with updated values from the Bitwig API.
+     * To be used by the {@link MatrixView} only to update this LauncherSlot with updated values from the Bitwig API.
      * @param {boolean} isStop
      * @param {boolean} isPlay
      * @param {boolean} isRecord

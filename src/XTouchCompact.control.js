@@ -6,7 +6,7 @@
  */
 
 loadAPI(6);
-load('lep/api.js');
+load('lep-framework/complete.js');
 
 host.defineController('Behringer', 'X-Touch Compact', '0.1', '58169cfc-2228-11e8-b467-0ed5f89f718b', 'Lennart Pegel');
 host.defineMidiPorts(1, 1);
@@ -77,7 +77,7 @@ lep.XTouchCompact = function(xtcMidiChannel) {
         trackBank = host.createMainTrackBank(WINDOW_SIZE, SENDS_NUMBER, 0),
         cursorDevice = host.createEditorCursorDevice(0),
         eventDispatcher = lep.MidiEventDispatcher.getInstance(),
-        trackWindow = new lep.TrackWindow('Tracks', 8, 0, 0, trackBank),
+        tracksView = new lep.TracksView('Tracks', 8, 0, 0, trackBank),
         masterTrack = host.createMasterTrack(0),
         isShiftPressed = ko.observable(false).updatedBy(function(obs) {
             eventDispatcher.onNote(NOTE_ACTION.SHIFT, function(noteOrCc, velocity /*, channel*/) {
@@ -91,14 +91,14 @@ lep.XTouchCompact = function(xtcMidiChannel) {
                 if (isShiftPressed()) {
                     cursorDevice.selectNext();
                 } else {
-                    trackWindow.moveChannelPageForth();
+                    tracksView.moveChannelPageForth();
                 }
             },
             PREV_DEVICE_OR_CHANNEL_PAGE: function() {
                 if (isShiftPressed()) {
                     cursorDevice.selectPrevious();
                 } else {
-                    trackWindow.moveChannelPageBack();
+                    tracksView.moveChannelPageBack();
                 }
             },
             PLAYING_STATUS_CHANGED: function(isPlaying) {

@@ -11,15 +11,15 @@
  * @param {?TrackBank} [trackBank] - if null, a MainTrackBank with 0 scenes will be created
  * @constructor
  */
-lep.TrackWindow = function(name, numTracks, numSends, numScenes, trackBank) {
-    lep.util.assertNonEmptyString(name, 'Invalid name for TrackWindow: {}', name);
-    lep.util.assertNumberInRange(numTracks, 1, lep.TrackWindow.MAX_TRACKS, 'Invalid numTracks for {}: {}', name, numTracks);
-    lep.util.assertNumberInRange(numSends, 0, lep.TrackWindow.MAX_SENDS, 'Invalid numSends for {}: {}', name, numSends);
+lep.TracksView = function(name, numTracks, numSends, numScenes, trackBank) {
+    lep.util.assertNonEmptyString(name, 'Invalid name for TracksView: {}', name);
+    lep.util.assertNumberInRange(numTracks, 1, lep.TracksView.MAX_TRACKS, 'Invalid numTracks for {}: {}', name, numTracks);
+    lep.util.assertNumberInRange(numSends, 0, lep.TracksView.MAX_SENDS, 'Invalid numSends for {}: {}', name, numSends);
     if (!this._super) {
         lep.util.assert(!numScenes, 'Invalid numScenes={} for {}. Use ClipWindow for multi-scene windows.', numScenes, name);
     } else {
         // derived classes like ClipWindow can have more scenes
-        lep.util.assertNumberInRange(numScenes, 0, lep.TrackWindow.MAX_SCENES, 'Invalid numScenes={} for {}', numScenes, name);
+        lep.util.assertNumberInRange(numScenes, 0, lep.TracksView.MAX_SCENES, 'Invalid numScenes={} for {}', numScenes, name);
     }
     if (trackBank) {
         lep.util.assertFunction(trackBank.followCursorTrack, 'Invalid trackBank for {}: {}', name, trackBank);
@@ -46,19 +46,19 @@ lep.TrackWindow = function(name, numTracks, numSends, numScenes, trackBank) {
 };
 
 /** @static */
-lep.TrackWindow.MAX_TRACKS = 16;
+lep.TracksView.MAX_TRACKS = 16;
 /** @static */
-lep.TrackWindow.MAX_SENDS = 16;
+lep.TracksView.MAX_SENDS = 16;
 /** @static */
-lep.TrackWindow.MAX_SCENES = 16;
+lep.TracksView.MAX_SCENES = 16;
 
 /**
- * Creates a TrackWindow instance with a main track bank (and zero scenes).
+ * Creates a TracksView instance with a main track bank (and zero scenes).
  * @param {number} numTracks
  * @param {number} numSends
- * @return {lep.TrackWindow}
+ * @return {lep.TracksView}
  * @static
  */
-lep.TrackWindow.createMain = function(numTracks, numSends) {
-    return new lep.TrackWindow('MainTrackWindow', numTracks, numSends);
+lep.TracksView.createMain = function(numTracks, numSends) {
+    return new lep.TracksView('MainTracksView', numTracks, numSends);
 };

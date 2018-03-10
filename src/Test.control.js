@@ -1,5 +1,5 @@
 loadAPI(6);
-load('lep/api.js');
+load('lep-framework/complete.js');
 
 host.defineController('LeP', 'test', '2.1', '98eac9c6-68fb-11e5-9d70-feff819cd123', 'meme');
 host.defineMidiPorts(1, 1);

@@ -15,7 +15,7 @@
  */
 
 loadAPI(6);
-load('lep/api.js');
+load('lep-framework/complete.js');
 
 host.defineController('Akai', 'APC mini', '1.0', '086a5ace-94b9-11e7-abc4-cec278b6b50a', 'Lennart Pegel');
 host.defineMidiPorts(1, 1);
@@ -89,7 +89,7 @@ function ApcMini() {
         transport = lep.util.getTransport(),
         currentMatrixMode = ko.observable(MATRIX_MODE.LAUNCHERS).extend({restoreable: true}),
         currentFaderMode = ko.observable(FADER_MODE.VOLUME).extend({restoreable: true}),
-        matrixWindow = lep.MatrixWindow.createMain(MATRIX_TRACKS, MATRIX_SENDS, MATRIX_SCENES, function (launcherSlot) {
+        matrixView = lep.MatrixView.createMain(MATRIX_TRACKS, MATRIX_SENDS, MATRIX_SCENES, function (launcherSlot) {
             return new lep.KnockoutSyncedValue({
                 name: lep.util.formatString('{}Value', launcherSlot.name),
                 ownValue: true,
@@ -188,16 +188,16 @@ function ApcMini() {
             })
         },
         VALUESET = {
-            VOLUME: lep.ValueSet.createVolumeValueSet(matrixWindow.trackBank, 8),
-            PAN: lep.ValueSet.createPanValueSet(matrixWindow.trackBank, 8),
-            SEND: lep.SendsValueSet.createFromTrackBank(matrixWindow.trackBank),
+            VOLUME: lep.ValueSet.createVolumeValueSet(matrixView.trackBank, 8),
+            PAN: lep.ValueSet.createPanValueSet(matrixView.trackBank, 8),
+            SEND: lep.SendsValueSet.createFromTrackBank(matrixView.trackBank),
             DEVICE_PARAMS: new lep.ParamsValueSet(cursorDevice),
             CONFIG: lep.ValueSet.createForMatrix('ConfigValues', 8, 8, function(col, row) {
                 if (row === 0) {
                     return new lep.KnockoutSyncedValue({
                         name: 'CfgTrackScrollSize' + (col + 1),
                         ownValue: (col + 1),
-                        refObservable: matrixWindow.trackScrollSize,
+                        refObservable: matrixView.trackScrollSize,
                         velocityValueOn: COLOR.GREEN,
                         velocityValueOff: COLOR.YELLOW
                     });
@@ -206,7 +206,7 @@ function ApcMini() {
                     return new lep.KnockoutSyncedValue({
                         name: 'CfgSceneScrollSize' + (col + 1),
                         ownValue: (col + 1),
-                        refObservable: matrixWindow.sceneScrollSize,
+                        refObservable: matrixView.sceneScrollSize,
                         velocityValueOn: COLOR.GREEN,
                         velocityValueOff: COLOR.YELLOW
                     });
@@ -253,10 +253,10 @@ function ApcMini() {
                     lep.ChannelSelectValue.setVelocityValues(COLOR.GREEN, COLOR.OFF);
                 }
                 switch(row) {
-                    case 4: return lep.ToggledValue.createArmValue(matrixWindow.trackBank, col);
-                    case 5: return lep.ToggledValue.createSoloValue(matrixWindow.trackBank, col, soloExclusivePref);
-                    case 6: return lep.ToggledValue.createMuteValue(matrixWindow.trackBank, col);
-                    case 7: return lep.ChannelSelectValue.create(matrixWindow.trackBank, col);
+                    case 4: return lep.ToggledValue.createArmValue(matrixView.trackBank, col);
+                    case 5: return lep.ToggledValue.createSoloValue(matrixView.trackBank, col, soloExclusivePref);
+                    case 6: return lep.ToggledValue.createMuteValue(matrixView.trackBank, col);
+                    case 7: return lep.ChannelSelectValue.create(matrixView.trackBank, col);
                 }
                 return new lep.BaseValue({
                     name: lep.util.formatString('UnusedMixSlot{}{}', col, row),
@@ -265,7 +265,7 @@ function ApcMini() {
             })
         },
         CONTROLSET = {
-            MATRIX: matrixWindow.createMatrixControlSet(function(colIndex, rowIndex /*, absoluteIndex */) {
+            MATRIX: matrixView.createMatrixControlSet(function(colIndex, rowIndex /*, absoluteIndex */) {
                 return new lep.Button({
                     name: lep.util.formatString('MatrixBtn {}:{}', colIndex, rowIndex),
                     clickNote: NOTE.MATRIX_START_NOTES_BY_ROW[rowIndex] + colIndex
@@ -320,14 +320,14 @@ function ApcMini() {
                 isOnClickRestoreable: true,
                 onClick: function() {
                     if (currentMatrixMode().isLaunchers) {
-                        matrixWindow.rotate();
+                        matrixView.rotate();
                     } else {
                         currentMatrixMode(MATRIX_MODE.LAUNCHERS);
                     }
                 },
                 computedVelocity: function() {
                     return (!currentMatrixMode().isLaunchers) ? COLOR.OFF :
-                             matrixWindow.isOrientationTracksByScenes() ? COLOR.GREEN: COLOR.GREEN_BLINK;
+                             matrixView.isOrientationTracksByScenes() ? COLOR.GREEN: COLOR.GREEN_BLINK;
                 }
             })
         });
@@ -412,41 +412,41 @@ function ApcMini() {
         var MATRIX_LEFT_VALUE = new lep.KnockoutSyncedValue({
                 name: 'MatrixLeft',
                 ownValue: true,
-                refObservable: matrixWindow.canMoveMatrixLeft,
-                onClick: createShiftCurriedHandler(matrixWindow.moveMatrixLeft),
+                refObservable: matrixView.canMoveMatrixLeft,
+                onClick: createShiftCurriedHandler(matrixView.moveMatrixLeft),
                 velocityValueOn: COLOR.RED,
                 velocityValueOff: COLOR.OFF
             }),
             MATRIX_RIGHT_VALUE =  new lep.KnockoutSyncedValue({
                 name: 'MatrixRight',
                 ownValue: true,
-                refObservable: matrixWindow.canMoveMatrixRight,
-                onClick: createShiftCurriedHandler(matrixWindow.moveMatrixRight),
+                refObservable: matrixView.canMoveMatrixRight,
+                onClick: createShiftCurriedHandler(matrixView.moveMatrixRight),
                 velocityValueOn: COLOR.RED,
                 velocityValueOff: COLOR.OFF
             }),
             MATRIX_UP_VALUE = new lep.KnockoutSyncedValue({
                 name: 'MatrixUp',
                 ownValue: true,
-                refObservable: matrixWindow.canMoveMatrixUp,
-                onClick: createShiftCurriedHandler(matrixWindow.moveMatrixUp),
+                refObservable: matrixView.canMoveMatrixUp,
+                onClick: createShiftCurriedHandler(matrixView.moveMatrixUp),
                 velocityValueOn: COLOR.RED,
                 velocityValueOff: COLOR.OFF
             }),
             MATRIX_DOWN_VALUE = new lep.KnockoutSyncedValue({
                 name: 'MatrixDown',
                 ownValue: true,
-                refObservable: matrixWindow.canMoveMatrixDown,
-                onClick: createShiftCurriedHandler(matrixWindow.moveMatrixDown),
+                refObservable: matrixView.canMoveMatrixDown,
+                onClick: createShiftCurriedHandler(matrixView.moveMatrixDown),
                 velocityValueOn: COLOR.RED,
                 velocityValueOff: COLOR.OFF
             }),
             TRACKS_LEFT_VALUE =  new lep.KnockoutSyncedValue({
                 name: 'TracksLeft',
                 ownValue: true,
-                refObservable: matrixWindow.canMoveChannelBack,
+                refObservable: matrixView.canMoveChannelBack,
                 onClick: function() {
-                    void( isShiftPressed() ? matrixWindow.moveChannelPageBack() : matrixWindow.moveChannelBack() );
+                    void( isShiftPressed() ? matrixView.moveChannelPageBack() : matrixView.moveChannelBack() );
                 },
                 velocityValueOn: COLOR.RED,
                 velocityValueOff: COLOR.OFF
@@ -454,9 +454,9 @@ function ApcMini() {
             TRACKS_RIGHT_VALUE =  new lep.KnockoutSyncedValue({
                 name: 'TracksRight',
                 ownValue: true,
-                refObservable: matrixWindow.canMoveChannelForth,
+                refObservable: matrixView.canMoveChannelForth,
                 onClick: function() {
-                    void( isShiftPressed() ? matrixWindow.moveChannelPageForth() : matrixWindow.moveChannelForth() );
+                    void( isShiftPressed() ? matrixView.moveChannelPageForth() : matrixView.moveChannelForth() );
                 },
                 velocityValueOn: COLOR.RED,
                 velocityValueOff: COLOR.OFF
@@ -540,7 +540,7 @@ function ApcMini() {
             var matrixMode = currentMatrixMode();
             return (matrixMode.isConfig) ? VALUESET.CONFIG :
                    (matrixMode.isMix) ? VALUESET.MIX :
-                    matrixWindow.launcherSlotValueSet();
+                    matrixView.launcherSlotValueSet();
         }));
     }
 
