@@ -91,6 +91,7 @@ lep.BCR2000 = function(bcrPresetNumber, bcfMidiChannel) {
             MODE_ARM_SELECT: NOTE.EG3,
             MODE_VALUE_SELECT: NOTE.EG4,
             SHIFT: NOTE.F1,
+            LOCK_DEVICE: NOTE.F2,
             RECORD: NOTE.F3,
             LOOP: NOTE.F4,
             PREV_DEVICE_OR_CHANNEL_PAGE: NOTE.P1,
@@ -103,7 +104,6 @@ lep.BCR2000 = function(bcrPresetNumber, bcfMidiChannel) {
 
         transport = lep.util.getTransport(),
         trackBank = host.createMainTrackBank(WINDOW_SIZE, SENDS_NUMBER, 0),
-        cursorDevice = host.createEditorCursorDevice(0),
         eventDispatcher = lep.MidiEventDispatcher.getInstance(),
 
         isShiftPressed = ko.observable(false),
@@ -112,14 +112,14 @@ lep.BCR2000 = function(bcrPresetNumber, bcfMidiChannel) {
         HANDLERS = {
             NEXT_DEVICE_OR_CHANNEL_PAGE: function() {
                 if (isShiftPressed()) {
-                    cursorDevice.selectNext();
+                    VALUESET.PARAM.selectNextDevice();
                 } else {
                     trackBank.scrollPageForwards();
                 }
             },
             PREV_DEVICE_OR_CHANNEL_PAGE: function() {
                 if (isShiftPressed()) {
-                    cursorDevice.selectPrevious();
+                    VALUESET.PARAM.selectPreviousDevice();
                 } else {
                     trackBank.scrollPageBackwards();
                 }
@@ -144,7 +144,7 @@ lep.BCR2000 = function(bcrPresetNumber, bcfMidiChannel) {
             PAN:    lep.ValueSet.createPanValueSet(trackBank, WINDOW_SIZE),
             SEND:   lep.SendsValueSet.createFromTrackBank(trackBank),
             SEND2:   lep.SendsValueSet.createFromTrackBank(trackBank),
-            PARAM:  new lep.ParamsValueSet(cursorDevice),
+            PARAM:  new lep.ParamsValueSet(),
             USERCONTROL: lep.ValueSet.createUserControlsValueSet(USER_CONTROL_PAGES, WINDOW_SIZE, 'BCR-UC-{}-{}'),
             SOLO:   lep.ValueSet.createSoloValueSet(trackBank, WINDOW_SIZE, prefs),
             ARM:    lep.ValueSet.createArmValueSet(trackBank, WINDOW_SIZE),
@@ -466,6 +466,23 @@ lep.BCR2000 = function(bcrPresetNumber, bcfMidiChannel) {
                 midiChannel: bcfMidiChannel,
                 valueToAttach: ko.computed(function() {
                     return isShiftPressed() ? TRANSPORT_VALUE.ARRANGER_AUTOMATION : TRANSPORT_VALUE.RECORD;
+                })
+            });
+            new lep.Button({
+                name: 'LockDeviceBtn',
+                clickNote: NOTE_ACTION.LOCK_DEVICE,
+                midiChannel: bcfMidiChannel,
+                valueToAttach: new lep.KnockoutSyncedValue({
+                    name: 'PinnedToDevice',
+                    ownValue: true,
+                    refObservable: VALUESET.PARAM.lockedToDevice,
+                    onClick: function() {
+                        if (isShiftPressed()) {
+                            VALUESET.PARAM.toggleDeviceWindow();
+                        } else {
+                            VALUESET.PARAM.lockedToDevice.toggle();
+                        }
+                    }
                 })
             });
             new lep.Button({

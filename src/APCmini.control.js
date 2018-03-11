@@ -113,7 +113,6 @@ function ApcMini() {
             });
         }),
         masterTrack = host.createMasterTrack(0),
-        cursorDevice = host.createEditorCursorDevice(0),
         soloExclusivePref = {
             soloExclusive: false
         },
@@ -191,7 +190,7 @@ function ApcMini() {
             VOLUME: lep.ValueSet.createVolumeValueSet(matrixView.trackBank, 8),
             PAN: lep.ValueSet.createPanValueSet(matrixView.trackBank, 8),
             SEND: lep.SendsValueSet.createFromTrackBank(matrixView.trackBank),
-            DEVICE_PARAMS: new lep.ParamsValueSet(cursorDevice),
+            DEVICE_PARAMS: new lep.ParamsValueSet(),
             CONFIG: lep.ValueSet.createForMatrix('ConfigValues', 8, 8, function(col, row) {
                 if (row === 0) {
                     return new lep.KnockoutSyncedValue({
@@ -370,17 +369,32 @@ function ApcMini() {
                 velocityValueOff: COLOR.OFF
             })
         });
-        new lep.Button({
-            name: 'DeviceBtn',
-            clickNote: ACTION_NOTE.DEVICE,
-            midiChannel: MIDI_CHANNEL,
-            valueToAttach: new lep.KnockoutSyncedValue({
+
+        var _devicePinnedValue = VALUESET.DEVICE_PARAMS.getPinnedToDeviceKoSyncedValue(),
+            _deviceModeValue = new lep.KnockoutSyncedValue({
                 name: 'DeviceMode',
                 ownValue: FADER_MODE.DEVICE,
                 refObservable: currentFaderMode,
                 restoreRefAfterLongClick: true,
+                onClick: function(ownVal, refObs) {
+                    var alreadySelected = ownVal === refObs.peek();
+                    if (alreadySelected) {
+                        VALUESET.DEVICE_PARAMS.toggleDeviceWindow();
+                    } else {
+                        refObs(ownVal);
+                    }
+                },
+                isOnClickRestoreable: true,
                 velocityValueOn: COLOR.RED,
                 velocityValueOff: COLOR.OFF
+            });
+
+        new lep.Button({
+            name: 'DeviceBtn',
+            clickNote: ACTION_NOTE.DEVICE,
+            midiChannel: MIDI_CHANNEL,
+            valueToAttach: ko.computed(function() {
+                return isShiftPressed() ? _devicePinnedValue : _deviceModeValue;
             })
         });
 

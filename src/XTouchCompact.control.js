@@ -75,7 +75,6 @@ lep.XTouchCompact = function(xtcMidiChannel) {
 
         transport = lep.util.getTransport(),
         trackBank = host.createMainTrackBank(WINDOW_SIZE, SENDS_NUMBER, 0),
-        cursorDevice = host.createEditorCursorDevice(0),
         eventDispatcher = lep.MidiEventDispatcher.getInstance(),
         tracksView = new lep.TracksView('Tracks', 8, 0, 0, trackBank),
         masterTrack = host.createMasterTrack(0),
@@ -89,14 +88,14 @@ lep.XTouchCompact = function(xtcMidiChannel) {
         HANDLERS = {
             NEXT_DEVICE_OR_CHANNEL_PAGE: function() {
                 if (isShiftPressed()) {
-                    cursorDevice.selectNext();
+                    VALUESET.PARAM.selectNextDevice();
                 } else {
                     tracksView.moveChannelPageForth();
                 }
             },
             PREV_DEVICE_OR_CHANNEL_PAGE: function() {
                 if (isShiftPressed()) {
-                    cursorDevice.selectPrevious();
+                    VALUESET.PARAM.selectPreviousDevice();
                 } else {
                     tracksView.moveChannelPageBack();
                 }
@@ -118,7 +117,7 @@ lep.XTouchCompact = function(xtcMidiChannel) {
             PAN:    lep.ValueSet.createPanValueSet(trackBank, WINDOW_SIZE),
             SEND:   lep.SendsValueSet.createFromTrackBank(trackBank),
             SEND2:   lep.SendsValueSet.createFromTrackBank(trackBank),
-            PARAM:  new lep.ParamsValueSet(cursorDevice),
+            PARAM:  new lep.ParamsValueSet(),
             USERCONTROL: lep.ValueSet.createUserControlsValueSet(USER_CONTROL_PAGES, WINDOW_SIZE, 'XTC-UC-{}-{}'),
             SOLO:   lep.ValueSet.createSoloValueSet(trackBank, WINDOW_SIZE, prefs),
             ARM:    lep.ValueSet.createArmValueSet(trackBank, WINDOW_SIZE),
@@ -529,6 +528,12 @@ lep.XTouchCompact = function(xtcMidiChannel) {
         currentEncoderValueSetObservable(VALUESET.PAN);
         currentFaderValueSetObservable(VALUESET.VOLUME);
         CONTROL.MAIN_FADER.attachValue(VALUE.MASTER_VOLUME);
+
+        // TODO move functionality to proper place
+        CONTROLSET.BOTTOM_BUTTONS.controls[7].attachValue(VALUESET.PARAM.getPinnedToDeviceKoSyncedValue());
+        eventDispatcher.onNotePressed(NOTE.BTN_BOTTOM_FIRST + 5, VALUESET.PARAM.toggleDeviceWindow, null, MIDI_CHANNEL);
+        eventDispatcher.onNotePressed(NOTE.BTN_BOTTOM_FIRST + 6, VALUESET.PARAM.gotoDevice, null, MIDI_CHANNEL);
+
         println('\n-------------\nX-Touch Compact ready');
     });
 
