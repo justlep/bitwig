@@ -27,7 +27,8 @@ lep.KnockoutSyncedValue = lep.util.extendClass(lep.BaseValue, {
 *                                                                  If given, `velocityValueOn` and `velocityValueOff` are ignored.
      * @param {ko.observable} [opts.ignoreClickIf] - if given, the `click` event, e.g. function(){..}()
      * @param {boolean} [opts.forceRewrite=false] - if true, the refObservable will be written with `ownValue` even if it already has that value
-     * @param {Function} [opts.onClick] - optional function to call when an absolute value > 0 is received, e.g. function(ownVal) {..}
+     * @param {KnockoutSyncedValue~ClickHandler} [opts.onClick] - optional function to call when an absolute value > 0 is received,
+     *                                                            e.g. function(ownVal, refObs) {..}
      * @param {boolean} [opts.restoreRefAfterLongClick] - if true, the refObservable value will be restored to the value
      *                                                    it had before this KSV instance pushed its ownValue into it, but only if
      *                                                    the click-release-timespan exceeds {@link #LONG_CLICK_TIME}
@@ -144,7 +145,7 @@ lep.KnockoutSyncedValue = lep.util.extendClass(lep.BaseValue, {
         // from now we have the "toggle-now!" case
 
         if (this.onClick) {
-            this.onClick(this.ownValue);
+            this.onClick(this.ownValue, this.refObservable);
             skipWriteRef = true;
         }
 
@@ -162,3 +163,10 @@ lep.KnockoutSyncedValue = lep.util.extendClass(lep.BaseValue, {
         }
     }
 });
+
+/**
+ * @callback KnockoutSyncedValue~ClickHandler
+ * @param {*} ownValue
+ * @param {ko.observable} refObservable
+ */
+
