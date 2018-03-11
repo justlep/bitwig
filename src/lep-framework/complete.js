@@ -36,6 +36,7 @@ load('value/ChannelSelectValue.js');
 load('value/ToggledTransportValue.js');
 load('value/KnockoutSyncedValue.js');
 
+load('view/SelectedTrackView.js');
 load('view/TracksView.js');
 load('view/LauncherSlot.js');
 load('view/MatrixView.js');
