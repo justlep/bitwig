@@ -1,5 +1,4 @@
 module.exports = function (grunt, opts) {
-    'use strict';
 
     grunt.registerTask('default', [
         'validate'
