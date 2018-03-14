@@ -9,6 +9,6 @@
         "ecmaFeatures": {
             "templateStrings": true
         },
-        "sourceType": "module"
+        "sourceType": "script"
     }
 }
