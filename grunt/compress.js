@@ -1,7 +1,6 @@
 module.exports = function (grunt, opts) {
-    'use strict';
 
-    var zipComment = [
+    const ZIP_COMMENT = [
             '<%= package.title %>',
             'Version <%= package.version %>',
             '<%= package.repository.url %>',
@@ -16,7 +15,7 @@ module.exports = function (grunt, opts) {
                 level: 1,
                 pretty: true,
                 archive: opts.VERSIONED_RELEASE_ZIP_PATH,
-                comment: zipComment
+                comment: ZIP_COMMENT
             },
             files: [
                 {

@@ -48,12 +48,12 @@ lep.ValueSet = function(name, cols, rows, valueCreationFn, windowSize) {
     /** @type {lep.BaseValue} */
     this.values = []; // BaseValues, NOT numerical values
 
-    lep.logDebug("Creating values for ValueSet {}", this.name);
+    lep.logDebug('Creating values for ValueSet {}', this.name);
     for (var rowIndex = 0, totalIndex = 0, colIndex, value; rowIndex < rows; rowIndex++) {
         for (colIndex = 0; colIndex < cols; colIndex++, totalIndex++) {
             value = valueCreationFn(colIndex, rowIndex, totalIndex);
             lep.util.assertBaseValue(value, 'Invalid value returned by valueCreationFn in ValueSet');
-            lep.logDebug("Created value: {}", value.name, this.name);
+            lep.logDebug('Created value: {}', value.name, this.name);
             this.values.push(value);
         }
     }

@@ -1,0 +1,14 @@
+{
+    "extends": "./.eslintrc-common.json",
+    "env": {
+        "node": true,
+        "es6": true
+    },
+    "parserOptions": {
+        "ecmaVersion": 2017,
+        "ecmaFeatures": {
+            "templateStrings": true
+        },
+        "sourceType": "module"
+    }
+}

@@ -112,6 +112,7 @@
                         msgType = 0x90;
                     }
 
+                    /*eslint no-constant-condition:0 */
                     while (true) {
                         if (msgType === 0xB0) { // CC
                             // lep.logDebug('MED received value {} on CC {} / channel {}', value, noteOrCC, channel);

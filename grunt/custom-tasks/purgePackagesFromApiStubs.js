@@ -5,7 +5,7 @@ module.exports = function (grunt, opts) {
     'use strict';
 
     grunt.registerTask('purgePackagesFromApiStubs', 'Removes Java package part from ApiStubs JSDoc comments.', function() {
-        let JAVA_PACKAGE_PART_REGEX = /com\.bitwig\.extension[a-zA-Z0-9\.]+\.([A-Z][a-zA-Z0-9]+)/g,
+        let JAVA_PACKAGE_PART_REGEX = /com\.bitwig\.extension[a-zA-Z0-9.]+\.([A-Z][a-zA-Z0-9]+)/g,
             apiSources = grunt.file.expand(['bitwigApiStubs/**/*.js']),
             totalOccurrences = 0;
 

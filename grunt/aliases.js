@@ -22,7 +22,7 @@ module.exports = function (grunt, opts) {
         'copy:apiSourcesFromBitwig',
         'compress:unmodifiedApiStubs',
         'purgePackagesFromApiStubs',
-        'generateJshintConfig'
+        'updateEslintConfig'
     ]);
 
     grunt.registerTask('copyToBitwigForTest', [
@@ -32,7 +32,7 @@ module.exports = function (grunt, opts) {
     ]);
 
     grunt.registerTask('validate', [
-        'jshint'
+        'exec:lint'
     ]);
 
     grunt.registerTask('test', [

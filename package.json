@@ -16,11 +16,13 @@
     "node": ">=6.9.1"
   },
   "scripts": {
+    "lint": "eslint --max-warnings 5 Gruntfile.js grunt/**/*.js src/**/*.js",
     "test": "grunt validate test"
   },
   "main": "Gruntfile.js",
   "license": "MIT",
   "devDependencies": {
+    "eslint": "^4.16.0",
     "chai": "^3.5.0",
     "chai-spies": "^0.7.1",
     "grunt": "^1.0.1",
@@ -29,7 +31,7 @@
     "grunt-contrib-compress": "^1.4.1",
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-copy": "^1.0.0",
-    "grunt-contrib-jshint": "^1.1.0",
+    "grunt-exec": "~1.0.1",
     "grunt-mocha-test": "^0.13.2",
     "load-grunt-config": "^0.19.2",
     "load-grunt-tasks": "^3.5.2",

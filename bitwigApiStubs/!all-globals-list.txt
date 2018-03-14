@@ -1,6 +1,6 @@
 
 *****************************************************************
-Last result of `grunt generateJshintConfig`
+Last result of `grunt updateEslintConfig`
 API version 2.3.1 | 177 files | 158 classes | 42 global functions
 *****************************************************************
 

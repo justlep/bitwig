@@ -1,27 +1,34 @@
 /**
- * Generates a new .jshintrc file containing all global functions + classes of the Bitwig API as readonly in the globals section,
- * so jshint won't reject them as unknown.
+ * Updates the controller scripts' eslint config with all global functions + classes from the Bitwig API stubs.
  *
- * The task is scanning all the .js files in the /bitwigApiStubs folder for global function declarations.
- * Then loads /.jshintrc.in and adds the found function names into the JSON's 'globals' property,
- * afterwards saves the altered JSON into .jshintrc which is used by the jshint grunt task.
+ * The task is scanning all the .js files in /bitwigApiStubs for global function declarations,
+ * putting their names into the globals section of src/.eslintrc.
  */
 module.exports = function (grunt, opts) {
-    'use strict';
 
-    const TASK_NAME = 'generateJshintConfig',
-          TARGET_JSHINTRC = './.jshintrc',
-          TARGET_SUMMARY_FILE = './bitwigApiStubs/!all-globals-list.txt';
+    const TASK_NAME = 'updateEslintConfig',
+          TARGET_ESLINTRC = 'src/.eslintrc',
+          TARGET_SUMMARY_FILE = 'bitwigApiStubs/!all-globals-list.txt';
 
-    grunt.registerTask(TASK_NAME, 'Copies an altered .jshintrc to the api path.', () => {
+    grunt.registerTask(TASK_NAME, 'Updates the controller scripts .eslintrc with latest Bitwig globals', () => {
 
         let FN_OR_CLASS_REGEX = /function[\s\t]+([a-z0-9_]+)\(/ig,
             API_VERSION_REGEX = /\/\* API Version - (\d\.\d+[.0-9A-Za-z-]*) \*\//,
-            jshintrc = grunt.file.readJSON('.jshintrc.in'),
+            eslintrcJson = grunt.file.readJSON(TARGET_ESLINTRC),
             apiStubFiles = grunt.file.expand(['bitwigApiStubs/**/*.js']),
             globalClasses = [],
             globalFunctions = [],
-            foundApiVersion = null;
+            foundApiVersion = null,
+            newGlobals = {
+                'lep': true,
+                'init': true,
+                'exit': true,
+                'flush': true,
+                'ko': false,
+                'host': false,
+                'load': false,
+                'loadAPI': false
+            };
 
         // grunt.log.writeln(apiSources);
         grunt.log.writeln('Scanning API stub files for global classes and functions...');
@@ -43,8 +50,10 @@ module.exports = function (grunt, opts) {
         });
 
         globalClasses.sort().concat(globalFunctions.sort()).forEach(name => {
-            jshintrc.globals[name] = false;
+            newGlobals[name] = false;
         });
+
+        eslintrcJson.globals = newGlobals;
 
         let numbersSummary = `API version ${foundApiVersion || '???'} | ${apiStubFiles.length} files | `+
                              `${globalClasses.length} classes | ${globalFunctions.length} global functions`,
@@ -59,8 +68,8 @@ module.exports = function (grunt, opts) {
             ];
 
         grunt.log.ok(numbersSummary);
-        grunt.file.write(TARGET_JSHINTRC, JSON.stringify(jshintrc, null, 2));
-        grunt.log.ok('\nWritten ' + TARGET_JSHINTRC);
+        grunt.file.write(TARGET_ESLINTRC, JSON.stringify(eslintrcJson, null, 2));
+        grunt.log.ok('\nWritten ' + TARGET_ESLINTRC);
         grunt.file.write(TARGET_SUMMARY_FILE, summaryParts.join('\n'));
         grunt.log.ok('\nWritten ' + TARGET_SUMMARY_FILE);
     });

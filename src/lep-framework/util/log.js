@@ -18,9 +18,11 @@ var lep = (typeof lep !== 'undefined') ? lep : {};
  *      lep.logWarn('Test {}', 123); // --> "Test 123"
  */
 (function() {
-
     var loggingFn,
         NOP = function(){};
+
+    /*eslint no-console: 0, no-undef: 0 */
+
 
     if (typeof println === 'function') {
         loggingFn = function() {
