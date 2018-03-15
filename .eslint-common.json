@@ -5,7 +5,7 @@
         "curly": [2, "all"],
         "brace-style": [2, "1tbs", { "allowSingleLine": true }],
         "comma-dangle": ["error", "never"],
-        "max-len": [2, {"code": 145, "ignoreRegExpLiterals": true}],
+        "max-len": [2, {"code": 145, "ignoreRegExpLiterals": true, "ignoreComments": true}],
         "quotes": [2, "single"],
         "no-mixed-spaces-and-tabs": [2],
         "no-multi-assign": 2,
