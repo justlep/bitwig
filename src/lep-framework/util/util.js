@@ -259,8 +259,11 @@ lep.util = (function() {
         /**
          * Register a callback to be invoked by the very first flush() triggered by Bitwig.
          * @param {function} handler
+         * @param {boolean} [skipOriginalFirst=false] - if true, the original global flush function (if present) will NOT be called along with the
+         *                                              given handler on first flush. By default, both the given first-flush handler and
+         *                                              the original flush function will be called on first flush.
          */
-        onFirstFlush: function(handler) {
+        onFirstFlush: function(handler, skipOriginalFirst) {
             this.assertFunction(handler, 'Invalid handler for util.onFirstFlush');
             this.assert(firstFlushFns !== -1, 'Cannot add first-flush handler - first flush already happened');
             if (!firstFlushFns) {
@@ -274,7 +277,11 @@ lep.util = (function() {
                     }
                     firstFlushFns = -1;
                     flush = originalFlushFn;
-                    lep.logDebug('First flush finished. Old flush handler restored.');
+                    if (originalFlushFn && !skipOriginalFirst) {
+                        lep.logDebug('Invoking original flush handler.');
+                        originalFlushFn();
+                    }
+                    lep.logDebug('First flush finished. Original flush handler restored.');
                 };
             }
             firstFlushFns.push(handler);
