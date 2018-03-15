@@ -50,12 +50,14 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
             }
         }).extend({toggleable: true});
 
-        // Track lock-status follows device lock-status
-        this.lockedToDevice.subscribe(function(locked) {
-            if (locked) {
-                popupNotification('RC control locked to ' + self.deviceName());
+        // make track lock-status follow device lock-status
+        this.lockedToDevice.subscribe(self.trackView.locked);
+
+        ko.computed(function() {
+            var deviceNameLocked = self.lockedToDevice() && self.deviceName();
+            if (deviceNameLocked) {
+                popupNotification('RC control locked to ' + deviceNameLocked);
             }
-            self.trackView.locked(locked);
         });
 
         this.gotoDevice = function() {
