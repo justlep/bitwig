@@ -172,6 +172,7 @@ lep.util = (function() {
          */
         generateArray: function(size, valueOrFn) {
             var arr = [], i = size;
+            /*eslint curly:0 */
             if (typeof valueOrFn === 'function') {
                 while (--i >= 0) arr[i] = valueOrFn(i);
             } else {

@@ -98,20 +98,20 @@ lep.MatrixView = lep.util.extendClass(lep.TracksView, {
         });
 
         this.moveMatrixUp = function(onePage) {
-            void( onePage ? ( self.isOrientationTracksByScenes() ? self.moveScenePageBack() : self.moveChannelPageBack() ) :
-                            ( self.isOrientationTracksByScenes() ? self.moveSceneBack() : self.moveChannelBack() ));
+            void ( onePage ? ( self.isOrientationTracksByScenes() ? self.moveScenePageBack() : self.moveChannelPageBack() ) :
+                             ( self.isOrientationTracksByScenes() ? self.moveSceneBack() : self.moveChannelBack() ));
         };
         this.moveMatrixDown = function(onePage) {
-            void( onePage ? ( self.isOrientationTracksByScenes() ? self.moveScenePageForth() : self.moveChannelPageForth() ) :
-                            ( self.isOrientationTracksByScenes() ? self.moveSceneForth() : self.moveChannelForth() ));
+            void ( onePage ? ( self.isOrientationTracksByScenes() ? self.moveScenePageForth() : self.moveChannelPageForth() ) :
+                             ( self.isOrientationTracksByScenes() ? self.moveSceneForth() : self.moveChannelForth() ));
         };
         this.moveMatrixLeft = function(onePage) {
-            void( onePage ? ( self.isOrientationTracksByScenes() ? self.moveChannelPageBack() : self.moveScenePageBack() ) :
-                            ( self.isOrientationTracksByScenes() ? self.moveChannelBack() : self.moveSceneBack() ));
+            void ( onePage ? ( self.isOrientationTracksByScenes() ? self.moveChannelPageBack() : self.moveScenePageBack() ) :
+                             ( self.isOrientationTracksByScenes() ? self.moveChannelBack() : self.moveSceneBack() ));
         };
         this.moveMatrixRight = function(onePage) {
-            void( onePage ? ( self.isOrientationTracksByScenes() ? self.moveChannelPageForth() : self.moveScenePageForth() ) :
-                            ( self.isOrientationTracksByScenes() ? self.moveChannelForth() : self.moveSceneForth() ));
+            void ( onePage ? ( self.isOrientationTracksByScenes() ? self.moveChannelPageForth() : self.moveScenePageForth() ) :
+                             ( self.isOrientationTracksByScenes() ? self.moveChannelForth() : self.moveSceneForth() ));
         };
 
         /**

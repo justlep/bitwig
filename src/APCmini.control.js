@@ -128,7 +128,6 @@ function ApcMini() {
                     clickTimeNow = Date.now();
                     if (clickTimeNow < maxNextDoubleClickTime) {
                         transport.stop();
-                        return;
                     } else {
                         maxNextDoubleClickTime = clickTimeNow + DOUBLE_CLICK_TIME_IN_MILLIS;
                     }
@@ -460,7 +459,7 @@ function ApcMini() {
                 ownValue: true,
                 refObservable: matrixView.canMoveChannelBack,
                 onClick: function() {
-                    void( isShiftPressed() ? matrixView.moveChannelPageBack() : matrixView.moveChannelBack() );
+                    void ( isShiftPressed() ? matrixView.moveChannelPageBack() : matrixView.moveChannelBack() );
                 },
                 velocityValueOn: COLOR.RED,
                 velocityValueOff: COLOR.OFF
@@ -470,7 +469,7 @@ function ApcMini() {
                 ownValue: true,
                 refObservable: matrixView.canMoveChannelForth,
                 onClick: function() {
-                    void( isShiftPressed() ? matrixView.moveChannelPageForth() : matrixView.moveChannelForth() );
+                    void ( isShiftPressed() ? matrixView.moveChannelPageForth() : matrixView.moveChannelForth() );
                 },
                 velocityValueOn: COLOR.RED,
                 velocityValueOff: COLOR.OFF

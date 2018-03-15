@@ -91,10 +91,11 @@
                 }
             },
             DISPATCH_HANDLER = {
-                MIDI: function (status, noteOrCC, value) {
+                MIDI: function (status, noteOrCC, prelimValue) {
                     // printMidi(status, noteOrCC, value);
                     var msgType = (status & 0xF0), // 0xB0 = CC, 0x90 = NOTE ON, 0x80 = NOTE OFF
                         channel = (status & 0xF),
+                        value = prelimValue,
                         hasChannelDependentHandlers = (boundChannelsBitmap & (1 << channel)),
                         channelAwareIndex = hasChannelDependentHandlers && getChannelDependentHandlerIndex(channel, noteOrCC),
                         genericHandlers,

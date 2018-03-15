@@ -16,7 +16,7 @@
     "node": ">=6.9.1"
   },
   "scripts": {
-    "lint": "eslint --max-warnings 5 Gruntfile.js grunt/**/*.js src/**/*.js",
+    "lint": "eslint --max-warnings 5 Gruntfile.js grunt/ src/",
     "test": "grunt validate test"
   },
   "main": "Gruntfile.js",

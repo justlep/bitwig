@@ -131,7 +131,9 @@ lep.BaseControl.prototype = {
      * @param {number} [valueOverride] - optional value to send instead of the BaseValue's value
      */
     syncToMidi: function(valueOverride) {
-        if (this.isMuted || this.isUnidirectional || (!this.value && !arguments.length)) return;
+        if (this.isMuted || this.isUnidirectional || (!this.value && !arguments.length)) {
+            return;
+        }
 
         var useOverride = !!arguments.length,
             valueToSend = useOverride ? valueOverride : (this.value.value || 0),
@@ -166,7 +168,9 @@ lep.BaseControl.prototype = {
      * @param {number} receivedValue
      */
     onValueReceived: function(noteOrCC, receivedValue) {
-        if (!this.value) return;
+        if (!this.value) {
+            return;
+        }
         if (this.sendsDiffValues) {
             var delta = (this.diffZeroValue) ? (receivedValue - this.diffZeroValue) :
                                                (receivedValue <= 64) ? receivedValue : (-1 * (128 - receivedValue));

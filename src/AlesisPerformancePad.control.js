@@ -51,7 +51,10 @@ function init() {
         HANDLERS = {
             MIDI: function(status, data1, data2) {
                 // printMidi(status, data1, data2);
-                if (status !== 0x90 || !data2) return;  // ignore anything that is not note-on
+                if (status !== 0x90 || !data2) {
+                    // ignore anything that is not note-on
+                    return;
+                }
 
                 var targetNote = isNoteRemapEnabled ? NOTE_MAPPING[data1] : data1,
                     targetVelocity;
