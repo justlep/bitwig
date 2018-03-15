@@ -1,6 +1,7 @@
 # LeP's controller scripts for Bitwig [![Build Status](https://travis-ci.org/justlep/bitwig.svg?branch=master)](https://travis-ci.org/justlep/bitwig)
 ##### Available scripts (BWS2-ready):
 * [AKAI APC mini](./doc/APCmini/)
+* Behringer X-Touch Compact (in progress)
 * [Behringer BCF2000](./doc/Behringer%20BCF2000/)
 * [Behringer BCR2000](./doc/Behringer%20BCR2000/)
 * [Arturia Beatstep Pro](./doc/ArturiaBeatstepPro/)
