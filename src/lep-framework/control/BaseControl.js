@@ -76,7 +76,7 @@ lep.BaseControl = function(opts) {
         lep.util.assertNumberInRangeOrEmpty(this.clickNote4Sync, 0, 127, 'Invalid clickNote4Sync {} for {}', this.clickNote4Sync, this.name);
 
         // disable feedback-loop-prevention for asymmetric midi sync
-        this.skipFeedbackLoops = this.skipFeedbackLoops && 
+        this.skipFeedbackLoops = this.skipFeedbackLoops &&
                                  this.midiChannel === this.midiChannel4Sync &&
                                  this.valueNote4Sync === this.valueNote &&
                                  this.valueCC4Sync === this.valueCC &&
@@ -175,11 +175,14 @@ lep.BaseControl.prototype = {
         }
 
         if (this.useValueNote) {
+            // lep.logDev('-> valueNote -> sendNoteOn({},{},{}) <- {}', this.midiChannel4Sync, this.valueNote4Sync, valueToSend, this.name);
             sendNoteOn(this.midiChannel4Sync, this.valueNote4Sync, valueToSend);
         } else if (this.useValueCC) {
+            // lep.logDev('-> valueCC -> sendChannelController({},{},{}) <- {}', this.midiChannel4Sync, this.valueCC4Sync, valueToSend, this.name);
             sendChannelController(this.midiChannel4Sync, this.valueCC4Sync, valueToSend);
         } else if (this.useClickNote) {
             // sending click note status only makes sense for LED-buttons, not for ClickEncoders
+            // lep.logDev('-> clickNote -> sendNoteOn({},{},{}) <- {}', this.midiChannel4Sync, this.clickNote4Sync, valueToSend, this.name);
             sendNoteOn(this.midiChannel4Sync, this.clickNote4Sync, valueToSend);
         }
     },
