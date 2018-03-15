@@ -14,21 +14,18 @@ host.addDeviceNameBasedDiscoveryPair(['X-TOUCH COMPACT'], ['X-TOUCH COMPACT']);
 
 function init() {
     lep.setLogLevel(lep.LOGLEVEL.DEBUG);
-    new lep.XTouchCompact(0);
+    new lep.XTouchCompact();
 }
 
 /**
  * @constructor
- * @param {number} xtcMidiChannel - XTouchCompact MIDI channel (0-based)
  */
-lep.XTouchCompact = function(xtcMidiChannel) {
-    lep.util.assertNumberInRange(xtcMidiChannel, 0, 15, 'Invalid xtcMidiChannel for XTouchCompact');
-
-    const MIDI_CHANNEL = xtcMidiChannel;
-
+lep.XTouchCompact = function() {
     host.getNotificationSettings().getUserNotificationsEnabled().set(true);
 
-    var WINDOW_SIZE = 8,
+    const MIDI_CHANNEL = 0,
+        GLOBAL_MIDI_CHANNEL = 12,
+        WINDOW_SIZE = 8,
         SENDS_NUMBER = 1,
         USER_CONTROL_PAGES = 6,
         prefs = {
@@ -44,24 +41,38 @@ lep.XTouchCompact = function(xtcMidiChannel) {
         },
         NOTE = {
             BTN_TOP1_FIRST: 16,
+            BTN_TOP1_FIRST_GLOBAL: 0,
             BTN_TOP2_FIRST: 24,
+            BTN_TOP2_FIRST_GLOBAL: 8,
             BTN_TOP3_FIRST: 32,
+            BTN_TOP3_FIRST_GLOBAL: 16,
             ENC_TOP_FIRST_CLICK: 0,
             ENC_RIGHT_FIRST_CLICK: 8,
             BTN_BOTTOM_FIRST: 40,
+            BTN_BOTTOM_FIRST_GLOBAL: 24,
             BTN_LOOP: 51,
+            BTN_LOOP_GLOBAL: 35,
             BTN_RECORD: 52,
+            BTN_RECORD_GLOBAL: 36,
             BTN_REWIND: 49,
+            BTN_REWIND_GLOBAL: 33,
             BTN_FORWARD: 50,
+            BTN_FORWARD_GLOBAL: 34,
             BTN_STOP: 53,
+            BTN_STOP_GLOBAL: 37,
             BTN_PLAY: 54,
+            BTN_PLAY_GLOBAL: 38,
             BTN_MAIN: 48
         },
         NOTE_ACTION = {
             MODE_SOLO_MUTE: NOTE.BTN_TOP2_FIRST,
+            MODE_SOLO_MUTE_GLOBAL: NOTE.BTN_TOP2_FIRST_GLOBAL,
             MODE_ARM_SELECT: NOTE.BTN_TOP2_FIRST + 1,
+            MODE_ARM_SELECT_GLOBAL: NOTE.BTN_TOP2_FIRST_GLOBAL + 1,
             MODE_VALUE_SELECT: NOTE.BTN_TOP2_FIRST + 2,
+            MODE_VALUE_SELECT_GLOBAL: NOTE.BTN_TOP2_FIRST_GLOBAL + 2,
             MODE_VALUE_PAGE_SELECT: NOTE.BTN_TOP2_FIRST + 3,
+            MODE_VALUE_PAGE_SELECT_GLOBAL: NOTE.BTN_TOP2_FIRST_GLOBAL + 3,
             SHIFT: NOTE.BTN_MAIN,
             RECORD: NOTE.BTN_RECORD,
             LOOP: NOTE.BTN_LOOP,
@@ -72,8 +83,16 @@ lep.XTouchCompact = function(xtcMidiChannel) {
             PLAY: NOTE.BTN_PLAY,
             STOP_MUTE_FADERS: NOTE.BTN_STOP
         },
+        BUTTON_VALUE = {
+            OFF: 0,
+            ON: 2,
+            BLINK: 3
+        };
 
-        transport = lep.util.getTransport(),
+    lep.ToggledValue.setAllDefaultVelocityValues(BUTTON_VALUE.ON, BUTTON_VALUE.OFF);
+    lep.ChannelSelectValue.setVelocityValues(BUTTON_VALUE.BLINK, BUTTON_VALUE.OFF);
+
+    const transport = lep.util.getTransport(),
         trackBank = host.createMainTrackBank(WINDOW_SIZE, SENDS_NUMBER, 0),
         eventDispatcher = lep.MidiEventDispatcher.getInstance(),
         tracksView = new lep.TracksView('Tracks', 8, 0, 0, trackBank),
@@ -137,6 +156,13 @@ lep.XTouchCompact = function(xtcMidiChannel) {
             MASTER_VOLUME: new lep.StandardRangedValue({
                 name: 'MasterVol',
                 rangedValue: masterTrack.volume()
+            }),
+            PARAM_VALUESET_LOCKED: new lep.KnockoutSyncedValue({
+                name: 'ParamValueSetPinnedToDevice',
+                ownValue: true,
+                refObservable: VALUESET.PARAM.lockedToDevice,
+                onClick: VALUESET.PARAM.lockedToDevice.toggle,
+                velocityValueOn: BUTTON_VALUE.BLINK
             })
         },
         // getNextFreeSwitchableValueSet = function() {
@@ -217,28 +243,36 @@ lep.XTouchCompact = function(xtcMidiChannel) {
                 return new lep.Button({
                     name: 'Top1Btn' + index,
                     clickNote: NOTE.BTN_TOP1_FIRST + index,
-                    midiChannel: MIDI_CHANNEL
+                    midiChannel: MIDI_CHANNEL,
+                    midiChannel4Sync: GLOBAL_MIDI_CHANNEL,
+                    clickNote4Sync: NOTE.BTN_TOP1_FIRST_GLOBAL + index
                 });
             }),
             TOP2_BUTTONS: new lep.ControlSet('Top2Buttons', WINDOW_SIZE, function(index) {
                 return new lep.Button({
                     name: 'Top2Btn' + index,
                     clickNote: NOTE.BTN_TOP2_FIRST + index,
-                    midiChannel: MIDI_CHANNEL
+                    midiChannel: MIDI_CHANNEL,
+                    midiChannel4Sync: GLOBAL_MIDI_CHANNEL,
+                    clickNote4Sync: NOTE.BTN_TOP2_FIRST_GLOBAL + index
                 });
             }),
             TOP3_BUTTONS: new lep.ControlSet('Top3Buttons', WINDOW_SIZE, function(index) {
                 return new lep.Button({
                     name: 'Top3Btn' + index,
                     clickNote: NOTE.BTN_TOP3_FIRST + index,
-                    midiChannel: MIDI_CHANNEL
+                    midiChannel: MIDI_CHANNEL,
+                    midiChannel4Sync: GLOBAL_MIDI_CHANNEL,
+                    clickNote4Sync: NOTE.BTN_TOP3_FIRST_GLOBAL + index
                 });
             }),
             BOTTOM_BUTTONS: new lep.ControlSet('BottomButtons', WINDOW_SIZE, function(index) {
                 return new lep.Button({
                     name: 'BottomBtn' + index,
                     clickNote: NOTE.BTN_BOTTOM_FIRST + index,
-                    midiChannel: MIDI_CHANNEL
+                    midiChannel: MIDI_CHANNEL,
+                    midiChannel4Sync: GLOBAL_MIDI_CHANNEL,
+                    clickNote4Sync: NOTE.BTN_BOTTOM_FIRST_GLOBAL + index
                 });
             })
         },
@@ -259,7 +293,8 @@ lep.XTouchCompact = function(xtcMidiChannel) {
                         name: 'EncoderPrevValuePageBtn',
                         ownValue: true,
                         refObservable: CONTROLSET.TOP_ENCODERS.hasPrevValuePage,
-                        onClick: CONTROLSET.TOP_ENCODERS.prevValuePage
+                        onClick: CONTROLSET.TOP_ENCODERS.prevValuePage,
+                        velocityValueOn: BUTTON_VALUE.ON
                     });
                 }
                 if (isNextPageBtn) {
@@ -267,14 +302,16 @@ lep.XTouchCompact = function(xtcMidiChannel) {
                         name: 'EncoderNextValuePageBtn',
                         ownValue: true,
                         refObservable: CONTROLSET.TOP_ENCODERS.hasNextValuePage,
-                        onClick: CONTROLSET.TOP_ENCODERS.nextValuePage
+                        onClick: CONTROLSET.TOP_ENCODERS.nextValuePage,
+                        velocityValueOn: BUTTON_VALUE.ON
                     });
                 }
                 if (switchableValueSet) {
                     return new lep.KnockoutSyncedValue({
                         name: 'EncoderValueTypeSelect-' + switchableValueSet.name,
                         ownValue: switchableValueSet,
-                        refObservable: currentEncoderValueSetObservable
+                        refObservable: currentEncoderValueSetObservable,
+                        velocityValueOn: BUTTON_VALUE.ON
                     });
                 }
             }),
@@ -289,7 +326,8 @@ lep.XTouchCompact = function(xtcMidiChannel) {
                         name: 'FaderPrevValuePageBtn',
                         ownValue: true,
                         refObservable: CONTROLSET.FADERS.hasPrevValuePage,
-                        onClick: CONTROLSET.FADERS.prevValuePage
+                        onClick: CONTROLSET.FADERS.prevValuePage,
+                        velocityValueOn: BUTTON_VALUE.ON
                     });
                 }
                 if (isNextPageBtn) {
@@ -297,14 +335,16 @@ lep.XTouchCompact = function(xtcMidiChannel) {
                         name: 'FaderNextValuePageBtn',
                         ownValue: true,
                         refObservable: CONTROLSET.FADERS.hasNextValuePage,
-                        onClick: CONTROLSET.FADERS.nextValuePage
+                        onClick: CONTROLSET.FADERS.nextValuePage,
+                        velocityValueOn: BUTTON_VALUE.ON
                     });
                 }
                 if (switchableValueSet) {
                     return new lep.KnockoutSyncedValue({
                         name: 'FaderValueTypeSelect-' + switchableValueSet.name,
                         ownValue: switchableValueSet,
-                        refObservable: currentFaderValueSetObservable
+                        refObservable: currentFaderValueSetObservable,
+                        velocityValueOn: BUTTON_VALUE.ON
                     });
                 }
             })
@@ -325,7 +365,8 @@ lep.XTouchCompact = function(xtcMidiChannel) {
                 return new lep.KnockoutSyncedValue({
                     name: 'EncoderValuePageSelect-' + index,
                     ownValue: index,
-                    refObservable: CONTROLSET.TOP_ENCODERS.valuePage
+                    refObservable: CONTROLSET.TOP_ENCODERS.valuePage,
+                    velocityValueOn: BUTTON_VALUE.ON
                 });
             }),
             FOR_FADERS: new lep.ValueSet('FaderValuePageSelect', WINDOW_SIZE, 1, function(index) {
@@ -338,7 +379,8 @@ lep.XTouchCompact = function(xtcMidiChannel) {
                 return new lep.KnockoutSyncedValue({
                     name: 'FaderValuePageSelect-' + index,
                     ownValue: index,
-                    refObservable: CONTROLSET.FADERS.valuePage
+                    refObservable: CONTROLSET.FADERS.valuePage,
+                    velocityValueOn: BUTTON_VALUE.ON
                 });
             })
         },
@@ -370,6 +412,8 @@ lep.XTouchCompact = function(xtcMidiChannel) {
                 name: valueName,
                 ownValue: modeKey,
                 refObservable: currentEncoderGroupMode,
+                velocityValueOn: BUTTON_VALUE.ON,
+                velocityValueOff: BUTTON_VALUE.OFF,
                 restoreRefAfterLongClick: true
             });
         },
@@ -397,25 +441,33 @@ lep.XTouchCompact = function(xtcMidiChannel) {
                 name: 'Mode Solo/Mute Btn',
                 clickNote: NOTE_ACTION.MODE_SOLO_MUTE,
                 midiChannel: MIDI_CHANNEL,
-                valueToAttach: ENCODER_GROUPS.SOLO_MUTE.MODE_BTN_VALUE
+                valueToAttach: ENCODER_GROUPS.SOLO_MUTE.MODE_BTN_VALUE,
+                midiChannel4Sync: GLOBAL_MIDI_CHANNEL,
+                clickNote4Sync: NOTE_ACTION.MODE_SOLO_MUTE_GLOBAL
             });
             new lep.Button({
                 name: 'Mode Arm/Select Btn',
                 clickNote: NOTE_ACTION.MODE_ARM_SELECT,
                 midiChannel: MIDI_CHANNEL,
-                valueToAttach: ENCODER_GROUPS.ARM_SELECT.MODE_BTN_VALUE
+                valueToAttach: ENCODER_GROUPS.ARM_SELECT.MODE_BTN_VALUE,
+                midiChannel4Sync: GLOBAL_MIDI_CHANNEL,
+                clickNote4Sync: NOTE_ACTION.MODE_ARM_SELECT_GLOBAL
             });
             new lep.Button({
                 name: 'Mode ValueType Btn',
                 clickNote: NOTE_ACTION.MODE_VALUE_SELECT,
                 midiChannel: MIDI_CHANNEL,
-                valueToAttach: ENCODER_GROUPS.VALUE_TYPE.MODE_BTN_VALUE
+                valueToAttach: ENCODER_GROUPS.VALUE_TYPE.MODE_BTN_VALUE,
+                midiChannel4Sync: GLOBAL_MIDI_CHANNEL,
+                clickNote4Sync: NOTE_ACTION.MODE_VALUE_SELECT_GLOBAL
             });
             new lep.Button({
                 name: 'Mode ValuePage Btn',
                 clickNote: NOTE_ACTION.MODE_VALUE_PAGE_SELECT,
                 midiChannel: MIDI_CHANNEL,
-                valueToAttach: ENCODER_GROUPS.VALUE_PAGE.MODE_BTN_VALUE
+                valueToAttach: ENCODER_GROUPS.VALUE_PAGE.MODE_BTN_VALUE,
+                midiChannel4Sync: GLOBAL_MIDI_CHANNEL,
+                clickNote4Sync: NOTE_ACTION.MODE_VALUE_PAGE_SELECT_GLOBAL
             });
             currentEncoderGroupMode('VALUE_TYPE');
         },
@@ -530,7 +582,7 @@ lep.XTouchCompact = function(xtcMidiChannel) {
         CONTROL.MAIN_FADER.attachValue(VALUE.MASTER_VOLUME);
 
         // TODO move functionality to proper place
-        CONTROLSET.BOTTOM_BUTTONS.controls[7].attachValue(VALUESET.PARAM.getPinnedToDeviceKoSyncedValue());
+        CONTROLSET.BOTTOM_BUTTONS.controls[7].attachValue(VALUE.PARAM_VALUESET_LOCKED);
         eventDispatcher.onNotePressed(NOTE.BTN_BOTTOM_FIRST + 5, VALUESET.PARAM.toggleDeviceWindow, null, MIDI_CHANNEL);
         eventDispatcher.onNotePressed(NOTE.BTN_BOTTOM_FIRST + 6, VALUESET.PARAM.gotoDevice, null, MIDI_CHANNEL);
 
