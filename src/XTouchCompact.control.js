@@ -33,11 +33,13 @@ lep.XTouchCompact = function() {
         },
         CC = {
             TOP_ENCODER: 10,
+            TOP_ENCODER_LED_MODE_GLOBAL: 10,
             FIRST_FADER_MOVE: 1,
             FIRST_FADER_TOUCH: 101,
             MAIN_FADER_MOVE: 9,
             MAIN_FADER_TOUCH: 109,
-            RIGHT_ENCODER: 18
+            RIGHT_ENCODER: 18,
+            RIGHT_ENCODER_LED_MODE_GLOBAL: 18
         },
         NOTE = {
             BTN_TOP1_FIRST: 16,
@@ -87,6 +89,13 @@ lep.XTouchCompact = function() {
             OFF: 0,
             ON: 2,
             BLINK: 3
+        },
+        ENCODER_LED_MODE = {
+            SINGLE: 0,
+            PAN: 1,
+            FAN: 2,
+            SPREAD: 3,
+            TRIM: 4
         };
 
     lep.ToggledValue.setAllDefaultVelocityValues(BUTTON_VALUE.ON, BUTTON_VALUE.OFF);
@@ -577,6 +586,31 @@ lep.XTouchCompact = function() {
     lep.util.onFirstFlush(function() {
         initTransportButtons();
         initEncoderModeButtons();
+
+        /**
+         * @param {lep.ValueSet} newValueSet - the new ValueSet that just got attached to this ControlSet (this)
+         * @this lep.ControlSet
+         */
+        var onEncodersValueSetChanged = function(newValueSet) {
+            if (!newValueSet) {
+                return;
+            }
+            var KEY = '__PREV_LED_MODE__',
+                currentLedMode = this[KEY],
+                newLedMode = (newValueSet === VALUESET.PAN) ? ENCODER_LED_MODE.TRIM : ENCODER_LED_MODE.FAN;
+
+            if (newLedMode !== currentLedMode) {
+                lep.logDebug('Setting LED mode of {} to {}', this.name, newLedMode);
+                for (var i = this.controls.length-1, cc; i >= 0; i--) {
+                    cc = this.controls[i].valueCC4Sync; // encoder led mode global CCs equal the encoder CCs
+                    sendChannelController(GLOBAL_MIDI_CHANNEL, cc, newLedMode);
+                }
+                this[KEY] = newLedMode;
+            }
+        };
+
+        CONTROLSET.TOP_ENCODERS.valueSet.subscribe(onEncodersValueSetChanged, CONTROLSET.TOP_ENCODERS);
+        CONTROLSET.RIGHT_ENCODERS.valueSet.subscribe(onEncodersValueSetChanged, CONTROLSET.RIGHT_ENCODERS);
         currentEncoderValueSetObservable(VALUESET.PAN);
         currentFaderValueSetObservable(VALUESET.VOLUME);
         CONTROL.MAIN_FADER.attachValue(VALUE.MASTER_VOLUME);
