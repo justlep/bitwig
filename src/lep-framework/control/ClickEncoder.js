@@ -11,8 +11,18 @@ lep.ClickEncoder = lep.util.extendClass(lep.BaseControl, {
 
         lep.util.assertNumber(opts.clickNote, 'Missing/invalid clickNote for ClickEncoder {}', this.name);
 
-        this.resyncOnClickRelease = (opts.resyncOnClickRelease!==false);
-        this.sendsDiffValues = (opts.sendsDiffValues!==false);
+        this.resyncOnClickRelease = (opts.resyncOnClickRelease !== false);
+        this.sendsDiffValues = (opts.sendsDiffValues !== false);
+
+        if (opts.skipResetOnDoubleClick) {
+            this.onClickNoteDoublePressed = null;
+        }
+    },
+    /** @override */
+    onClickNoteDoublePressed: function() {
+        if (this.value) {
+            this.value.resetToDefault();
+        }
     },
     /** @override */
     onClickNotePressed: function() {
