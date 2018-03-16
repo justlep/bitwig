@@ -60,6 +60,7 @@ lep.util = (function() {
          * Contained placeholders '{}' will be replaced with additional parameters in the respective order.
          * @param {*} s -  what to print
          * @param {...*} - any number of additional values replacing the placeholders in s
+         * @return {string}
          */
         formatString: function(s) {
             var out = '' + s;
