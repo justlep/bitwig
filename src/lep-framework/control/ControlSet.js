@@ -68,9 +68,9 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
 
     ko.computed(function() {
         var valueSet = self.valueSet();
-        return valueSet ? valueSet.currentValues() : [];
+        return valueSet ? valueSet.currentValues() : null;
     }).subscribe(function(newCurrentValues) {
-        for (var i = newCurrentValues.length-1; i>= 0; i--) {
+        for (var i = (newCurrentValues||'').length - 1 ; i>= 0; i--) {
             self.controls[i].attachValue(newCurrentValues[i]);
         }
     });
