@@ -71,14 +71,14 @@ ko.extenders.toggleable = function(target /*, opts */) {
 ko.extenders.restoreable = (function() {
     /*eslint:camelcase:0 */
 
-    const OLD_VAL_KEY = '__rst_previousValue__',
+    var OLD_VAL_KEY = '__rst_previousValue__',
         DESCRIPTOR = {
-        enumerable: false,
-        configurable: false,
-        get: function() {
-            return this[OLD_VAL_KEY];
-        }
-    };
+            enumerable: false,
+            configurable: false,
+            get: function() {
+                return this[OLD_VAL_KEY];
+            }
+        };
 
     return function(target /*, opts */) {
         lep.util.assert(ko.isWriteableObservable(target), 'Cannot use toggleable extender on readonly observables');

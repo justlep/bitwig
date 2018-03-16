@@ -320,8 +320,8 @@ lep.DC1 = function() {
      * @param {number} nextOrPrev - positive or negative
      */
     function loadNextOrPrevSnapshot(nextOrPrev) {
-        const TOTAL_SNAPSHOTS = 8 * 16;
-        var direction = (nextOrPrev < 0) ? -1 : 1,
+        var TOTAL_SNAPSHOTS = 8 * 16,
+            direction = (nextOrPrev < 0) ? -1 : 1,
             _currentSnapshot = currentSnapshot(),
             _savedSnapshots = savedSnapshots(),
             startIndex = lastClickedSnapshotIndex + TOTAL_SNAPSHOTS,

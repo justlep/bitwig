@@ -23,7 +23,7 @@ function init() {
 lep.XTouchCompact = function() {
     host.getNotificationSettings().getUserNotificationsEnabled().set(true);
 
-    const MIDI_CHANNEL = 0,
+    var MIDI_CHANNEL = 0,
         GLOBAL_MIDI_CHANNEL = 12,
         WINDOW_SIZE = 8,
         SENDS_NUMBER = 1,
@@ -92,7 +92,7 @@ lep.XTouchCompact = function() {
     lep.ToggledValue.setAllDefaultVelocityValues(BUTTON_VALUE.ON, BUTTON_VALUE.OFF);
     lep.ChannelSelectValue.setVelocityValues(BUTTON_VALUE.BLINK, BUTTON_VALUE.OFF);
 
-    const transport = lep.util.getTransport(),
+    var transport = lep.util.getTransport(),
         trackBank = host.createMainTrackBank(WINDOW_SIZE, SENDS_NUMBER, 0),
         eventDispatcher = lep.MidiEventDispatcher.getInstance(),
         tracksView = new lep.TracksView('Tracks', 8, 0, 0, trackBank),

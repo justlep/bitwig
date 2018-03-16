@@ -32,7 +32,7 @@ function init() {
  * @constructor
  */
 function ApcMini() {
-    const MIDI_CHANNEL = 0,
+    var MIDI_CHANNEL = 0,
         MATRIX_SENDS = 6,
         MATRIX_TRACKS = 8,
         MATRIX_SCENES = 8,
@@ -83,9 +83,9 @@ function ApcMini() {
             PAN: {isPan: true},
             SEND: {isSend: true},
             DEVICE: {isDevice: true}
-        };
+        },
 
-    var eventDispatcher = lep.MidiEventDispatcher.getInstance(),
+        eventDispatcher = lep.MidiEventDispatcher.getInstance(),
         transport = lep.util.getTransport(),
         currentMatrixMode = ko.observable(MATRIX_MODE.LAUNCHERS).extend({restoreable: true}),
         currentFaderMode = ko.observable(FADER_MODE.VOLUME).extend({restoreable: true}),
@@ -210,7 +210,7 @@ function ApcMini() {
                     });
                 }
 
-                const xyDecimal = (col * 10) + row; // e.g. x=7,y=4 -> 74
+                var xyDecimal = (col * 10) + row; // e.g. x=7,y=4 -> 74
 
                 switch (xyDecimal) {
                     case 74: return VALUE.OVERDUB;
@@ -572,7 +572,7 @@ function ApcMini() {
 
 /** @static **/
 ApcMini.resetButtons = function(leaveExitPattern) {
-    const START_NOTES = [56, 48, 40, 32, 24, 16, 8, 0, 82, 64]; // start notes of matrix, side buttons, bottom buttons
+    var START_NOTES = [56, 48, 40, 32, 24, 16, 8, 0, 82, 64]; // start notes of matrix, side buttons, bottom buttons
     START_NOTES.forEach(function(startNote) {
         for (var i=0; i<8; i++) {
             sendNoteOn(0, startNote+i, 0);

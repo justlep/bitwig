@@ -18,10 +18,10 @@ lep.SendsValueSet = lep.util.extendClass(lep.ValueSet, {
         lep.util.assert(tracks.length > 1, 'Invalid cursorDevice for SendsValueSet {}', this.name);
         lep.util.assertFunction(tracks[0].sendBank, 'Invalid track[0] for SendsValueSet {}', this.name);
 
-        const self = this;
-
-        var _allSettableScrollPositions = [],
-            _scrollable = null;
+        var self = this,
+            _allSettableScrollPositions = [],
+            _scrollable = null,
+            _effectiveCurrentPage;
 
         this._super(name, tracks.length, 1, function(trackIndex) {
             var sendBank = tracks[trackIndex].sendBank();
@@ -37,7 +37,7 @@ lep.SendsValueSet = lep.util.extendClass(lep.ValueSet, {
             });
         });
 
-        var _effectiveCurrentPage = this.currentPage; // do not move up since `currentPage` is set by super-call
+        _effectiveCurrentPage = this.currentPage; // do not move up since `currentPage` is set by super-call
 
         /**
          * @override

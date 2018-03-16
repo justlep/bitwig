@@ -10,19 +10,17 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
      * @constructs
      */
     _init: function(followsSelectedPage) {
-        const
+        var self = this,
             PARAMS_PER_PAGE = 8,
             INSTANCE_NAME = 'ParamsValueSet' + lep.ParamsValueSet.instances.push(this),
-            self = this,
-            _trackView = new lep.SelectedTrackView(),
-            _cursorDevice = _trackView.getCursorTrack().createCursorDevice(),
-            _remoteControlsPage = (followsSelectedPage !== false) ?
-                                            _cursorDevice.createCursorRemoteControlsPage(PARAMS_PER_PAGE) :
-                                            _cursorDevice.createCursorRemoteControlsPage(INSTANCE_NAME, PARAMS_PER_PAGE, '');
-
+            TRACK_VIEW = new lep.SelectedTrackView(),
+            CURSOR_DEVICE = TRACK_VIEW.getCursorTrack().createCursorDevice(),
+            REMOTE_CONTROL_PAGE = (followsSelectedPage !== false) ?
+                                            CURSOR_DEVICE.createCursorRemoteControlsPage(PARAMS_PER_PAGE) :
+                                            CURSOR_DEVICE.createCursorRemoteControlsPage(INSTANCE_NAME, PARAMS_PER_PAGE, '');
 
         this._super(INSTANCE_NAME, PARAMS_PER_PAGE, 1, function(paramIndex) {
-            return lep.StandardRangedValue.createRemoteControlValue(_remoteControlsPage, paramIndex);
+            return lep.StandardRangedValue.createRemoteControlValue(REMOTE_CONTROL_PAGE, paramIndex);
         });
 
         var _effectiveCurrentPage = this.currentPage,
@@ -33,20 +31,20 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
                 }
             };
 
-        this.trackView = _trackView;
+        this.trackView = TRACK_VIEW;
         this.deviceName = ko.observable('');
 
         this.selectNextDevice = function() {
-            _cursorDevice.selectNext();
+            CURSOR_DEVICE.selectNext();
         };
         this.selectPreviousDevice = function() {
-            _cursorDevice.selectPrevious();
+            CURSOR_DEVICE.selectPrevious();
         };
 
         this.lockedToDevice = ko.computed({
-            read: ko.observable(false).updatedByBitwigValue(_cursorDevice.isPinned()),
+            read: ko.observable(false).updatedByBitwigValue(CURSOR_DEVICE.isPinned()),
             write: function(doLock) {
-                _cursorDevice.isPinned().set(!!doLock);
+                CURSOR_DEVICE.isPinned().set(!!doLock);
             }
         }).extend({toggleable: true});
 
@@ -61,12 +59,12 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
         });
 
         this.gotoDevice = function() {
-            _trackView.getCursorTrack().selectInEditor();
-            _cursorDevice.selectInEditor();
+            TRACK_VIEW.getCursorTrack().selectInEditor();
+            CURSOR_DEVICE.selectInEditor();
         };
 
         this.toggleDeviceWindow = function() {
-            _cursorDevice.isWindowOpen().toggle();
+            CURSOR_DEVICE.isWindowOpen().toggle();
         };
 
         /**
@@ -77,18 +75,18 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
             write: function(_newPageIndex) {
                 var newPageIndex = lep.util.limitToRange(_newPageIndex, 0, self.lastPage());
                 lep.logDev('setParameterPage({})', newPageIndex);
-                _remoteControlsPage.selectedPageIndex().set(newPageIndex);
+                REMOTE_CONTROL_PAGE.selectedPageIndex().set(newPageIndex);
             }
         });
 
-        _remoteControlsPage.selectedPageIndex().addValueObserver(function(newCurrentPage) {
+        REMOTE_CONTROL_PAGE.selectedPageIndex().addValueObserver(function(newCurrentPage) {
             _effectiveCurrentPage(newCurrentPage);
             var newParameterPageName = _paramPageNames[newCurrentPage] || '-default-';
             lep.logDebug('Selected parameter page: {}', newParameterPageName);
             popupNotification('Parameter Page: ' + newParameterPageName);
         }, -1);
 
-        _remoteControlsPage.pageNames().addValueObserver(function(pageNamesArrayValue) {
+        REMOTE_CONTROL_PAGE.pageNames().addValueObserver(function(pageNamesArrayValue) {
             _paramPageNames = [];
             for (var nameIndex in pageNamesArrayValue) {
                 _paramPageNames.push(pageNamesArrayValue[nameIndex]);
@@ -96,7 +94,7 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
             self.lastPage(_paramPageNames.length - 1);
         });
 
-        _cursorDevice.name().addValueObserver(function(deviceName) {
+        CURSOR_DEVICE.name().addValueObserver(function(deviceName) {
             lep.logDebug('Selected device: "{}"', deviceName);
             self.deviceName(deviceName || '_nodevname_');
         });
@@ -106,7 +104,7 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
      * @return {lep.KnockoutSyncedValue}
      */
     getPinnedToDeviceKoSyncedValue: function() {
-        const KEY = '__ptdksv__';
+        var KEY = '__ptdksv__';
         if (!this[KEY]) {
             this[KEY] = new lep.KnockoutSyncedValue({
                 name: 'PinnedToDevice4' + this.name,

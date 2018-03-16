@@ -71,7 +71,7 @@ lep.ToggledValue.VELOCITY_VALUES = {
  * @param {number} offValue
  */
 lep.ToggledValue.setAllDefaultVelocityValues = function(onValue, offValue) {
-    const ON_REGEX = /ON$/;
+    var ON_REGEX = /ON$/;
     for (var k in lep.ToggledValue.VELOCITY_VALUES) {
         lep.ToggledValue.VELOCITY_VALUES[k] = ON_REGEX.test(k) ? onValue : offValue;
     }
