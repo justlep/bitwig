@@ -109,6 +109,7 @@ lep.BaseControl.DIFF_VALUE_RANGE = {
 lep.BaseControl.prototype = {
     onClickNotePressed: lep.util.NOP,
     onClickNoteReleased: lep.util.NOP,
+    onClickNoteDoublePressed: null,
 
     setDiffValueRangeFine: function(useFine) {
         this.diffValueRange = useFine ? lep.BaseControl.DIFF_VALUE_RANGE.FINE : lep.BaseControl.DIFF_VALUE_RANGE.NORMAL;
@@ -211,9 +212,18 @@ lep.BaseControl.prototype = {
         this.isClicked = !!receivedValue;
 
         if (this.isClicked) {
-            this.onClickNotePressed();
+            if (this.onClickNoteDoublePressed) {
+                var clickTimeNow = Date.now();
+                if (clickTimeNow < (this._maxNextDoubleClickTime || 0)) {
+                    this.onClickNoteDoublePressed(this);
+                } else {
+                    // doubleclick time of 400 milliseconds should be sufficient
+                    this._maxNextDoubleClickTime = clickTimeNow + 400;
+                }
+            }
+            this.onClickNotePressed(this);
         } else {
-            this.onClickNoteReleased();
+            this.onClickNoteReleased(this);
         }
     },
     bindMidiValueListener: function() {
