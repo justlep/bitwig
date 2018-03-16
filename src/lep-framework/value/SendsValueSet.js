@@ -33,7 +33,7 @@ lep.SendsValueSet = lep.util.extendClass(lep.ValueSet, {
 
             return new lep.StandardRangedValue({
                 name: lep.util.formatString('{}-Send{}', name, trackIndex),
-                rangedValue: sendBank.getItemAt( sendBank.getItemAt(0) )
+                rangedValue: sendBank.getItemAt(0)
             });
         });
 
