@@ -88,13 +88,38 @@ lep.ValueSet = function(name, cols, rows, valueCreationFn, windowSize) {
     });
 };
 
+lep.ValueSet.prototype = {
+    supportsControlSet: function(controlSet) {
+        var controlSetSize = controlSet.controls.length;
+        return controlSetSize === this._windowSize;
+    },
+    gotoNextPage: function() {
+        if (this.hasNextPage()) {
+            this.currentPage(this.currentPage() + 1);
+        }
+    },
+    gotoPrevPage: function() {
+        if (this.hasPrevPage()) {
+            this.currentPage(this.currentPage() - 1);
+        }
+    }
+};
+
 /** @type {Object.<string,lep.ValueSet>} */
 lep.ValueSet.instancesByName = {};
 
+/**
+ * @param {string} name
+ * @return {boolean}
+ */
 lep.ValueSet.exists = function(name) {
     return !!lep.ValueSet.instancesByName[name];
 };
 
+/**
+ * @param {string} name
+ * @param {lep.ValueSet} instance
+ */
 lep.ValueSet.register = function(name, instance) {
     lep.util.assert(!lep.ValueSet.exists(name), 'ValueSet with name "{}" already exists', name);
     lep.ValueSet.instancesByName[name] = instance;
@@ -116,23 +141,6 @@ lep.ValueSet.createForMatrix = function(name, cols, rows, valueCreationFn) {
 
 /** @static */
 lep.ValueSet.MAX_SIZE = 100;
-
-lep.ValueSet.prototype = {
-    supportsControlSet: function(controlSet) {
-        var controlSetSize = controlSet.controls.length;
-        return controlSetSize === this._windowSize;
-    },
-    gotoNextPage: function() {
-        if (this.hasNextPage()) {
-            this.currentPage(this.currentPage() + 1);
-        }
-    },
-    gotoPrevPage: function() {
-        if (this.hasPrevPage()) {
-            this.currentPage(this.currentPage() - 1);
-        }
-    }
-};
 
 /**
  * @param {ChannelBank} trackBank
