@@ -8,6 +8,8 @@
  * @param {Object} opts
  * @param {string} opts.name - a speaking name for this instance
  * @param {*} [opts.value=0] - an underlying value that this BaseValue should wrap
+ * @param {function} [opts.resetToDefault] - a function that resets this individual instance' value. (!) Avoid using this option.
+*                                            Rather define a `resetToDefault` override in a subclass' prototype.
  * @constructor
  */
 lep.BaseValue = function(opts) {
@@ -18,6 +20,11 @@ lep.BaseValue = function(opts) {
 
     this.value = opts.value || 0;
 
+    if (opts.resetToDefault) {
+        lep.util.assertFunction(opts.resetToDefault, 'Invalid resetToDefault for {}: {}', this.name, opts.resetToDefault);
+        this.resetToDefault = opts.resetToDefault;
+    }
+
     /** @type {lep.BaseControl} */
     this.controller = null;
 };
@@ -25,6 +32,7 @@ lep.BaseValue = function(opts) {
 lep.BaseValue.prototype = {
     setIndication:   lep.util.NOP,
     afterDetach: lep.util.NOP,
+    resetToDefault: lep.util.NOP,
 
     syncToController: function() {
         if (this.controller && this.controller.isBidirectional) {

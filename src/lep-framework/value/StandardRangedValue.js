@@ -47,7 +47,14 @@ lep.StandardRangedValue = lep.util.extendClass(lep.BaseValue, {
 
         lep.StandardRangedValue._instances.push(this);
     },
-
+    /**
+     * @override
+     */
+    resetToDefault: function() {
+        if (typeof this.rangedValue.reset === 'function') {
+            this.rangedValue.reset();
+        }
+    },
     /**
      * Set the value of this SRV manually (i.e. programmatically instead of MIDI-value-received or observer event)
      */
