@@ -299,7 +299,7 @@ lep.XTouchCompact = function() {
 
                 if (isPrevPageIndex) {
                     return new lep.KnockoutSyncedValue({
-                        name: 'EncoderPrevValuePageBtn',
+                        name: 'EncoderPrevValuePage',
                         ownValue: true,
                         refObservable: CONTROLSET.TOP_ENCODERS.hasPrevValuePage,
                         onClick: CONTROLSET.TOP_ENCODERS.prevValuePage,
@@ -308,7 +308,7 @@ lep.XTouchCompact = function() {
                 }
                 if (isNextPageBtn) {
                     return new lep.KnockoutSyncedValue({
-                        name: 'EncoderNextValuePageBtn',
+                        name: 'EncoderNextValuePage',
                         ownValue: true,
                         refObservable: CONTROLSET.TOP_ENCODERS.hasNextValuePage,
                         onClick: CONTROLSET.TOP_ENCODERS.nextValuePage,
@@ -332,7 +332,7 @@ lep.XTouchCompact = function() {
 
                 if (isPrevPageIndex) {
                     return new lep.KnockoutSyncedValue({
-                        name: 'FaderPrevValuePageBtn',
+                        name: 'FaderPrevValuePage',
                         ownValue: true,
                         refObservable: CONTROLSET.FADERS.hasPrevValuePage,
                         onClick: CONTROLSET.FADERS.prevValuePage,
@@ -341,7 +341,7 @@ lep.XTouchCompact = function() {
                 }
                 if (isNextPageBtn) {
                     return new lep.KnockoutSyncedValue({
-                        name: 'FaderNextValuePageBtn',
+                        name: 'FaderNextValuePage',
                         ownValue: true,
                         refObservable: CONTROLSET.FADERS.hasNextValuePage,
                         onClick: CONTROLSET.FADERS.nextValuePage,
@@ -428,26 +428,26 @@ lep.XTouchCompact = function() {
         },
         ENCODER_GROUPS = {
             SOLO_MUTE: {
-                MODE_BTN_VALUE: createGroupModeBtnValue('SOLO_MUTE', 'Mode Solo/Mute'),
+                MODE_BTN_VALUE: createGroupModeBtnValue('SOLO_MUTE', 'Mode-Solo/Mute'),
                 BUTTON_VALUESETS: {upper: VALUESET.SOLO, lower: VALUESET.MUTE}
             },
             ARM_SELECT: {
-                MODE_BTN_VALUE: createGroupModeBtnValue('ARM_SELECT', 'Mode Arm/Select'),
+                MODE_BTN_VALUE: createGroupModeBtnValue('ARM_SELECT', 'Mode-Arm/Select'),
                 BUTTON_VALUESETS: {upper: VALUESET.ARM, lower: VALUESET.SELECT}
             },
             VALUE_TYPE: {
-                MODE_BTN_VALUE: createGroupModeBtnValue('VALUE_TYPE', 'Mode ValueType'),
+                MODE_BTN_VALUE: createGroupModeBtnValue('VALUE_TYPE', 'Mode-ValueType'),
                 BUTTON_VALUESETS: {upper: VALUETYPE_BTN_VALUESET.FOR_ENCODERS, lower: VALUETYPE_BTN_VALUESET.FOR_FADERS}
             },
             VALUE_PAGE: {
-                MODE_BTN_VALUE: createGroupModeBtnValue('VALUE_PAGE', 'Mode ValuePage'),
+                MODE_BTN_VALUE: createGroupModeBtnValue('VALUE_PAGE', 'Mode-ValuePage'),
                 BUTTON_VALUESETS: {upper: VALUEPAGE_BTN_VALUESET.FOR_ENCODERS, lower: VALUEPAGE_BTN_VALUESET.FOR_FADERS}
             }
         },
 
         initEncoderModeButtons = function() {
             new lep.Button({
-                name: 'Mode Solo/Mute Btn',
+                name: 'ModeBtn-Solo/Mute',
                 clickNote: NOTE_ACTION.MODE_SOLO_MUTE,
                 midiChannel: MIDI_CHANNEL,
                 valueToAttach: ENCODER_GROUPS.SOLO_MUTE.MODE_BTN_VALUE,
@@ -455,7 +455,7 @@ lep.XTouchCompact = function() {
                 clickNote4Sync: NOTE_ACTION.MODE_SOLO_MUTE_GLOBAL
             });
             new lep.Button({
-                name: 'Mode Arm/Select Btn',
+                name: 'ModeBtn-Arm/Select',
                 clickNote: NOTE_ACTION.MODE_ARM_SELECT,
                 midiChannel: MIDI_CHANNEL,
                 valueToAttach: ENCODER_GROUPS.ARM_SELECT.MODE_BTN_VALUE,
@@ -463,7 +463,7 @@ lep.XTouchCompact = function() {
                 clickNote4Sync: NOTE_ACTION.MODE_ARM_SELECT_GLOBAL
             });
             new lep.Button({
-                name: 'Mode ValueType Btn',
+                name: 'ModeBtn-ValueType',
                 clickNote: NOTE_ACTION.MODE_VALUE_SELECT,
                 midiChannel: MIDI_CHANNEL,
                 valueToAttach: ENCODER_GROUPS.VALUE_TYPE.MODE_BTN_VALUE,
@@ -471,7 +471,7 @@ lep.XTouchCompact = function() {
                 clickNote4Sync: NOTE_ACTION.MODE_VALUE_SELECT_GLOBAL
             });
             new lep.Button({
-                name: 'Mode ValuePage Btn',
+                name: 'ModeBtn-ValuePage',
                 clickNote: NOTE_ACTION.MODE_VALUE_PAGE_SELECT,
                 midiChannel: MIDI_CHANNEL,
                 valueToAttach: ENCODER_GROUPS.VALUE_PAGE.MODE_BTN_VALUE,
