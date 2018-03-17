@@ -373,22 +373,25 @@ lep.XTouchCompact = function() {
                 return isShiftPressed() ? TRANSPORT_VALUE.ARRANGER_AUTOMATION : TRANSPORT_VALUE.RECORD;
             })
         });
-        new lep.Button({
-            name: 'PunchInBtn',
-            clickNote: NOTE_ACTION.PUNCH_IN,
-            midiChannel: MIDI_CHANNEL,
-            valueToAttach: ko.computed(function() {
-                return isShiftPressed() ? TRANSPORT_VALUE.OVERDUB : TRANSPORT_VALUE.PUNCH_IN;
-            })
-        });
-        new lep.Button({
-            name: 'PunchOutBtn',
-            clickNote: NOTE_ACTION.PUNCH_OUT,
-            midiChannel: MIDI_CHANNEL,
-            valueToAttach: ko.computed(function() {
-                return isShiftPressed() ? TRANSPORT_VALUE.CLEAR_PUNCH_ON_STOP : TRANSPORT_VALUE.PUNCH_OUT;
-            })
-        });
+
+        // TODO move punchIn/Out to config value set, assignable to lower button row, shift?
+
+        // new lep.Button({
+        //     name: 'PunchInBtn',
+        //     clickNote: NOTE_ACTION.PUNCH_IN,
+        //     midiChannel: MIDI_CHANNEL,
+        //     valueToAttach: ko.computed(function() {
+        //         return isShiftPressed() ? TRANSPORT_VALUE.OVERDUB : TRANSPORT_VALUE.PUNCH_IN;
+        //     })
+        // });
+        // new lep.Button({
+        //     name: 'PunchOutBtn',
+        //     clickNote: NOTE_ACTION.PUNCH_OUT,
+        //     midiChannel: MIDI_CHANNEL,
+        //     valueToAttach: ko.computed(function() {
+        //         return isShiftPressed() ? TRANSPORT_VALUE.CLEAR_PUNCH_ON_STOP : TRANSPORT_VALUE.PUNCH_OUT;
+        //     })
+        // });
         new lep.Button({
             name: 'LoopBtn',
             clickNote: NOTE_ACTION.LOOP,
