@@ -102,6 +102,11 @@ lep.ValueSet.prototype = {
         if (this.hasPrevPage()) {
             this.currentPage(this.currentPage() - 1);
         }
+    },
+    popupNotificationIfAttached: function(message) {
+        if (this.controlSet.peek()) {
+            host.showPopupNotification(message);
+        }
     }
 };
 
