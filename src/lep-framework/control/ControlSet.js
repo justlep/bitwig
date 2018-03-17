@@ -21,6 +21,7 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
 
     this.id = lep.util.nextId();
     this.name = name;
+    this.autoSwap = false;
 
     /** @type {lep.BaseControl[]} */
     this.controls = [];
@@ -63,6 +64,10 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
             }
             newValueSet.controlSet(self);
             _valueSet(newValueSet);
+
+            if (self.autoSwap && oldControlSet && currentValueSet) {
+                oldControlSet.valueSet(currentValueSet);
+            }
         }
     });
 
@@ -162,6 +167,19 @@ lep.ControlSet.prototype = {
         this._isFollingObservable = true;
         obs.subscribe(this.valueSet, this);
         this.setValueSet(obs());
+    },
+
+    /**
+     * @param {boolean} [autoSwap=true] - if omitted or not false, then
+     *                                    when this instance gets a new ValueSet which is currently attached to another ControlSet,
+     *                                    that other ControlSet will afterwards get this instance's current(previous) ValueSet,
+     *                                    i.e. they're swapping ValueSets.
+     *
+     * @return {lep.ControlSet} - this instance
+     */
+    withAutoSwap: function(autoSwap) {
+        this.autoSwap = autoSwap !== false;
+        return this;
     }
 };
 
