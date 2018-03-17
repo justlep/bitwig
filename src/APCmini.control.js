@@ -369,7 +369,7 @@ function ApcMini() {
             })
         });
 
-        var _devicePinnedValue = VALUESET.DEVICE_PARAMS.getPinnedToDeviceKoSyncedValue(),
+        var _devicePinnedValue = VALUESET.DEVICE_PARAMS.getDefaultPinnedToDeviceKoSyncedValue(),
             _deviceModeValue = new lep.KnockoutSyncedValue({
                 name: 'DeviceMode',
                 ownValue: FADER_MODE.DEVICE,
