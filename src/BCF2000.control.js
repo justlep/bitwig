@@ -163,50 +163,9 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
         //     return null;
         // },
 
-        /**
-         * Observable holding the VALUE_SET.* that is currently assigned to the encoders.
-         * When setting a valueSet that is already used by the faders, the valueSets of faders/encoders will be swapped.
-         */
-        currentEncoderValueSetObservable = (function(){
-            var _valueSet = ko.observable();
-            return ko.computed({
-                read: _valueSet,
-                write: function(newValueSet) {
-                    lep.util.assertValueSet(newValueSet, 'Invalid valueSet for currentEncoderValueSetObservable');
-                    var oldValueSet = _valueSet(),
-                        otherObservable = currentFaderValueSetObservable;
-                    _valueSet(newValueSet);
-                    CONTROLSET.ENCODERS.setValueSet(newValueSet);
-                    if (newValueSet === otherObservable()) {
-                        otherObservable(oldValueSet);
-                    }
-                }
-            });
-        })(),
-        /**
-         * Observable holding the VALUE_SET.* that is currently assigned to the faders.
-         * When setting a valueSet that is already used by the encoders, the valueSets of faders/encoders will be swapped.
-         */
-        currentFaderValueSetObservable = (function(){
-            var _valueSet = ko.observable();
-            return ko.computed({
-                read: _valueSet,
-                write: function(newValueSet) {
-                    lep.util.assertValueSet(newValueSet, 'Invalid valueSet for currentFaderValueSetObservable');
-                    var oldValueSet = _valueSet(),
-                        otherObservable = currentEncoderValueSetObservable;
-                    _valueSet(newValueSet);
-                    CONTROLSET.FADERS.setValueSet(newValueSet);
-                    if (newValueSet === otherObservable()) {
-                        otherObservable(oldValueSet);
-                    }
-                }
-            });
-        })(),
-
         initEncodersAndFadersValueSet = function() {
-            currentEncoderValueSetObservable(VALUESET.PAN);
-            currentFaderValueSetObservable(VALUESET.VOLUME);
+            CONTROLSET.ENCODERS.valueSet(VALUESET.PAN);
+            CONTROLSET.FADERS.valueSet(VALUESET.VOLUME);
         },
 
         CONTROLSET = {
@@ -217,14 +176,14 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
                     clickNote: NOTE.FIRST_ENCODER_CLICK + index,
                     midiChannel: bcfMidiChannel
                 });
-            }),
+            }).withAutoSwap(),
             FADERS: new lep.ControlSet('Faders', WINDOW_SIZE, function(index) {
                 return new lep.Fader({
                     name: 'Fader' + index,
                     valueCC: CC.FIRST_FADER + index,
                     midiChannel: bcfMidiChannel
                 });
-            }),
+            }).withAutoSwap(),
             UPPER_BUTTONS: new lep.ControlSet('Upper Buttons', WINDOW_SIZE, function(index) {
                 return new lep.Button({
                     name: 'UpperBtn' + index,
@@ -245,67 +204,68 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
          * ValueSets for the buttons selecting which value type (volume, pan etc) is assigned to the encoders/faders.
          * (!) The last two buttons do NOT repesent value *type* but the -/+ buttons for the active value *PAGE*
          */
+        createValueTypeSelectorValueSet = function(namePrefix, targetControlSet) {
+            lep.util.assert(SWITCHABLE_VALUESETS.length);
+            lep.util.assert(targetControlSet instanceof lep.ControlSet,
+                'Invalid targetControlSet for createValueTypeSelectorValueSet(): {}', targetControlSet);
+
+            return new lep.ValueSet(namePrefix + 'ValueTypeSelector', WINDOW_SIZE, 1, function(index) {
+                var isPrevPageIndex = (index === WINDOW_SIZE-2),
+                    isNextPageBtn = (index === WINDOW_SIZE-1),
+                    switchableValueSet = !isPrevPageIndex && !isNextPageBtn && SWITCHABLE_VALUESETS[index];
+
+                if (isPrevPageIndex) {
+                    return new lep.KnockoutSyncedValue({
+                        name: namePrefix + 'PrevValuePage',
+                        ownValue: true,
+                        refObservable: targetControlSet.hasPrevValuePage,
+                        onClick: targetControlSet.prevValuePage
+                    });
+                }
+                if (isNextPageBtn) {
+                    return new lep.KnockoutSyncedValue({
+                        name: namePrefix + 'NextValuePage',
+                        ownValue: true,
+                        refObservable: targetControlSet.hasNextValuePage,
+                        onClick: targetControlSet.nextValuePage
+                    });
+                }
+                if (switchableValueSet) {
+                    var isParamsValueSet = switchableValueSet === VALUESET.PARAM,
+                        isLockableValueSet = isParamsValueSet;
+
+                    return new lep.KnockoutSyncedValue({
+                        name: namePrefix + 'ValueTypeSelect-' + switchableValueSet.name,
+                        ownValue: switchableValueSet,
+                        refObservable: targetControlSet.valueSet,
+                        computedVelocity: isLockableValueSet ? function() {
+                            if (!isShiftPressed()) {
+                                return (this.ownValue === this.refObservable()) ? 127 : 0;
+                            }
+                            var isLocked = isParamsValueSet ? switchableValueSet.lockedToDevice() : false;
+                            return isLocked ? 127 : 0;
+                        } : undefined,
+                        doubleClickAware: isLockableValueSet,
+                        onClick: function(valueSet, refObs, isDoubleClick) {
+                            if (valueSet !== refObs()) {
+                                refObs(valueSet);
+                            }
+                            if (isParamsValueSet) {
+                                if (isShiftPressed()) {
+                                    valueSet.lockedToDevice.toggle();
+                                } else if (isDoubleClick) {
+                                    valueSet.toggleDeviceWindow();
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        },
+
         VALUETYPE_BTN_VALUESET = {
-            _assertion: lep.util.assert(SWITCHABLE_VALUESETS.length <= WINDOW_SIZE-2, 'There are more value types than encoder buttons!'),
-            FOR_ENCODERS: new lep.ValueSet('EncoderValueTypeSelect', WINDOW_SIZE, 1, function(index) {
-                var isPrevPageIndex = (index === WINDOW_SIZE-2),
-                    isNextPageBtn = (index === WINDOW_SIZE-1),
-                    switchableValueSet = !isPrevPageIndex && !isNextPageBtn && SWITCHABLE_VALUESETS[index];
-
-                if (isPrevPageIndex) {
-                    return new lep.KnockoutSyncedValue({
-                        name: 'EncoderPrevValuePageBtn',
-                        ownValue: true,
-                        refObservable: CONTROLSET.ENCODERS.hasPrevValuePage,
-                        onClick: CONTROLSET.ENCODERS.prevValuePage
-                    });
-                }
-                if (isNextPageBtn) {
-                    return new lep.KnockoutSyncedValue({
-                        name: 'EncoderNextValuePageBtn',
-                        ownValue: true,
-                        refObservable: CONTROLSET.ENCODERS.hasNextValuePage,
-                        onClick: CONTROLSET.ENCODERS.nextValuePage
-                    });
-                }
-                if (switchableValueSet) {
-                    return new lep.KnockoutSyncedValue({
-                        name: 'EncoderValueTypeSelect-' + switchableValueSet.name,
-                        ownValue: switchableValueSet,
-                        refObservable: currentEncoderValueSetObservable
-                    });
-                }
-            }),
-            FOR_FADERS: new lep.ValueSet('FaderValueTypeSelect', WINDOW_SIZE, 1, function(index) {
-                lep.util.assert(SWITCHABLE_VALUESETS.length);
-                var isPrevPageIndex = (index === WINDOW_SIZE-2),
-                    isNextPageBtn = (index === WINDOW_SIZE-1),
-                    switchableValueSet = !isPrevPageIndex && !isNextPageBtn && SWITCHABLE_VALUESETS[index];
-
-                if (isPrevPageIndex) {
-                    return new lep.KnockoutSyncedValue({
-                        name: 'FaderPrevValuePageBtn',
-                        ownValue: true,
-                        refObservable: CONTROLSET.FADERS.hasPrevValuePage,
-                        onClick: CONTROLSET.FADERS.prevValuePage
-                    });
-                }
-                if (isNextPageBtn) {
-                    return new lep.KnockoutSyncedValue({
-                        name: 'FaderNextValuePageBtn',
-                        ownValue: true,
-                        refObservable: CONTROLSET.FADERS.hasNextValuePage,
-                        onClick: CONTROLSET.FADERS.nextValuePage
-                    });
-                }
-                if (switchableValueSet) {
-                    return new lep.KnockoutSyncedValue({
-                        name: 'FaderValueTypeSelect-' + switchableValueSet.name,
-                        ownValue: switchableValueSet,
-                        refObservable: currentFaderValueSetObservable
-                    });
-                }
-            })
+            FOR_ENCODERS: createValueTypeSelectorValueSet('TopEncoders', CONTROLSET.ENCODERS),
+            FOR_FADERS: createValueTypeSelectorValueSet('Faders', CONTROLSET.FADERS)
         },
 
         /**
