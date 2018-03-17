@@ -67,14 +67,6 @@ lep.XTouchCompact = function() {
             BTN_MAIN: 48
         },
         NOTE_ACTION = {
-            MODE_SOLO_MUTE: NOTE.BTN_TOP2_FIRST,
-            MODE_SOLO_MUTE_GLOBAL: NOTE.BTN_TOP2_FIRST_GLOBAL,
-            MODE_ARM_SELECT: NOTE.BTN_TOP2_FIRST + 1,
-            MODE_ARM_SELECT_GLOBAL: NOTE.BTN_TOP2_FIRST_GLOBAL + 1,
-            MODE_VALUE_SELECT: NOTE.BTN_TOP2_FIRST + 2,
-            MODE_VALUE_SELECT_GLOBAL: NOTE.BTN_TOP2_FIRST_GLOBAL + 2,
-            MODE_VALUE_PAGE_SELECT: NOTE.BTN_TOP2_FIRST + 3,
-            MODE_VALUE_PAGE_SELECT_GLOBAL: NOTE.BTN_TOP2_FIRST_GLOBAL + 3,
             SHIFT: NOTE.BTN_MAIN,
             RECORD: NOTE.BTN_RECORD,
             LOOP: NOTE.BTN_LOOP,
@@ -96,10 +88,17 @@ lep.XTouchCompact = function() {
             FAN: 2,
             SPREAD: 3,
             TRIM: 4
-        };
+        },
+        XT_BUTTON_MODE = {
+            MIXER: {isMixer: 1},
+            CONTROLS: {isControls: 1},
+            VALUE_PAGE: {isValuePage: 1} // TODO
+        },
+        buttonMode = ko.observable(XT_BUTTON_MODE.MIXER);
 
     lep.ToggledValue.setAllDefaultVelocityValues(BUTTON_VALUE.ON, BUTTON_VALUE.OFF);
-    lep.ChannelSelectValue.setVelocityValues(BUTTON_VALUE.BLINK, BUTTON_VALUE.OFF);
+    lep.ChannelSelectValue.setVelocityValues(BUTTON_VALUE.ON, BUTTON_VALUE.OFF);
+    lep.ToggledValue.setArmVelocityValues(BUTTON_VALUE.BLINK, BUTTON_VALUE.OFF);
 
     var transport = lep.util.getTransport(),
         trackBank = host.createMainTrackBank(WINDOW_SIZE, SENDS_NUMBER, 0),
@@ -140,6 +139,24 @@ lep.XTouchCompact = function() {
             }
         },
 
+        // createValuePageValueSet = function(namePrefix) {
+        //     lep.util.assertNonEmptyString(namePrefix, 'Invalid namePrefix for createValuePageValueSet: {}', namePrefix);
+        //     return new lep.ValueSet(namePrefix + 'ValuePageSelect', WINDOW_SIZE, 1, function(index) {
+        //         if (index >= WINDOW_SIZE-2) {
+        //             var prevOrNextValuePageBtnValue = VALUETYPE_BTN_VALUESET.FOR_ENCODERS.values[index];
+        //             lep.util.assert(prevOrNextValuePageBtnValue && prevOrNextValuePageBtnValue instanceof lep.KnockoutSyncedValue,
+        //                 'Unexpected type for VALUETYPE_BTN_VALUESET.FOR_ENCODERS.values[{}]', index);
+        //             return prevOrNextValuePageBtnValue;
+        //         }
+        //         return new lep.KnockoutSyncedValue({
+        //             name: 'EncoderValuePageSelect-' + index,
+        //             ownValue: index,
+        //             refObservable: CONTROLSET.TOP_ENCODERS.valuePage,
+        //             velocityValueOn: BUTTON_VALUE.ON
+        //         });
+        //     })
+        // },
+
         VALUESET = {
             VOLUME: lep.ValueSet.createVolumeValueSet(trackBank, WINDOW_SIZE),
             PAN:    lep.ValueSet.createPanValueSet(trackBank, WINDOW_SIZE),
@@ -167,56 +184,6 @@ lep.XTouchCompact = function() {
                 rangedValue: masterTrack.volume()
             })
         },
-        // getNextFreeSwitchableValueSet = function() {
-        //     for (var i = 0, valueSet; i < SWITCHABLE_VALUESETS.length; i++) {
-        //         valueSet = SWITCHABLE_VALUESETS[i];
-        //         if (!valueSet.isControlled()) {
-        //             return valueSet;
-        //         }
-        //     }
-        //     return null;
-        // },
-        /**
-         * Observable holding the VALUE_SET.* that is currently assigned to the encoders.
-         * When setting a valueSet that is already used by the faders, the valueSets of faders/encoders will be swapped.
-         */
-        currentEncoderValueSetObservable = (function(){
-            var _valueSet = ko.observable();
-            return ko.computed({
-                read: _valueSet,
-                write: function(newValueSet) {
-                    lep.util.assertValueSet(newValueSet, 'Invalid valueSet for currentEncoderValueSetObservable');
-                    var oldValueSet = _valueSet(),
-                        otherObservable = currentFaderValueSetObservable;
-                    _valueSet(newValueSet);
-                    CONTROLSET.TOP_ENCODERS.setValueSet(newValueSet);
-                    if (newValueSet === otherObservable()) {
-                        otherObservable(oldValueSet);
-                    }
-                }
-            });
-        })(),
-        /**
-         * Observable holding the VALUE_SET.* that is currently assigned to the faders.
-         * When setting a valueSet that is already used by the encoders, the valueSets of faders/encoders will be swapped.
-         */
-        currentFaderValueSetObservable = (function(){
-            var _valueSet = ko.observable();
-            return ko.computed({
-                read: _valueSet,
-                write: function(newValueSet) {
-                    lep.util.assertValueSet(newValueSet, 'Invalid valueSet for currentFaderValueSetObservable');
-                    var oldValueSet = _valueSet(),
-                        otherObservable = currentEncoderValueSetObservable;
-                    _valueSet(newValueSet);
-                    CONTROLSET.FADERS.setValueSet(newValueSet);
-                    if (newValueSet === otherObservable()) {
-                        otherObservable(oldValueSet);
-                    }
-                }
-            });
-        })(),
-
         CONTROLSET = {
             TOP_ENCODERS: new lep.ControlSet('TopEncoders', WINDOW_SIZE, function(index) {
                 return new lep.ClickEncoder({
@@ -225,7 +192,7 @@ lep.XTouchCompact = function() {
                     clickNote: NOTE.ENC_TOP_FIRST_CLICK + index,
                     midiChannel: MIDI_CHANNEL
                 });
-            }),
+            }).withAutoSwap(),
             RIGHT_ENCODERS: new lep.ControlSet('RightEncoders', WINDOW_SIZE, function(index) {
                 return new lep.ClickEncoder({
                     name: 'RightEncoder' + index,
@@ -233,14 +200,14 @@ lep.XTouchCompact = function() {
                     clickNote: NOTE.ENC_RIGHT_FIRST_CLICK + index,
                     midiChannel: MIDI_CHANNEL
                 });
-            }),
+            }).withAutoSwap(),
             FADERS: new lep.ControlSet('Faders', WINDOW_SIZE, function(index) {
                 return new lep.Fader({
                     name: 'Fader' + index,
                     valueCC: CC.FIRST_FADER_MOVE + index,
                     midiChannel: MIDI_CHANNEL
                 });
-            }),
+            }).withAutoSwap(),
             TOP1_BUTTONS: new lep.ControlSet('Top1Buttons', WINDOW_SIZE, function(index) {
                 return new lep.Button({
                     name: 'Top1Btn' + index,
@@ -283,214 +250,74 @@ lep.XTouchCompact = function() {
          * ValueSets for the buttons selecting which value type (volume, pan etc) is assigned to the encoders/faders.
          * (!) The last two buttons do NOT repesent value *type* but the -/+ buttons for the active value *PAGE*
          */
-        VALUETYPE_BTN_VALUESET = {
-            _assertion: lep.util.assert(SWITCHABLE_VALUESETS.length <= WINDOW_SIZE-2, 'There are more value types than encoder buttons!'),
-            FOR_ENCODERS: new lep.ValueSet('EncoderValueTypeSelect', WINDOW_SIZE, 1, function(index) {
+        createValueTypeSelectorValueSet = function(namePrefix, targetControlSet) {
+            lep.util.assert(SWITCHABLE_VALUESETS.length);
+            lep.util.assert(targetControlSet instanceof lep.ControlSet,
+                'Invalid targetControlSet for createValueTypeSelectorValueSet(): {}', targetControlSet);
+
+            return new lep.ValueSet(namePrefix + 'ValueTypeSelector', WINDOW_SIZE, 1, function(index) {
                 var isPrevPageIndex = (index === WINDOW_SIZE-2),
                     isNextPageBtn = (index === WINDOW_SIZE-1),
                     switchableValueSet = !isPrevPageIndex && !isNextPageBtn && SWITCHABLE_VALUESETS[index];
 
                 if (isPrevPageIndex) {
                     return new lep.KnockoutSyncedValue({
-                        name: 'EncoderPrevValuePage',
+                        name: namePrefix + 'PrevValuePage',
                         ownValue: true,
-                        refObservable: CONTROLSET.TOP_ENCODERS.hasPrevValuePage,
-                        onClick: CONTROLSET.TOP_ENCODERS.prevValuePage,
+                        refObservable: targetControlSet.hasPrevValuePage,
+                        onClick: targetControlSet.prevValuePage,
                         velocityValueOn: BUTTON_VALUE.ON
                     });
                 }
                 if (isNextPageBtn) {
                     return new lep.KnockoutSyncedValue({
-                        name: 'EncoderNextValuePage',
+                        name: namePrefix + 'NextValuePage',
                         ownValue: true,
-                        refObservable: CONTROLSET.TOP_ENCODERS.hasNextValuePage,
-                        onClick: CONTROLSET.TOP_ENCODERS.nextValuePage,
+                        refObservable: targetControlSet.hasNextValuePage,
+                        onClick: targetControlSet.nextValuePage,
                         velocityValueOn: BUTTON_VALUE.ON
                     });
                 }
                 if (switchableValueSet) {
-                    return new lep.KnockoutSyncedValue({
-                        name: 'EncoderValueTypeSelect-' + switchableValueSet.name,
-                        ownValue: switchableValueSet,
-                        refObservable: currentEncoderValueSetObservable,
-                        velocityValueOn: BUTTON_VALUE.ON
-                    });
-                }
-            }),
-            FOR_FADERS: new lep.ValueSet('FaderValueTypeSelect', WINDOW_SIZE, 1, function(index) {
-                lep.util.assert(SWITCHABLE_VALUESETS.length);
-                var isPrevPageIndex = (index === WINDOW_SIZE-2),
-                    isNextPageBtn = (index === WINDOW_SIZE-1),
-                    switchableValueSet = !isPrevPageIndex && !isNextPageBtn && SWITCHABLE_VALUESETS[index];
+                    var isParamsValueSet = switchableValueSet === VALUESET.PARAM,
+                        isLockableValueSet = isParamsValueSet; // TODO update this if a special multi-pan-valueset will be lockable later
 
-                if (isPrevPageIndex) {
                     return new lep.KnockoutSyncedValue({
-                        name: 'FaderPrevValuePage',
-                        ownValue: true,
-                        refObservable: CONTROLSET.FADERS.hasPrevValuePage,
-                        onClick: CONTROLSET.FADERS.prevValuePage,
-                        velocityValueOn: BUTTON_VALUE.ON
-                    });
-                }
-                if (isNextPageBtn) {
-                    return new lep.KnockoutSyncedValue({
-                        name: 'FaderNextValuePage',
-                        ownValue: true,
-                        refObservable: CONTROLSET.FADERS.hasNextValuePage,
-                        onClick: CONTROLSET.FADERS.nextValuePage,
-                        velocityValueOn: BUTTON_VALUE.ON
-                    });
-                }
-                if (switchableValueSet) {
-                    var isParamsValueSet = switchableValueSet === VALUESET.PARAM;
-                    return new lep.KnockoutSyncedValue({
-                        name: 'FaderValueTypeSelect-' + switchableValueSet.name,
+                        name: namePrefix + 'ValueTypeSelect-' + switchableValueSet.name,
                         ownValue: switchableValueSet,
-                        refObservable: currentFaderValueSetObservable,
-                        velocityValueOn: isParamsValueSet ? undefined : BUTTON_VALUE.ON,
-                        computedVelocity: isParamsValueSet ? function() {
-                            return (this.ownValue !== this.refObservable()) ? BUTTON_VALUE.OFF :
-                                    VALUESET.PARAM.lockedToDevice() ? BUTTON_VALUE.BLINK : BUTTON_VALUE.ON;
+                        refObservable: targetControlSet.valueSet,
+                        velocityValueOn: isLockableValueSet ? undefined : BUTTON_VALUE.ON,
+                        computedVelocity: isLockableValueSet ? function() {
+                            if (this.ownValue !== this.refObservable()) {
+                                return BUTTON_VALUE.OFF;
+                            }
+                            var isLocked = isParamsValueSet ? switchableValueSet.lockedToDevice() : false; // TODO add lockable pan valueset later
+                            return isLocked ? BUTTON_VALUE.BLINK : BUTTON_VALUE.ON;
                         } : undefined,
-                        doubleClickAware: true,
-                        onClick: isParamsValueSet ? function(ownVal, refObs, isDoubleClick) {
-                            if (ownVal !== refObs()) {
-                                refObs(ownVal);
+                        doubleClickAware: isLockableValueSet,
+                        onClick: function(valueSet, refObs, isDoubleClick) {
+                            if (valueSet !== refObs()) {
+                                refObs(valueSet);
                             }
-                            if (isShiftPressed()) {
-                                VALUESET.PARAM.lockedToDevice.toggle();
-                                return;
+                            if (isParamsValueSet) {
+                                if (isShiftPressed()) {
+                                    valueSet.lockedToDevice.toggle();
+                                } else if (isDoubleClick) {
+                                    valueSet.toggleDeviceWindow(); // TODO check here if window available or go to device etc
+                                }
                             }
-                            if (isDoubleClick) {
-                                VALUESET.PARAM.toggleDeviceWindow(); // TODO check here
-                            }
-                        } : undefined
+                        }
                     });
                 }
-            })
-        },
-
-        /**
-         * ValueSets for the buttons selecting which value PAGE is active in the currently
-         * attached valueSet of to the encoders/faders.
-         */
-        VALUEPAGE_BTN_VALUESET = {
-            FOR_ENCODERS: new lep.ValueSet('EncoderValuePageSelect', WINDOW_SIZE, 1, function(index) {
-                if (index >= WINDOW_SIZE-2) {
-                    var prevOrNextValuePageBtnValue = VALUETYPE_BTN_VALUESET.FOR_ENCODERS.values[index];
-                    lep.util.assert(prevOrNextValuePageBtnValue && prevOrNextValuePageBtnValue instanceof lep.KnockoutSyncedValue,
-                        'Unexpected type for VALUETYPE_BTN_VALUESET.FOR_ENCODERS.values[{}]', index);
-                    return prevOrNextValuePageBtnValue;
-                }
-                return new lep.KnockoutSyncedValue({
-                    name: 'EncoderValuePageSelect-' + index,
-                    ownValue: index,
-                    refObservable: CONTROLSET.TOP_ENCODERS.valuePage,
-                    velocityValueOn: BUTTON_VALUE.ON
-                });
-            }),
-            FOR_FADERS: new lep.ValueSet('FaderValuePageSelect', WINDOW_SIZE, 1, function(index) {
-                if (index >= WINDOW_SIZE-2) {
-                    var prevOrNextValuePageBtnValue = VALUETYPE_BTN_VALUESET.FOR_FADERS.values[index];
-                    lep.util.assert(prevOrNextValuePageBtnValue && prevOrNextValuePageBtnValue instanceof lep.KnockoutSyncedValue,
-                        'Unexpected type for VALUETYPE_BTN_VALUESET.FOR_FADERS.values[{}]', index);
-                    return prevOrNextValuePageBtnValue;
-                }
-                return new lep.KnockoutSyncedValue({
-                    name: 'FaderValuePageSelect-' + index,
-                    ownValue: index,
-                    refObservable: CONTROLSET.FADERS.valuePage,
-                    velocityValueOn: BUTTON_VALUE.ON
-                });
-            })
-        },
-
-        currentEncoderGroupMode = (function(){
-            var _currentEncoderGroupMode = ko.observable();
-            return ko.computed({
-                read: _currentEncoderGroupMode,
-                write: function(newGroupModeKey) {
-                    lep.util.assertObject(ENCODER_GROUPS[newGroupModeKey], 'Unknown encoder groupModeKey: {}', newGroupModeKey);
-                    lep.logDebug('Switching encoderGroupMode to "{}"', newGroupModeKey);
-                    _currentEncoderGroupMode(newGroupModeKey);
-
-                    var buttonValueSets = ENCODER_GROUPS[newGroupModeKey].BUTTON_VALUESETS,
-                        lowerButtonValueSet = buttonValueSets.lower;
-
-                    if (buttonValueSets.upper) {
-                        CONTROLSET.TOP1_BUTTONS.setValueSet(buttonValueSets.upper);
-                    }
-                    if (lowerButtonValueSet) {
-                        CONTROLSET.TOP3_BUTTONS.setValueSet(lowerButtonValueSet);
-                    }
-                }
-            });
-        })(),
-
-        createGroupModeBtnValue = function(modeKey, valueName) {
-            return new lep.KnockoutSyncedValue({
-                name: valueName,
-                ownValue: modeKey,
-                refObservable: currentEncoderGroupMode,
-                velocityValueOn: BUTTON_VALUE.ON,
-                velocityValueOff: BUTTON_VALUE.OFF,
-                restoreRefAfterLongClick: true
             });
         },
-        ENCODER_GROUPS = {
-            SOLO_MUTE: {
-                MODE_BTN_VALUE: createGroupModeBtnValue('SOLO_MUTE', 'Mode-Solo/Mute'),
-                BUTTON_VALUESETS: {upper: VALUESET.SOLO, lower: VALUESET.MUTE}
-            },
-            ARM_SELECT: {
-                MODE_BTN_VALUE: createGroupModeBtnValue('ARM_SELECT', 'Mode-Arm/Select'),
-                BUTTON_VALUESETS: {upper: VALUESET.ARM, lower: VALUESET.SELECT}
-            },
-            VALUE_TYPE: {
-                MODE_BTN_VALUE: createGroupModeBtnValue('VALUE_TYPE', 'Mode-ValueType'),
-                BUTTON_VALUESETS: {upper: VALUETYPE_BTN_VALUESET.FOR_ENCODERS, lower: VALUETYPE_BTN_VALUESET.FOR_FADERS}
-            },
-            VALUE_PAGE: {
-                MODE_BTN_VALUE: createGroupModeBtnValue('VALUE_PAGE', 'Mode-ValuePage'),
-                BUTTON_VALUESETS: {upper: VALUEPAGE_BTN_VALUESET.FOR_ENCODERS, lower: VALUEPAGE_BTN_VALUESET.FOR_FADERS}
-            }
+
+        VALUETYPE_SELECTOR_VALUESET = {
+            FOR_TOP_ENCODERS: createValueTypeSelectorValueSet('TopEncoders', CONTROLSET.TOP_ENCODERS),
+            FOR_RIGHT_ENCODERS: createValueTypeSelectorValueSet('RightEncoders', CONTROLSET.RIGHT_ENCODERS),
+            FOR_FADERS: createValueTypeSelectorValueSet('Faders', CONTROLSET.FADERS)
         },
 
-        initEncoderModeButtons = function() {
-            new lep.Button({
-                name: 'ModeBtn-Solo/Mute',
-                clickNote: NOTE_ACTION.MODE_SOLO_MUTE,
-                midiChannel: MIDI_CHANNEL,
-                valueToAttach: ENCODER_GROUPS.SOLO_MUTE.MODE_BTN_VALUE,
-                midiChannel4Sync: GLOBAL_MIDI_CHANNEL,
-                clickNote4Sync: NOTE_ACTION.MODE_SOLO_MUTE_GLOBAL
-            });
-            new lep.Button({
-                name: 'ModeBtn-Arm/Select',
-                clickNote: NOTE_ACTION.MODE_ARM_SELECT,
-                midiChannel: MIDI_CHANNEL,
-                valueToAttach: ENCODER_GROUPS.ARM_SELECT.MODE_BTN_VALUE,
-                midiChannel4Sync: GLOBAL_MIDI_CHANNEL,
-                clickNote4Sync: NOTE_ACTION.MODE_ARM_SELECT_GLOBAL
-            });
-            new lep.Button({
-                name: 'ModeBtn-ValueType',
-                clickNote: NOTE_ACTION.MODE_VALUE_SELECT,
-                midiChannel: MIDI_CHANNEL,
-                valueToAttach: ENCODER_GROUPS.VALUE_TYPE.MODE_BTN_VALUE,
-                midiChannel4Sync: GLOBAL_MIDI_CHANNEL,
-                clickNote4Sync: NOTE_ACTION.MODE_VALUE_SELECT_GLOBAL
-            });
-            new lep.Button({
-                name: 'ModeBtn-ValuePage',
-                clickNote: NOTE_ACTION.MODE_VALUE_PAGE_SELECT,
-                midiChannel: MIDI_CHANNEL,
-                valueToAttach: ENCODER_GROUPS.VALUE_PAGE.MODE_BTN_VALUE,
-                midiChannel4Sync: GLOBAL_MIDI_CHANNEL,
-                clickNote4Sync: NOTE_ACTION.MODE_VALUE_PAGE_SELECT_GLOBAL
-            });
-            currentEncoderGroupMode('VALUE_TYPE');
-        },
         TRANSPORT_VALUE = {
             PLAY: lep.ToggledTransportValue.getPlayInstance(),
             RECORD: lep.ToggledTransportValue.getRecordInstance(),
@@ -569,12 +396,17 @@ lep.XTouchCompact = function() {
             name: 'StopBtn',
             clickNote: NOTE_ACTION.STOP_MUTE_FADERS,
             midiChannel: MIDI_CHANNEL,
+            midiChannel4Sync: GLOBAL_MIDI_CHANNEL,
+            clickNote4Sync: NOTE.BTN_STOP_GLOBAL,
             valueToAttach: new lep.KnockoutSyncedValue({
                 name: 'Stop/MuteFaders',
                 ownValue: true,
                 refObservable: ko.computed(function(){
                     return isShiftPressed() && !CONTROLSET.FADERS.muted();
                 }),
+                computedVelocity: function() {
+                    return isShiftPressed() ? (CONTROLSET.FADERS.muted() ? BUTTON_VALUE.BLINK : BUTTON_VALUE.ON) : BUTTON_VALUE.OFF;
+                },
                 onClick: function() {
                     if (isShiftPressed()) {
                         CONTROLSET.FADERS.muted.toggle();
@@ -587,17 +419,10 @@ lep.XTouchCompact = function() {
         });
     }
 
-    // ====================== Init ======================
-
-    initPreferences();
-    transport.addIsPlayingObserver(HANDLERS.PLAYING_STATUS_CHANGED);
-    eventDispatcher.onNotePressed(NOTE_ACTION.NEXT_DEVICE_OR_CHANNEL_PAGE, HANDLERS.NEXT_DEVICE_OR_CHANNEL_PAGE);
-    eventDispatcher.onNotePressed(NOTE_ACTION.PREV_DEVICE_OR_CHANNEL_PAGE, HANDLERS.PREV_DEVICE_OR_CHANNEL_PAGE);
-
-    lep.util.onFirstFlush(function() {
-        initTransportButtons();
-        initEncoderModeButtons();
-
+    /**
+     * Switch the LED ring display mode of the encoders depending on the value type it is currently attached to
+     */
+    function initEncoderLedRingsModeSwitching() {
         /**
          * @param {lep.ValueSet} newValueSet - the new ValueSet that just got attached to this ControlSet (this)
          * @this lep.ControlSet
@@ -622,12 +447,38 @@ lep.XTouchCompact = function() {
 
         CONTROLSET.TOP_ENCODERS.valueSet.subscribe(onEncodersValueSetChanged, CONTROLSET.TOP_ENCODERS);
         CONTROLSET.RIGHT_ENCODERS.valueSet.subscribe(onEncodersValueSetChanged, CONTROLSET.RIGHT_ENCODERS);
-        currentEncoderValueSetObservable(VALUESET.PAN);
-        currentFaderValueSetObservable(VALUESET.VOLUME);
+    }
+
+    // ====================== Init ======================
+
+    initPreferences();
+    transport.addIsPlayingObserver(HANDLERS.PLAYING_STATUS_CHANGED);
+    eventDispatcher.onNotePressed(NOTE_ACTION.NEXT_DEVICE_OR_CHANNEL_PAGE, HANDLERS.NEXT_DEVICE_OR_CHANNEL_PAGE);
+    eventDispatcher.onNotePressed(NOTE_ACTION.PREV_DEVICE_OR_CHANNEL_PAGE, HANDLERS.PREV_DEVICE_OR_CHANNEL_PAGE);
+
+    lep.util.onFirstFlush(function() {
+        initTransportButtons();
+        initEncoderLedRingsModeSwitching();
+
         CONTROL.MAIN_FADER.attachValue(VALUE.MASTER_VOLUME);
 
+        CONTROLSET.TOP1_BUTTONS.setObservableValueSet(ko.computed(function() {
+            return buttonMode().isMixer ? VALUESET.SOLO : VALUETYPE_SELECTOR_VALUESET.FOR_TOP_ENCODERS;
+        }));
+        CONTROLSET.TOP2_BUTTONS.setObservableValueSet(ko.computed(function() {
+            return buttonMode().isMixer ? VALUESET.MUTE : VALUETYPE_SELECTOR_VALUESET.FOR_RIGHT_ENCODERS;
+        }));
+        CONTROLSET.TOP3_BUTTONS.setObservableValueSet(ko.computed(function() {
+            return buttonMode().isMixer ? VALUESET.ARM : VALUETYPE_SELECTOR_VALUESET.FOR_FADERS;
+        }));
+        CONTROLSET.BOTTOM_BUTTONS.setObservableValueSet(ko.computed(function() {
+            return buttonMode().isMixer ? VALUESET.SELECT : VALUESET.SELECT; // TODO
+        }));
+
+        buttonMode(XT_BUTTON_MODE.CONTROLS);
+
         // TODO move functionality to proper place
-        eventDispatcher.onNotePressed(NOTE.BTN_BOTTOM_FIRST + 6, VALUESET.PARAM.gotoDevice, null, MIDI_CHANNEL);
+        // eventDispatcher.onNotePressed(NOTE.BTN_BOTTOM_FIRST + 6, VALUESET.PARAM.gotoDevice, null, MIDI_CHANNEL);
 
         println('\n-------------\nX-Touch Compact ready');
     });
