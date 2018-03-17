@@ -24,12 +24,7 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
         });
 
         var _effectiveCurrentPage = this.currentPage,
-            _paramPageNames = [],
-            popupNotification = function(message) {
-                if (self.controlSet.peek()) {
-                    host.showPopupNotification(message);
-                }
-            };
+            _paramPageNames = [];
 
         this.trackView = TRACK_VIEW;
         this.deviceName = ko.observable('');
@@ -52,14 +47,14 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
         this.lockedToDevice.subscribe(function(isLocked) {
             self.trackView.locked(isLocked);
             if (!isLocked) {
-                popupNotification('RC unlocked');
+                self.popupNotificationIfAttached('RC unlocked');
             }
         });
 
         ko.computed(function() {
             var deviceNameLocked = self.lockedToDevice() && self.deviceName();
             if (deviceNameLocked) {
-                popupNotification('RC locked to ' + deviceNameLocked);
+                self.popupNotificationIfAttached('RC locked to ' + deviceNameLocked);
             }
         });
 
@@ -88,7 +83,7 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
             _effectiveCurrentPage(newCurrentPage);
             var newParameterPageName = _paramPageNames[newCurrentPage] || '-default-';
             lep.logDebug('Selected parameter page: {}', newParameterPageName);
-            popupNotification('Parameter Page: ' + newParameterPageName);
+            self.popupNotificationIfAttached('Parameter Page: ' + newParameterPageName);
         }, -1);
 
         REMOTE_CONTROL_PAGE.pageNames().addValueObserver(function(pageNamesArrayValue) {
@@ -108,7 +103,7 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
     /**
      * @return {lep.KnockoutSyncedValue}
      */
-    getPinnedToDeviceKoSyncedValue: function() {
+    getDefaultPinnedToDeviceKoSyncedValue: function() {
         var KEY = '__ptdksv__';
         if (!this[KEY]) {
             this[KEY] = new lep.KnockoutSyncedValue({
