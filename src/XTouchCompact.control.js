@@ -161,7 +161,7 @@ lep.XTouchCompact = function() {
             VOLUME: lep.ValueSet.createVolumeValueSet(trackBank, WINDOW_SIZE),
             PAN:    lep.ValueSet.createPanValueSet(trackBank, WINDOW_SIZE),
             SEND:   lep.SendsValueSet.createFromTrackBank(trackBank),
-            SEND2:   lep.SendsValueSet.createFromTrackBank(trackBank),
+            SELECTED_TRACK_SENDS: new lep.SelectedTrackSendsValueSet(WINDOW_SIZE),
             PARAM:  new lep.ParamsValueSet(),
             USERCONTROL: lep.ValueSet.createUserControlsValueSet(USER_CONTROL_PAGES, WINDOW_SIZE, 'XTC-UC-{}-{}'),
             SOLO:   lep.ValueSet.createSoloValueSet(trackBank, WINDOW_SIZE, prefs),
@@ -174,7 +174,7 @@ lep.XTouchCompact = function() {
             VALUESET.VOLUME,
             VALUESET.PAN,
             VALUESET.SEND,
-            VALUESET.SEND2,
+            VALUESET.SELECTED_TRACK_SENDS,
             VALUESET.PARAM,
             VALUESET.USERCONTROL
         ],
@@ -248,7 +248,7 @@ lep.XTouchCompact = function() {
 
         /**
          * ValueSets for the buttons selecting which value type (volume, pan etc) is assigned to the encoders/faders.
-         * (!) The last two buttons do NOT repesent value *type* but the -/+ buttons for the active value *PAGE*
+         * (!) The last two buttons do NOT represent value *type* but the -/+ buttons for the active value *PAGE*
          */
         createValueTypeSelectorValueSet = function(namePrefix, targetControlSet) {
             lep.util.assert(SWITCHABLE_VALUESETS.length);
@@ -280,7 +280,8 @@ lep.XTouchCompact = function() {
                 }
                 if (switchableValueSet) {
                     var isParamsValueSet = switchableValueSet === VALUESET.PARAM,
-                        isLockableValueSet = isParamsValueSet; // TODO update this if a special multi-pan-valueset will be lockable later
+                        isTrackSends = switchableValueSet === VALUESET.SELECTED_TRACK_SENDS,
+                        isLockableValueSet = isParamsValueSet || isTrackSends;
 
                     return new lep.KnockoutSyncedValue({
                         name: namePrefix + 'ValueTypeSelect-' + switchableValueSet.name,
@@ -291,20 +292,24 @@ lep.XTouchCompact = function() {
                             if (this.ownValue !== this.refObservable()) {
                                 return BUTTON_VALUE.OFF;
                             }
-                            var isLocked = isParamsValueSet ? switchableValueSet.lockedToDevice() : false; // TODO add lockable pan valueset later
+                            var isLocked = isParamsValueSet ? switchableValueSet.lockedToDevice() :
+                                           isTrackSends ? switchableValueSet.lockedToTrack() : false;
                             return isLocked ? BUTTON_VALUE.BLINK : BUTTON_VALUE.ON;
                         } : undefined,
                         doubleClickAware: isLockableValueSet,
                         onClick: function(valueSet, refObs, isDoubleClick) {
+                            var shiftPressed = isShiftPressed.peek();
                             if (valueSet !== refObs()) {
                                 refObs(valueSet);
                             }
                             if (isParamsValueSet) {
-                                if (isShiftPressed()) {
+                                if (shiftPressed) {
                                     valueSet.lockedToDevice.toggle();
                                 } else if (isDoubleClick) {
                                     valueSet.toggleDeviceWindow(); // TODO check here if window available or go to device etc
                                 }
+                            } else if (isTrackSends && shiftPressed) {
+                                valueSet.lockedToTrack.toggle();
                             }
                         }
                     });
@@ -476,6 +481,10 @@ lep.XTouchCompact = function() {
         }));
 
         buttonMode(XT_BUTTON_MODE.CONTROLS);
+
+        CONTROLSET.FADERS.valueSet(VALUESET.VOLUME);
+        CONTROLSET.TOP_ENCODERS.valueSet(VALUESET.PAN);
+        CONTROLSET.RIGHT_ENCODERS.valueSet(VALUESET.PARAM);
 
         // TODO move functionality to proper place
         // eventDispatcher.onNotePressed(NOTE.BTN_BOTTOM_FIRST + 6, VALUESET.PARAM.gotoDevice, null, MIDI_CHANNEL);

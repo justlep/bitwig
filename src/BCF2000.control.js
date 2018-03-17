@@ -135,7 +135,7 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
             VOLUME: lep.ValueSet.createVolumeValueSet(trackBank, WINDOW_SIZE),
             PAN:    lep.ValueSet.createPanValueSet(trackBank, WINDOW_SIZE),
             SEND:   lep.SendsValueSet.createFromTrackBank(trackBank),
-            SEND2:   lep.SendsValueSet.createFromTrackBank(trackBank),
+            SELECTED_TRACK_SENDS: new lep.SelectedTrackSendsValueSet(WINDOW_SIZE),
             PARAM:  new lep.ParamsValueSet(),
             USERCONTROL: lep.ValueSet.createUserControlsValueSet(USER_CONTROL_PAGES, WINDOW_SIZE, 'BCF-UC-{}-{}'),
             SOLO:   lep.ValueSet.createSoloValueSet(trackBank, WINDOW_SIZE, prefs),
@@ -148,7 +148,7 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
             VALUESET.VOLUME,
             VALUESET.PAN,
             VALUESET.SEND,
-            VALUESET.SEND2,
+            VALUESET.SELECTED_TRACK_SENDS,
             VALUESET.PARAM,
             VALUESET.USERCONTROL
         ],
@@ -202,7 +202,7 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
 
         /**
          * ValueSets for the buttons selecting which value type (volume, pan etc) is assigned to the encoders/faders.
-         * (!) The last two buttons do NOT repesent value *type* but the -/+ buttons for the active value *PAGE*
+         * (!) The last two buttons do NOT represent value *type* but the -/+ buttons for the active value *PAGE*
          */
         createValueTypeSelectorValueSet = function(namePrefix, targetControlSet) {
             lep.util.assert(SWITCHABLE_VALUESETS.length);
@@ -232,7 +232,8 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
                 }
                 if (switchableValueSet) {
                     var isParamsValueSet = switchableValueSet === VALUESET.PARAM,
-                        isLockableValueSet = isParamsValueSet;
+                        isTrackSends = switchableValueSet === VALUESET.SELECTED_TRACK_SENDS,
+                        isLockableValueSet = isParamsValueSet || isTrackSends;
 
                     return new lep.KnockoutSyncedValue({
                         name: namePrefix + 'ValueTypeSelect-' + switchableValueSet.name,
@@ -247,15 +248,18 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
                         } : undefined,
                         doubleClickAware: isLockableValueSet,
                         onClick: function(valueSet, refObs, isDoubleClick) {
+                            var shiftPressed = isShiftPressed.peek();
                             if (valueSet !== refObs()) {
                                 refObs(valueSet);
                             }
                             if (isParamsValueSet) {
-                                if (isShiftPressed()) {
+                                if (shiftPressed) {
                                     valueSet.lockedToDevice.toggle();
                                 } else if (isDoubleClick) {
                                     valueSet.toggleDeviceWindow();
                                 }
+                            } else if (isTrackSends && shiftPressed) {
+                                valueSet.lockedToTrack.toggle();
                             }
                         }
                     });

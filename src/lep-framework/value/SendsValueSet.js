@@ -1,5 +1,7 @@
 /**
- * Represents a ValueSet of Sends in form of StandardRangedValues for a given fix array of tracks.
+ * Represents a ValueSet of Sends for a given fix array of tracks,
+ * i.e. other than {@link lep.SelectedTrackSendsValueSet}, this valueset allows control over
+ * one send per track for multiple tracks at the same time.
  *
  * Author: Lennart Pegel - https://github.com/justlep
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
@@ -80,8 +82,9 @@ lep.SendsValueSet.createFromTrackBank = function(trackBank) {
     // two instances based on the same trackBank apparently share equals SendBank instance, hence cannot be moved independently
     // TODO check how to realize two independent SendsValueSets, best without "cloning" or adding trackbanks
 
-    for (var i = 0; i < bankSize; i++) {
-        tracks.push(trackBank.getItemAt(i));
+    for (var i = 0, track; i < bankSize; i++) {
+        track = trackBank.getItemAt(i);
+        tracks.push(track);
     }
     return new lep.SendsValueSet(name, tracks);
 };
