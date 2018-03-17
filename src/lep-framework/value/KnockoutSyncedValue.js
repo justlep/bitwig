@@ -29,6 +29,7 @@ lep.KnockoutSyncedValue = lep.util.extendClass(lep.BaseValue, {
      * @param {boolean} [opts.forceRewrite=false] - if true, the refObservable will be written with `ownValue` even if it already has that value
      * @param {KnockoutSyncedValue~ClickHandler} [opts.onClick] - optional function to call when an absolute value > 0 is received,
      *                                                            e.g. function(ownVal, refObs) {..}
+     * @param {boolean} [opts.doubleClickAware] - if true, the onClick handler gets passed an additional parameter for the `isDoubleClick` flag
      * @param {boolean} [opts.restoreRefAfterLongClick] - if true, the refObservable value will be restored to the value
      *                                                    it had before this KSV instance pushed its ownValue into it, but only if
      *                                                    the click-release-timespan exceeds {@link #LONG_CLICK_TIME}
@@ -63,6 +64,8 @@ lep.KnockoutSyncedValue = lep.util.extendClass(lep.BaseValue, {
         }
 
         this.onClick = opts.onClick;
+        this.doubleClickAware = !!this.onClick && opts.doubleClickAware;
+
         this.refObservable = opts.refObservable;
         this.ownValue = opts.ownValue;
         this.value = null;
@@ -145,8 +148,21 @@ lep.KnockoutSyncedValue = lep.util.extendClass(lep.BaseValue, {
         // from now we have the "toggle-now!" case
 
         if (this.onClick) {
-            this.onClick(this.ownValue, this.refObservable);
             skipWriteRef = true;
+
+            var isDoubleClick = false,
+                clickTimeNow;
+
+            if (this.doubleClickAware) {
+                clickTimeNow = Date.now();
+                if (clickTimeNow < (this._maxNextDoubleClickTime || 0)) {
+                    isDoubleClick = true;
+                } else {
+                    // doubleclick time of 400 milliseconds should be sufficient
+                    this._maxNextDoubleClickTime = clickTimeNow + 400;
+                }
+            }
+            this.onClick(this.ownValue, this.refObservable, isDoubleClick);
         }
 
         if (this.restoreRefAfterLongClick) {
@@ -168,5 +184,6 @@ lep.KnockoutSyncedValue = lep.util.extendClass(lep.BaseValue, {
  * @callback KnockoutSyncedValue~ClickHandler
  * @param {*} ownValue
  * @param {ko.observable} refObservable
+ * @param {boolean} isDoubleClick - only set if opts.doubleClickAware was true
  */
 
