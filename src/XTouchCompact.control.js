@@ -165,13 +165,6 @@ lep.XTouchCompact = function() {
             MASTER_VOLUME: new lep.StandardRangedValue({
                 name: 'MasterVol',
                 rangedValue: masterTrack.volume()
-            }),
-            PARAM_VALUESET_LOCKED: new lep.KnockoutSyncedValue({
-                name: 'ParamValueSetPinnedToDevice',
-                ownValue: true,
-                refObservable: VALUESET.PARAM.lockedToDevice,
-                onClick: VALUESET.PARAM.lockedToDevice.toggle,
-                velocityValueOn: BUTTON_VALUE.BLINK
             })
         },
         // getNextFreeSwitchableValueSet = function() {
@@ -349,11 +342,29 @@ lep.XTouchCompact = function() {
                     });
                 }
                 if (switchableValueSet) {
+                    var isParamsValueSet = switchableValueSet === VALUESET.PARAM;
                     return new lep.KnockoutSyncedValue({
                         name: 'FaderValueTypeSelect-' + switchableValueSet.name,
                         ownValue: switchableValueSet,
                         refObservable: currentFaderValueSetObservable,
-                        velocityValueOn: BUTTON_VALUE.ON
+                        velocityValueOn: isParamsValueSet ? undefined : BUTTON_VALUE.ON,
+                        computedVelocity: isParamsValueSet ? function() {
+                            return (this.ownValue !== this.refObservable()) ? BUTTON_VALUE.OFF :
+                                    VALUESET.PARAM.lockedToDevice() ? BUTTON_VALUE.BLINK : BUTTON_VALUE.ON;
+                        } : undefined,
+                        doubleClickAware: true,
+                        onClick: isParamsValueSet ? function(ownVal, refObs, isDoubleClick) {
+                            if (ownVal !== refObs()) {
+                                refObs(ownVal);
+                            }
+                            if (isShiftPressed()) {
+                                VALUESET.PARAM.lockedToDevice.toggle();
+                                return;
+                            }
+                            if (isDoubleClick) {
+                                VALUESET.PARAM.toggleDeviceWindow(); // TODO check here
+                            }
+                        } : undefined
                     });
                 }
             })
@@ -616,8 +627,6 @@ lep.XTouchCompact = function() {
         CONTROL.MAIN_FADER.attachValue(VALUE.MASTER_VOLUME);
 
         // TODO move functionality to proper place
-        CONTROLSET.BOTTOM_BUTTONS.controls[7].attachValue(VALUE.PARAM_VALUESET_LOCKED);
-        eventDispatcher.onNotePressed(NOTE.BTN_BOTTOM_FIRST + 5, VALUESET.PARAM.toggleDeviceWindow, null, MIDI_CHANNEL);
         eventDispatcher.onNotePressed(NOTE.BTN_BOTTOM_FIRST + 6, VALUESET.PARAM.gotoDevice, null, MIDI_CHANNEL);
 
         println('\n-------------\nX-Touch Compact ready');
