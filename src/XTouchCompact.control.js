@@ -298,18 +298,14 @@ lep.XTouchCompact = function() {
                         } : undefined,
                         doubleClickAware: isLockableValueSet,
                         onClick: function(valueSet, refObs, isDoubleClick) {
-                            var shiftPressed = isShiftPressed.peek();
-                            if (valueSet !== refObs()) {
-                                refObs(valueSet);
-                            }
-                            if (isParamsValueSet) {
-                                if (shiftPressed) {
+                            if (isDoubleClick) {
+                                if (isTrackSends) {
+                                    valueSet.lockedToTrack.toggle();
+                                } else if (isParamsValueSet) {
                                     valueSet.lockedToDevice.toggle();
-                                } else if (isDoubleClick) {
-                                    valueSet.toggleDeviceWindow(); // TODO check here if window available or go to device etc
                                 }
-                            } else if (isTrackSends && shiftPressed) {
-                                valueSet.lockedToTrack.toggle();
+                            } else if (valueSet !== refObs()) {
+                                refObs(valueSet);
                             }
                         }
                     });
@@ -363,7 +359,9 @@ lep.XTouchCompact = function() {
             name: 'PlayBtn',
             clickNote: NOTE_ACTION.PLAY,
             midiChannel: MIDI_CHANNEL,
-            valueToAttach: TRANSPORT_VALUE.PLAY
+            valueToAttach: ko.computed(function() {
+                return isShiftPressed() ? TRANSPORT_VALUE.OVERDUB : TRANSPORT_VALUE.PLAY;
+            })
         });
         new lep.Button({
             name: 'RecordBtn',
