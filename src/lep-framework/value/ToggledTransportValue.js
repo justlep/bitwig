@@ -29,13 +29,16 @@ lep.ToggledTransportValue = lep.util.extendClass(lep.BaseValue, {
         this.toggleOnPressed = (opts.toggleOnPressed !== false);
         this.isOn = null;
 
+        this.onValue = 127;
+        this.offValue = 0;
+
         this.togglingMethod = function() {
             settableBoolean.toggle();
         };
 
         settableBoolean.addValueObserver(function(isOn) {
             self.isOn = isOn;
-            self.value = calcVelocity ? calcVelocity(isOn) : isOn ? 127 : 0;
+            self.value = calcVelocity ? calcVelocity(isOn) : isOn ? self.onValue : self.offValue;
             self.syncToController();
         });
     },
@@ -45,6 +48,11 @@ lep.ToggledTransportValue = lep.util.extendClass(lep.BaseValue, {
         if (this.toggleOnPressed === isPressed) {
             this.togglingMethod();
         }
+    },
+    withVelocities: function(onValue, offValue) {
+        this.onValue = onValue;
+        this.offValue = offValue;
+        return this;
     }
 });
 
