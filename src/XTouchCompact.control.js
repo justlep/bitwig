@@ -68,14 +68,8 @@ lep.XTouchCompact = function() {
         },
         NOTE_ACTION = {
             SHIFT: NOTE.BTN_MAIN,
-            RECORD: NOTE.BTN_RECORD,
-            LOOP: NOTE.BTN_LOOP,
             PREV_DEVICE_OR_CHANNEL_PAGE: NOTE.BTN_REWIND,
-            NEXT_DEVICE_OR_CHANNEL_PAGE: NOTE.BTN_FORWARD,
-            PUNCH_IN: NOTE.BTN_TOP2_FIRST + 6,
-            PUNCH_OUT: NOTE.BTN_TOP2_FIRST + 7,
-            PLAY: NOTE.BTN_PLAY,
-            STOP_MUTE_FADERS: NOTE.BTN_STOP
+            NEXT_DEVICE_OR_CHANNEL_PAGE: NOTE.BTN_FORWARD
         },
         BUTTON_VALUE = {
             OFF: 0,
@@ -94,6 +88,7 @@ lep.XTouchCompact = function() {
             CONTROLS: {isControls: 1},
             VALUE_PAGE: {isValuePage: 1} // TODO
         },
+        keepMainConfig = ko.observable(false).extend({toggleable: true}),
         buttonMode = ko.observable(XT_BUTTON_MODE.MIXER);
 
     lep.ToggledValue.setAllDefaultVelocityValues(BUTTON_VALUE.ON, BUTTON_VALUE.OFF);
@@ -110,7 +105,7 @@ lep.XTouchCompact = function() {
                 obs(!!velocity);
             }, null, MIDI_CHANNEL);
         }),
-        clearPunchOnStop = ko.observable(true),
+        clearPunchOnStop = ko.observable(true).extend({toggleable: true}),
 
         HANDLERS = {
             NEXT_DEVICE_OR_CHANNEL_PAGE: function() {
@@ -137,6 +132,62 @@ lep.XTouchCompact = function() {
                     }
                 }
             }
+        },
+
+        TRANSPORT_VALUE = {
+            PLAY: lep.ToggledTransportValue.getPlayInstance().withVelocities(BUTTON_VALUE.BLINK, BUTTON_VALUE.OFF),
+            RECORD: lep.ToggledTransportValue.getRecordInstance().withVelocities(BUTTON_VALUE.ON, BUTTON_VALUE.OFF),
+            ARRANGER_AUTOMATION: lep.ToggledTransportValue.getArrangerAutomationInstance().withVelocities(BUTTON_VALUE.ON, BUTTON_VALUE.OFF),
+            LOOP: lep.ToggledTransportValue.getLoopInstance().withVelocities(BUTTON_VALUE.ON, BUTTON_VALUE.OFF),
+            METRONOME: lep.ToggledTransportValue.getMetronomeInstance().withVelocities(BUTTON_VALUE.BLINK, BUTTON_VALUE.OFF),
+            OVERDUB: lep.ToggledTransportValue.getOverdubInstance().withVelocities(BUTTON_VALUE.ON, BUTTON_VALUE.OFF),
+            PUNCH_IN: lep.ToggledTransportValue.getPunchInInstance().withVelocities(BUTTON_VALUE.ON, BUTTON_VALUE.OFF),
+            PUNCH_OUT: lep.ToggledTransportValue.getPunchOutInstance().withVelocities(BUTTON_VALUE.ON, BUTTON_VALUE.OFF),
+            CLEAR_PUNCH_ON_STOP: new lep.KnockoutSyncedValue({
+                name: 'ClearPunchInOutOnStop',
+                ownValue: true,
+                refObservable: clearPunchOnStop,
+                velocityValueOn: BUTTON_VALUE.ON,
+                onClick: clearPunchOnStop.toggle
+            })
+        },
+
+        createMainConfigValueSet = function() {
+            return new lep.ValueSet('MainConfig', 8, 1, function(i) {
+               switch (i) {
+                   case 7:
+                       return new lep.KnockoutSyncedValue({
+                           name: 'ButtonModeSwitch',
+                           ownValue: XT_BUTTON_MODE.CONTROLS,
+                           refObservable: buttonMode,
+                           velocityValueOn: BUTTON_VALUE.ON,
+                           onClick: function(ownValue, refObs) {
+                               var newButtonMode = (refObs.peek() === ownValue) ? XT_BUTTON_MODE.MIXER : XT_BUTTON_MODE.CONTROLS;
+                               refObs(newButtonMode);
+                           }
+                       });
+                   case 5:
+                       return new lep.KnockoutSyncedValue({
+                           name: 'ButtonModeSwitch',
+                           ownValue: true,
+                           refObservable: keepMainConfig,
+                           velocityValueOn: BUTTON_VALUE.BLINK,
+                           onClick: keepMainConfig.toggle
+                       });
+                   case 0:
+                       return TRANSPORT_VALUE.PUNCH_IN;
+                   case 1:
+                       return TRANSPORT_VALUE.PUNCH_OUT;
+                   case 2:
+                       return TRANSPORT_VALUE.CLEAR_PUNCH_ON_STOP;
+                   default:
+                       return new lep.KnockoutSyncedValue({
+                           name: 'unused' + i,
+                           ownValue: true,
+                           refObservable: ko.observable(false)
+                       });
+               }
+            });
         },
 
         // createValuePageValueSet = function(namePrefix) {
@@ -167,7 +218,8 @@ lep.XTouchCompact = function() {
             SOLO:   lep.ValueSet.createSoloValueSet(trackBank, WINDOW_SIZE, prefs),
             ARM:    lep.ValueSet.createArmValueSet(trackBank, WINDOW_SIZE),
             MUTE:   lep.ValueSet.createMuteValueSet(trackBank, WINDOW_SIZE),
-            SELECT: lep.ValueSet.createSelectValueSet(trackBank, WINDOW_SIZE)
+            SELECT: lep.ValueSet.createSelectValueSet(trackBank, WINDOW_SIZE),
+            MAIN_CONFIG: createMainConfigValueSet()
         },
 
         SWITCHABLE_VALUESETS = [
@@ -319,24 +371,6 @@ lep.XTouchCompact = function() {
             FOR_FADERS: createValueTypeSelectorValueSet('Faders', CONTROLSET.FADERS)
         },
 
-        TRANSPORT_VALUE = {
-            PLAY: lep.ToggledTransportValue.getPlayInstance(),
-            RECORD: lep.ToggledTransportValue.getRecordInstance(),
-            ARRANGER_AUTOMATION: lep.ToggledTransportValue.getArrangerAutomationInstance(),
-            LOOP: lep.ToggledTransportValue.getLoopInstance(),
-            METRONOME: lep.ToggledTransportValue.getMetronomeInstance(),
-            OVERDUB: lep.ToggledTransportValue.getOverdubInstance(),
-            PUNCH_IN: lep.ToggledTransportValue.getPunchInInstance(),
-            PUNCH_OUT: lep.ToggledTransportValue.getPunchOutInstance(),
-            CLEAR_PUNCH_ON_STOP: new lep.KnockoutSyncedValue({
-                name: 'ClearPunchInOutOnStop',
-                ownValue: true,
-                refObservable: clearPunchOnStop,
-                onClick: function() {
-                    clearPunchOnStop(!clearPunchOnStop());
-                }
-            })
-        },
         CONTROL = {
             MAIN_FADER: new lep.Fader({
                 name: 'MainFader',
@@ -357,50 +391,38 @@ lep.XTouchCompact = function() {
     function initTransportButtons() {
         new lep.Button({
             name: 'PlayBtn',
-            clickNote: NOTE_ACTION.PLAY,
+            clickNote: NOTE.BTN_PLAY,
+            clickNote4Sync: NOTE.BTN_PLAY_GLOBAL,
             midiChannel: MIDI_CHANNEL,
+            midiChannel4Sync: GLOBAL_MIDI_CHANNEL,
             valueToAttach: ko.computed(function() {
                 return isShiftPressed() ? TRANSPORT_VALUE.OVERDUB : TRANSPORT_VALUE.PLAY;
             })
         });
         new lep.Button({
             name: 'RecordBtn',
-            clickNote: NOTE_ACTION.RECORD,
+            clickNote: NOTE.BTN_RECORD,
+            clickNote4Sync: NOTE.BTN_RECORD_GLOBAL,
             midiChannel: MIDI_CHANNEL,
+            midiChannel4Sync: GLOBAL_MIDI_CHANNEL,
             valueToAttach: ko.computed(function() {
                 return isShiftPressed() ? TRANSPORT_VALUE.ARRANGER_AUTOMATION : TRANSPORT_VALUE.RECORD;
             })
         });
 
-        // TODO move punchIn/Out to config value set, assignable to lower button row, shift?
-
-        // new lep.Button({
-        //     name: 'PunchInBtn',
-        //     clickNote: NOTE_ACTION.PUNCH_IN,
-        //     midiChannel: MIDI_CHANNEL,
-        //     valueToAttach: ko.computed(function() {
-        //         return isShiftPressed() ? TRANSPORT_VALUE.OVERDUB : TRANSPORT_VALUE.PUNCH_IN;
-        //     })
-        // });
-        // new lep.Button({
-        //     name: 'PunchOutBtn',
-        //     clickNote: NOTE_ACTION.PUNCH_OUT,
-        //     midiChannel: MIDI_CHANNEL,
-        //     valueToAttach: ko.computed(function() {
-        //         return isShiftPressed() ? TRANSPORT_VALUE.CLEAR_PUNCH_ON_STOP : TRANSPORT_VALUE.PUNCH_OUT;
-        //     })
-        // });
         new lep.Button({
             name: 'LoopBtn',
-            clickNote: NOTE_ACTION.LOOP,
+            clickNote: NOTE.BTN_LOOP,
             midiChannel: MIDI_CHANNEL,
+            midiChannel4Sync: GLOBAL_MIDI_CHANNEL,
+            clickNote4Sync: NOTE.BTN_LOOP_GLOBAL,
             valueToAttach: ko.computed(function() {
                 return isShiftPressed() ? TRANSPORT_VALUE.METRONOME : TRANSPORT_VALUE.LOOP;
             })
         });
         new lep.Button({
             name: 'StopBtn',
-            clickNote: NOTE_ACTION.STOP_MUTE_FADERS,
+            clickNote: NOTE.BTN_STOP,
             midiChannel: MIDI_CHANNEL,
             midiChannel4Sync: GLOBAL_MIDI_CHANNEL,
             clickNote4Sync: NOTE.BTN_STOP_GLOBAL,
@@ -477,8 +499,10 @@ lep.XTouchCompact = function() {
         CONTROLSET.TOP3_BUTTONS.setObservableValueSet(ko.computed(function() {
             return buttonMode().isMixer ? VALUESET.ARM : VALUETYPE_SELECTOR_VALUESET.FOR_FADERS;
         }));
+
         CONTROLSET.BOTTOM_BUTTONS.setObservableValueSet(ko.computed(function() {
-            return buttonMode().isMixer ? VALUESET.SELECT : VALUESET.SELECT; // TODO
+            return (isShiftPressed() || keepMainConfig()) ? VALUESET.MAIN_CONFIG :
+                   buttonMode().isMixer ? VALUESET.SELECT : VALUESET.SELECT; // TODO
         }));
 
         buttonMode(XT_BUTTON_MODE.CONTROLS);
