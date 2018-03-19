@@ -14,8 +14,6 @@
  * (Used Mocha to avoid the overhead of PhantomJS-based test runners like Karma & co)
  */
 
-'use strict';
-
 let vm = require('vm'),
     path = require('path'),
     fs = require('fs'),
@@ -38,6 +36,7 @@ frameworkLoaderSource.replace(/^load.'([^']*)'./gm, function (fullMatch, relativ
 // Execute all files in the current VM context..
 filesToExecute.forEach(absoluteFilePath => {
     let relativeFilePath = path.relative(projectRootPath, absoluteFilePath);
+    /*eslint no-console:0 */
     console.log('# Loading: ' + relativeFilePath);
     vm.runInThisContext(fs.readFileSync(absoluteFilePath));
 });

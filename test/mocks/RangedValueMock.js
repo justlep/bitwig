@@ -18,5 +18,5 @@ RangedValueMock = function() {
     };
 
     this.setIndication = function(on) {
-    }
+    };
 };

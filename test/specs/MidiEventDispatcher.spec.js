@@ -1,6 +1,6 @@
 /*global describe, it, beforeEach */
 
-var chai = require('chai'),
+let chai = require('chai'),
     assert = chai.assert,
     spies = require('chai-spies'),
     expect = chai.expect;
@@ -12,7 +12,7 @@ chai.use(spies);
 
 describe('lep.MidiEventDispatcher', function() {
 
-    var med0,
+    let med0,
         med1;
 
     beforeEach(function() {
@@ -21,7 +21,7 @@ describe('lep.MidiEventDispatcher', function() {
     });
 
     it('creates one reused instance per inPort', function() {
-        var medDefault = lep.MidiEventDispatcher.getInstance(),
+        let medDefault = lep.MidiEventDispatcher.getInstance(),
             medDefault2 = lep.MidiEventDispatcher.getInstance(),
             med5_1 = lep.MidiEventDispatcher.getInstance(5),
             med5_2 = lep.MidiEventDispatcher.getInstance(5);
@@ -39,7 +39,7 @@ describe('lep.MidiEventDispatcher', function() {
     });
 
     it('triggers channel-dependent and channel-independent note/CC handlers', function() {
-        var CH_A = 1,
+        let CH_A = 1,
             CH_B = 13,
             SPY = {
                 NOTE55A: {ON: chai.spy(), OFF: chai.spy()},
@@ -61,17 +61,17 @@ describe('lep.MidiEventDispatcher', function() {
         med0.onCC(88, SPY.CC88A);
 
         host.mockNoteOn(0, 55, 127, CH_A);
-        expect(SPY.NOTE55A.ON).to.have.been.called.once();
+        expect(SPY.NOTE55A.ON).to.have.been.called.exactly(1);
         expect(SPY.NOTE55A.ON).to.have.been.called.with(55,127,CH_A);
 
         host.mockNoteOn(0, 55, 66, CH_A);
         expect(SPY.NOTE55A.ON).to.have.been.called.with(55,66,CH_A);
-        expect(SPY.NOTE55A.ON).to.have.been.called.twice(); // different note should not call the handler
+        expect(SPY.NOTE55A.ON).to.have.been.called.exactly(2); // different note should not call the handler
 
         host.mockNoteOn(0, 50, 127, CH_A);
-        expect(SPY.NOTE55A.ON).to.have.been.called.twice();
+        expect(SPY.NOTE55A.ON).to.have.been.called.exactly(2);
         host.mockNoteOn(1, 55, 127, CH_A);
-        expect(SPY.NOTE55A.ON).to.have.been.called.twice(); // different input should not call the handler
+        expect(SPY.NOTE55A.ON).to.have.been.called.exactly(2); // different input should not call the handler
 
         expect(SPY.NOTE55B.ON).to.not.have.been.called();
         expect(SPY.NOTE55B.OFF).to.not.have.been.called();
@@ -127,7 +127,7 @@ describe('lep.MidiEventDispatcher', function() {
     });
 
     it('ensures a handler\'s this-context if it was given to onXXX()', function() {
-        var CTX = {},
+        let CTX = {},
             SPY = {
                 CC77_NO_CTX: chai.spy(function() {
                     assert.notStrictEqual(this, CTX);
@@ -159,7 +159,7 @@ describe('lep.MidiEventDispatcher', function() {
     });
 
     it('triggers noteReleased-handlers on zero-values depending on strictNoteOff', function() {
-        var PORT_STRICT = 20,
+        let PORT_STRICT = 20,
             PORT_LOOSE = 21,
             NOTE = 55,
             CHANNEL = 7,
@@ -181,14 +181,14 @@ describe('lep.MidiEventDispatcher', function() {
         strictMED.onNoteReleased(NOTE, SPY.STRICT_OFF);
 
         host.mockNoteOn(PORT_STRICT, NOTE, 0, CHANNEL);
-        expect(SPY.STRICT_ON).to.have.been.called.once();
+        expect(SPY.STRICT_ON).to.have.been.called.exactly(1);
         expect(SPY.STRICT_OFF).to.not.have.been.called();
         host.mockNoteOn(PORT_STRICT, NOTE, 123, CHANNEL);
         expect(SPY.STRICT_ON).to.have.been.called.exactly(2);
         expect(SPY.STRICT_OFF).to.not.have.been.called();
         host.mockNoteOff(PORT_STRICT, NOTE, 0, CHANNEL);
         expect(SPY.STRICT_ON).to.have.been.called.exactly(2);
-        expect(SPY.STRICT_OFF).to.have.been.called.once();
+        expect(SPY.STRICT_OFF).to.have.been.called.exactly(1);
         expect(SPY.STRICT_OFF).to.have.been.called.with(NOTE, 0, CHANNEL);
 
 
@@ -199,12 +199,12 @@ describe('lep.MidiEventDispatcher', function() {
 
         host.mockNoteOn(PORT_LOOSE, NOTE, 0, CHANNEL);
         expect(SPY.LOOSE_ON).to.not.have.been.called();
-        expect(SPY.LOOSE_OFF).to.have.been.called.once();
+        expect(SPY.LOOSE_OFF).to.have.been.called.exactly(1);
         host.mockNoteOn(PORT_LOOSE, NOTE, 123, CHANNEL);
-        expect(SPY.LOOSE_ON).to.have.been.called.once();
-        expect(SPY.LOOSE_OFF).to.have.been.called.once();
+        expect(SPY.LOOSE_ON).to.have.been.called.exactly(1);
+        expect(SPY.LOOSE_OFF).to.have.been.called.exactly(1);
         host.mockNoteOff(PORT_LOOSE, NOTE, 0, CHANNEL);
-        expect(SPY.LOOSE_ON).to.have.been.called.once();
+        expect(SPY.LOOSE_ON).to.have.been.called.exactly(1);
         expect(SPY.LOOSE_OFF).to.have.been.called.exactly(2);
         expect(SPY.LOOSE_OFF).to.have.been.called.with(NOTE, 0, CHANNEL);
         host.mockNoteOff(PORT_LOOSE, NOTE, 0, OTHERCHANNEL);

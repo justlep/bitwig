@@ -1,13 +1,13 @@
 /*global describe, it, beforeEach */
 
-var assert = require('chai').assert;
+let assert = require('chai').assert;
 
 // load lep-API and mocks into this context..
 require('./../loadFrameworkAndMocks');
 
 describe('lep.util.extendClass()', function() {
 
-    var A, B, C, a, b;
+    let A, B, C, a, b;
 
     beforeEach(function(){
         A = function(a) {

@@ -1,6 +1,6 @@
 /*global describe, it, beforeEach */
 
-var assert = require('chai').assert;
+let assert = require('chai').assert;
 
 // load lep-API and mocks into this context..
 require('./../loadFrameworkAndMocks');
@@ -10,7 +10,7 @@ lep.setLogLevel(lep.LOGLEVEL.WARN);
 describe('ko-extensions.js', function() {
 
     it('adds a `toggle` method to the subscribable prototype', function() {
-        var _co = ko.observable(),
+        let _co = ko.observable(),
             o1 = ko.observable(),
             o2 = ko.observable(),
             c1 = ko.computed({
@@ -41,7 +41,7 @@ describe('ko-extensions.js', function() {
     });
 
     it('defines a `toggleable` extender that adds toggle, toggleOn, toggleOff methods', function() {
-        var o1 = ko.observable(),
+        let o1 = ko.observable(),
             o2 = ko.observable().extend({toggleable: true}),
             o3 = ko.observable(123).extend({toggleable: true});
 
@@ -78,7 +78,7 @@ describe('ko-extensions.js', function() {
     });
 
     it('provides readonly access to the previous value via previousValue', function() {
-        var o1 = ko.observable(),
+        let o1 = ko.observable(),
             o2 = ko.observable().extend({restoreable: true});
 
         assert.isUndefined(o1.previousValue);
@@ -101,7 +101,7 @@ describe('ko-extensions.js', function() {
     });
 
     it('can restore previous values using the restoreable extender', function() {
-        var o1 = ko.observable().extend({restoreable: true}),
+        let o1 = ko.observable().extend({restoreable: true}),
             o2 = ko.observable(5).extend({restoreable: true});
 
         assert.isFunction(o1.restore);
@@ -131,7 +131,7 @@ describe('ko-extensions.js', function() {
     });
 
     it('adds an `updatedBy` method to the subscribable prototype', function(done) {
-        var timer,
+        let timer,
             registerAsyncUpdater = function(obs) {
                 timer = setInterval(function() {
                     obs(obs()+1);

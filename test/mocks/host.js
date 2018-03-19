@@ -1,7 +1,7 @@
 
-var host = (function() {
+let host = (function() {
 
-    var inPorts = [];
+    let inPorts = [];
 
     return {
         getMidiInPort: function(inPortNumber){
@@ -25,19 +25,19 @@ var host = (function() {
             return inPorts[inPortNumber];
         },
 
-        mockNoteOn: function(inPort, note, value, channel) {
-            var status = 0x90 + channel,
-                inPort = inPorts[inPort];
+        mockNoteOn: function(_inPort, note, value, channel) {
+            let status = 0x90 + channel,
+                inPort = inPorts[_inPort];
             inPort && inPort.midiCallback.apply(this, [status, note, value]);
         },
-        mockNoteOff: function(inPort, note, value, channel) {
-            var status = 0x80 + channel,
-                inPort = inPorts[inPort];
+        mockNoteOff: function(_inPort, note, value, channel) {
+            let status = 0x80 + channel,
+                inPort = inPorts[_inPort];
             inPort && inPort.midiCallback.apply(this, [status, note, value]);
         },
-        mockCC: function(inPort, cc, value, channel) {
-            var status = 0xB0 + channel,
-                inPort = inPorts[inPort];
+        mockCC: function(_inPort, cc, value, channel) {
+            let status = 0xB0 + channel,
+                inPort = inPorts[_inPort];
             inPort && inPort.midiCallback.apply(this, [status, cc, value]);
         },
         showPopupNotification: function() {

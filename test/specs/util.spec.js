@@ -1,7 +1,7 @@
 /*global describe, it, beforeEach */
 
 
-var assert = require('chai').assert;
+let assert = require('chai').assert;
 
 // load lep-API and mocks into this context..
 require('./../loadFrameworkAndMocks');
@@ -118,14 +118,14 @@ describe('util.js', function() {
         );
         assert.throw(
             function(){
-                var min = 10, max = 20;
+                let min = 10, max = 20;
                 lep.util.assertNumberInRange(5, min, max, 'Number must be within {} and {}', min, max);
             },
             'Number must be within 10 and 20'
         );
         assert.throw(
             function(){
-                var min = 10, max = 20;
+                let min = 10, max = 20;
                 lep.util.assertNumberInRange(5, min, max, 'Number must be within {} and {}');
             },
             'Number must be within {} and {}'
@@ -142,7 +142,7 @@ describe('util.js', function() {
     });
 
     it('generates positive IDs using nextId()', function() {
-        var lastId = lep.util.nextId();
+        let lastId = lep.util.nextId();
         assert.isNumber(lastId);
         assert.isAbove(lastId, 0);
         assert.strictEqual(lep.util.nextId(), lastId + 1);
@@ -156,7 +156,7 @@ describe('util.js', function() {
     });
 
     it('binds function to scopes using bind()', function() {
-        var obj = {
+        let obj = {
                 __fooProperty__: 123,
                 getX: function(){
                     return this.__fooProperty__;
@@ -173,7 +173,7 @@ describe('util.js', function() {
     });
 
     it('generates arrays with initial values', function() {
-        var a = lep.util.generateArray(20, 'xxx');
+        let a = lep.util.generateArray(20, 'xxx');
         assert.isArray(a);
         assert.strictEqual(a.length, 20);
         assert.strictEqual(a[0], 'xxx');
@@ -183,7 +183,7 @@ describe('util.js', function() {
     });
 
     it('generates arrays using a creator function', function() {
-        var s = 'abcdefgh',
+        let s = 'abcdefgh',
             len = s.length,
             firstCharCode = s.charCodeAt(0),
             creatorFn = function(i) {
@@ -198,13 +198,13 @@ describe('util.js', function() {
     });
 
     it('generates simple maps using createMap', function() {
-        var m = lep.util.createMap('bli',555,'bla',666,'blubs',777);
+        let m = lep.util.createMap('bli',555,'bla',666,'blubs',777);
         assert.isObject(m);
         assert.deepEqual(m, {bli:555, bla:666, blubs:777});
     });
 
     it('generates 1d-arrays based on cols+rows using a creator function', function() {
-        var cols = 3,
+        let cols = 3,
             rows = 2,
             creatorFn = function(col, row, index) {
                 return `${index}__${col}*${row}=${col*row}`;
@@ -219,7 +219,7 @@ describe('util.js', function() {
     });
 
     it('extends objects using extend()', function() {
-        var o1 = {a: 1, b: {c: 3}, getA: function(){return this.a;}},
+        let o1 = {a: 1, b: {c: 3}, getA: function(){return this.a;}},
             o2 = {a: 5, x: 666};
 
         assert.strictEqual(o1.getA(), 1);
@@ -235,7 +235,7 @@ describe('util.js', function() {
     });
 
     it('measures time differences in millis', function(done) {
-        var ID1 = 1,
+        let ID1 = 1,
             ID2 = 3,
             TIME_TO_MEASURE = 500,
             TOLERANCE = 100;
