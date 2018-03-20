@@ -180,6 +180,11 @@ lep.ControlSet.prototype = {
     withAutoSwap: function(autoSwap) {
         this.autoSwap = autoSwap !== false;
         return this;
+    },
+    forceSyncToMidi: function() {
+        for (var i = 0, len = this.controls.length; i < len; i++) {
+            this.controls[i].forceSyncToMidi();
+        }
     }
 };
 

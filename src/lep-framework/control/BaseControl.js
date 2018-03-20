@@ -148,6 +148,14 @@ lep.BaseControl.prototype = {
         }
     },
     /**
+     * Syncs this control to the midi device (if bidirectional and not muted),
+     * resetting any currently set feedback-loop-prevention value.
+     */
+    forceSyncToMidi: function() {
+        this.nextFeedbackLoopValue = null;
+        this.syncToMidi();
+    },
+    /**
      * Sends the BaseValue's numerical value (or an explicitely given value) to the device.
      * @param {number} [valueOverride] - optional value to send instead of the BaseValue's value
      */
