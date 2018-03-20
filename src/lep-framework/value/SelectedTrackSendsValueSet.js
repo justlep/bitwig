@@ -49,10 +49,11 @@ lep.SelectedTrackSendsValueSet = lep.util.extendClass(lep.ValueSet, {
 
         this.lockedToTrack = _trackView.locked;
 
-        ko.computed(function() {
-            var lockedTrackName = self.lockedToTrack() && _trackView.trackName.peek();
-            if (lockedTrackName) {
-                self.popupNotificationIfAttached('MultiSends locked to track ' + lockedTrackName);
+        this.lockedToTrack.subscribe(function(isLocked) {
+            if (isLocked) {
+                host.showPopupNotification('MultiSends locked to track ' + _trackView.trackName.peek());
+            } else {
+                host.showPopupNotification('MultiSends unlocked');
             }
         });
 

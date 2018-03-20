@@ -47,14 +47,14 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
         this.lockedToDevice.subscribe(function(isLocked) {
             self.trackView.locked(isLocked);
             if (!isLocked) {
-                self.popupNotificationIfAttached('RC unlocked');
+                host.showPopupNotification('RC unlocked');
             }
         });
 
         ko.computed(function() {
             var deviceNameLocked = self.lockedToDevice() && self.deviceName();
             if (deviceNameLocked) {
-                self.popupNotificationIfAttached('RC locked to ' + deviceNameLocked);
+                host.showPopupNotification('RC locked to ' + deviceNameLocked);
             }
         });
 
