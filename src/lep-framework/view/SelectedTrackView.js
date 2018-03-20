@@ -17,8 +17,7 @@ lep.SelectedTrackView = function(opts) {
     var _opts = opts || {},
         _numSends = _opts.numSends || 0,
         _numScenes = _opts.numScenes || 0,
-        _id = this.name,
-        self = this;
+        _id = this.name;
 
     lep.util.assertNumberInRange(_numSends, 0, 50, 'Invalid numSends for {}: {}', this.name, _numSends);
     lep.util.assertNumberInRange(_numScenes, 0, 50, 'Invalid numScenes for {}: {}', this.name, _numScenes);
@@ -29,22 +28,21 @@ lep.SelectedTrackView = function(opts) {
 
     var _cursorTrack = host.createCursorTrack(_id, this.name, _numSends, _numScenes, false),
         _settableIsPinned = _cursorTrack.isPinned(),
-        _syncChannelIfNotLocked = function() {
-            if (!self.locked.peek()) {
-                _cursorTrack.selectChannel(lep.SelectedTrackView._autoFollowingCursorTrack);
-            }
-        };
+        _syncChannel = function() {
+            _cursorTrack.selectChannel(lep.SelectedTrackView._autoFollowingCursorTrack);
+        },
+        _syncOrNOP = _syncChannel;
 
     lep.SelectedTrackView._autoFollowingCursorTrack.name().addValueObserver(function(trackName) {
-        lep.logWarn('Track of {} is now {}', self.name, trackName);
-        _syncChannelIfNotLocked();
+        // lep.logWarn('Track of {} is now {}', self.name, trackName);
+        _syncOrNOP();
     });
 
     this.locked = ko.computed({
         read: ko.observable(false).updatedByBitwigValue(_settableIsPinned),
         write: function(doLock) {
+            _syncOrNOP = doLock ? lep.util.NOP : _syncChannel;
             _settableIsPinned.set(!!doLock);
-            _syncChannelIfNotLocked();
         }
     }).extend({toggleable: true});
 
