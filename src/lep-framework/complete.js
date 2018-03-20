@@ -41,3 +41,4 @@ load('view/SelectedTrackView.js');
 load('view/TracksView.js');
 load('view/LauncherSlot.js');
 load('view/MatrixView.js');
+load('util/VolumeMeter.js');

@@ -134,108 +134,6 @@ lep.XTouchCompact = function() {
             }
         },
 
-        TRANSPORT_VALUE = {
-            PLAY: lep.ToggledTransportValue.getPlayInstance().withVelocities(BUTTON_VALUE.BLINK, BUTTON_VALUE.OFF),
-            RECORD: lep.ToggledTransportValue.getRecordInstance().withVelocities(BUTTON_VALUE.ON, BUTTON_VALUE.OFF),
-            ARRANGER_AUTOMATION: lep.ToggledTransportValue.getArrangerAutomationInstance().withVelocities(BUTTON_VALUE.ON, BUTTON_VALUE.OFF),
-            LOOP: lep.ToggledTransportValue.getLoopInstance().withVelocities(BUTTON_VALUE.ON, BUTTON_VALUE.OFF),
-            METRONOME: lep.ToggledTransportValue.getMetronomeInstance().withVelocities(BUTTON_VALUE.BLINK, BUTTON_VALUE.OFF),
-            OVERDUB: lep.ToggledTransportValue.getOverdubInstance().withVelocities(BUTTON_VALUE.ON, BUTTON_VALUE.OFF),
-            PUNCH_IN: lep.ToggledTransportValue.getPunchInInstance().withVelocities(BUTTON_VALUE.ON, BUTTON_VALUE.OFF),
-            PUNCH_OUT: lep.ToggledTransportValue.getPunchOutInstance().withVelocities(BUTTON_VALUE.ON, BUTTON_VALUE.OFF),
-            CLEAR_PUNCH_ON_STOP: new lep.KnockoutSyncedValue({
-                name: 'ClearPunchInOutOnStop',
-                ownValue: true,
-                refObservable: clearPunchOnStop,
-                velocityValueOn: BUTTON_VALUE.ON,
-                onClick: clearPunchOnStop.toggle
-            })
-        },
-
-        createMainConfigValueSet = function() {
-            return new lep.ValueSet('MainConfig', 8, 1, function(i) {
-               switch (i) {
-                   case 7:
-                       return new lep.KnockoutSyncedValue({
-                           name: 'ButtonModeSwitch',
-                           ownValue: XT_BUTTON_MODE.CONTROLS,
-                           refObservable: buttonMode,
-                           velocityValueOn: BUTTON_VALUE.ON,
-                           onClick: function(ownValue, refObs) {
-                               var newButtonMode = (refObs.peek() === ownValue) ? XT_BUTTON_MODE.MIXER : XT_BUTTON_MODE.CONTROLS;
-                               refObs(newButtonMode);
-                           }
-                       });
-                   case 5:
-                       return new lep.KnockoutSyncedValue({
-                           name: 'ButtonModeSwitch',
-                           ownValue: true,
-                           refObservable: keepMainConfig,
-                           velocityValueOn: BUTTON_VALUE.BLINK,
-                           onClick: keepMainConfig.toggle
-                       });
-                   case 0:
-                       return TRANSPORT_VALUE.PUNCH_IN;
-                   case 1:
-                       return TRANSPORT_VALUE.PUNCH_OUT;
-                   case 2:
-                       return TRANSPORT_VALUE.CLEAR_PUNCH_ON_STOP;
-                   default:
-                       return new lep.KnockoutSyncedValue({
-                           name: 'unused' + i,
-                           ownValue: true,
-                           refObservable: ko.observable(false)
-                       });
-               }
-            });
-        },
-
-        // createValuePageValueSet = function(namePrefix) {
-        //     lep.util.assertNonEmptyString(namePrefix, 'Invalid namePrefix for createValuePageValueSet: {}', namePrefix);
-        //     return new lep.ValueSet(namePrefix + 'ValuePageSelect', WINDOW_SIZE, 1, function(index) {
-        //         if (index >= WINDOW_SIZE-2) {
-        //             var prevOrNextValuePageBtnValue = VALUETYPE_BTN_VALUESET.FOR_ENCODERS.values[index];
-        //             lep.util.assert(prevOrNextValuePageBtnValue && prevOrNextValuePageBtnValue instanceof lep.KnockoutSyncedValue,
-        //                 'Unexpected type for VALUETYPE_BTN_VALUESET.FOR_ENCODERS.values[{}]', index);
-        //             return prevOrNextValuePageBtnValue;
-        //         }
-        //         return new lep.KnockoutSyncedValue({
-        //             name: 'EncoderValuePageSelect-' + index,
-        //             ownValue: index,
-        //             refObservable: CONTROLSET.TOP_ENCODERS.valuePage,
-        //             velocityValueOn: BUTTON_VALUE.ON
-        //         });
-        //     })
-        // },
-
-        VALUESET = {
-            VOLUME: lep.ValueSet.createVolumeValueSet(trackBank, WINDOW_SIZE),
-            PAN:    lep.ValueSet.createPanValueSet(trackBank, WINDOW_SIZE),
-            SEND:   lep.SendsValueSet.createFromTrackBank(trackBank),
-            SELECTED_TRACK_SENDS: new lep.SelectedTrackSendsValueSet(WINDOW_SIZE),
-            PARAM:  new lep.ParamsValueSet(),
-            USERCONTROL: lep.ValueSet.createUserControlsValueSet(USER_CONTROL_PAGES, WINDOW_SIZE, 'XTC-UC-{}-{}'),
-            SOLO:   lep.ValueSet.createSoloValueSet(trackBank, WINDOW_SIZE, prefs),
-            ARM:    lep.ValueSet.createArmValueSet(trackBank, WINDOW_SIZE),
-            MUTE:   lep.ValueSet.createMuteValueSet(trackBank, WINDOW_SIZE),
-            SELECT: lep.ValueSet.createSelectValueSet(trackBank, WINDOW_SIZE),
-            MAIN_CONFIG: createMainConfigValueSet()
-        },
-
-        SWITCHABLE_VALUESETS = [
-            VALUESET.VOLUME,
-            VALUESET.PAN,
-            VALUESET.SEND,
-            VALUESET.SELECTED_TRACK_SENDS,
-            VALUESET.PARAM,
-            VALUESET.USERCONTROL
-        ],
-        VALUE = {
-            MASTER_VOLUME: new lep.StandardRangedValue({
-                name: 'MasterVol',
-                rangedValue: masterTrack.volume()
-            })
-        },
         CONTROLSET = {
             TOP_ENCODERS: new lep.ControlSet('TopEncoders', WINDOW_SIZE, function(index) {
                 return new lep.ClickEncoder({
@@ -298,6 +196,124 @@ lep.XTouchCompact = function() {
             })
         },
 
+        volumeMeter = new lep.VolumeMeter({
+            tracksView: tracksView,
+            overloadControlSet: CONTROLSET.TOP_ENCODERS,
+            //midiChannel: GLOBAL_MIDI_CHANNEL,
+            //midiStartCC: 26,
+            //maxMidiValue: 13,
+            usePeak: false
+        }),
+
+        TRANSPORT_VALUE = {
+            PLAY: lep.ToggledTransportValue.getPlayInstance().withVelocities(BUTTON_VALUE.BLINK, BUTTON_VALUE.OFF),
+            RECORD: lep.ToggledTransportValue.getRecordInstance().withVelocities(BUTTON_VALUE.ON, BUTTON_VALUE.OFF),
+            ARRANGER_AUTOMATION: lep.ToggledTransportValue.getArrangerAutomationInstance().withVelocities(BUTTON_VALUE.ON, BUTTON_VALUE.OFF),
+            LOOP: lep.ToggledTransportValue.getLoopInstance().withVelocities(BUTTON_VALUE.ON, BUTTON_VALUE.OFF),
+            METRONOME: lep.ToggledTransportValue.getMetronomeInstance().withVelocities(BUTTON_VALUE.BLINK, BUTTON_VALUE.OFF),
+            OVERDUB: lep.ToggledTransportValue.getOverdubInstance().withVelocities(BUTTON_VALUE.ON, BUTTON_VALUE.OFF),
+            PUNCH_IN: lep.ToggledTransportValue.getPunchInInstance().withVelocities(BUTTON_VALUE.ON, BUTTON_VALUE.OFF),
+            PUNCH_OUT: lep.ToggledTransportValue.getPunchOutInstance().withVelocities(BUTTON_VALUE.ON, BUTTON_VALUE.OFF),
+            CLEAR_PUNCH_ON_STOP: new lep.KnockoutSyncedValue({
+                name: 'ClearPunchInOutOnStop',
+                ownValue: true,
+                refObservable: clearPunchOnStop,
+                velocityValueOn: BUTTON_VALUE.ON,
+                onClick: clearPunchOnStop.toggle
+            })
+        },
+
+        createMainConfigValueSet = function() {
+            return new lep.ValueSet('MainConfig', 8, 1, function(i) {
+               switch (i) {
+                   case 7:
+                       return new lep.KnockoutSyncedValue({
+                           name: 'ButtonModeSwitch',
+                           ownValue: XT_BUTTON_MODE.CONTROLS,
+                           refObservable: buttonMode,
+                           velocityValueOn: BUTTON_VALUE.ON,
+                           onClick: function(ownValue, refObs) {
+                               var newButtonMode = (refObs.peek() === ownValue) ? XT_BUTTON_MODE.MIXER : XT_BUTTON_MODE.CONTROLS;
+                               refObs(newButtonMode);
+                           }
+                       });
+                   case 5:
+                       return new lep.KnockoutSyncedValue({
+                           name: 'ButtonModeSwitch',
+                           ownValue: true,
+                           refObservable: keepMainConfig,
+                           velocityValueOn: BUTTON_VALUE.BLINK,
+                           onClick: keepMainConfig.toggle
+                       });
+                   case 6:
+                       return new lep.KnockoutSyncedValue({
+                           name: 'VolumeMeterSwitch',
+                           ownValue: true,
+                           refObservable: volumeMeter.isEnabled,
+                           velocityValueOn: BUTTON_VALUE.ON,
+                           onClick: volumeMeter.isEnabled.toggle
+                       });
+                   case 0:
+                       return TRANSPORT_VALUE.PUNCH_IN;
+                   case 1:
+                       return TRANSPORT_VALUE.PUNCH_OUT;
+                   case 2:
+                       return TRANSPORT_VALUE.CLEAR_PUNCH_ON_STOP;
+                   default:
+                       return new lep.KnockoutSyncedValue({
+                           name: 'unused' + i,
+                           ownValue: true,
+                           refObservable: ko.observable(false)
+                       });
+               }
+            });
+        },
+
+        // createValuePageValueSet = function(namePrefix) {
+        //     lep.util.assertNonEmptyString(namePrefix, 'Invalid namePrefix for createValuePageValueSet: {}', namePrefix);
+        //     return new lep.ValueSet(namePrefix + 'ValuePageSelect', WINDOW_SIZE, 1, function(index) {
+        //         if (index >= WINDOW_SIZE-2) {
+        //             var prevOrNextValuePageBtnValue = VALUETYPE_BTN_VALUESET.FOR_ENCODERS.values[index];
+        //             lep.util.assert(prevOrNextValuePageBtnValue && prevOrNextValuePageBtnValue instanceof lep.KnockoutSyncedValue,
+        //                 'Unexpected type for VALUETYPE_BTN_VALUESET.FOR_ENCODERS.values[{}]', index);
+        //             return prevOrNextValuePageBtnValue;
+        //         }
+        //         return new lep.KnockoutSyncedValue({
+        //             name: 'EncoderValuePageSelect-' + index,
+        //             ownValue: index,
+        //             refObservable: CONTROLSET.TOP_ENCODERS.valuePage,
+        //             velocityValueOn: BUTTON_VALUE.ON
+        //         });
+        //     })
+        // },
+
+        VALUESET = {
+            VOLUME: lep.ValueSet.createVolumeValueSet(trackBank, WINDOW_SIZE),
+            PAN:    lep.ValueSet.createPanValueSet(trackBank, WINDOW_SIZE),
+            SEND:   lep.SendsValueSet.createFromTrackBank(trackBank),
+            SELECTED_TRACK_SENDS: new lep.SelectedTrackSendsValueSet(WINDOW_SIZE),
+            PARAM:  new lep.ParamsValueSet(),
+            USERCONTROL: lep.ValueSet.createUserControlsValueSet(USER_CONTROL_PAGES, WINDOW_SIZE, 'XTC-UC-{}-{}'),
+            SOLO:   lep.ValueSet.createSoloValueSet(trackBank, WINDOW_SIZE, prefs),
+            ARM:    lep.ValueSet.createArmValueSet(trackBank, WINDOW_SIZE),
+            MUTE:   lep.ValueSet.createMuteValueSet(trackBank, WINDOW_SIZE),
+            SELECT: lep.ValueSet.createSelectValueSet(trackBank, WINDOW_SIZE),
+            MAIN_CONFIG: createMainConfigValueSet()
+        },
+        SWITCHABLE_VALUESETS = [
+            VALUESET.VOLUME,
+            VALUESET.PAN,
+            VALUESET.SEND,
+            VALUESET.SELECTED_TRACK_SENDS,
+            VALUESET.PARAM,
+            VALUESET.USERCONTROL
+        ],
+        VALUE = {
+            MASTER_VOLUME: new lep.StandardRangedValue({
+                name: 'MasterVol',
+                rangedValue: masterTrack.volume()
+            })
+        },
         /**
          * ValueSets for the buttons selecting which value type (volume, pan etc) is assigned to the encoders/faders.
          * (!) The last two buttons do NOT represent value *type* but the -/+ buttons for the active value *PAGE*
