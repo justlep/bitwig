@@ -83,7 +83,7 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
             MODE_ARM_SELECT: NOTE.EG3,
             MODE_VALUE_SELECT: NOTE.EG4,
             SHIFT: NOTE.F1,
-            LOCK_DEVICE: NOTE.F2,
+            VU_METER: NOTE.F2,
             RECORD: NOTE.F3,
             LOOP: NOTE.F4,
             PREV_DEVICE_OR_CHANNEL_PAGE: NOTE.P1,
@@ -96,6 +96,7 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
 
         transport = lep.util.getTransport(),
         trackBank = host.createMainTrackBank(WINDOW_SIZE, SENDS_NUMBER, 0),
+        tracksView = new lep.TracksView('Tracks', WINDOW_SIZE, SENDS_NUMBER, 0, trackBank),
         eventDispatcher = lep.MidiEventDispatcher.getInstance(),
 
         isShiftPressed = ko.observable(false),
@@ -106,14 +107,14 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
                 if (isShiftPressed()) {
                     VALUESET.PARAM.selectNextDevice();
                 } else {
-                    trackBank.scrollPageForwards();
+                    tracksView.moveChannelPageForth();
                 }
             },
             PREV_DEVICE_OR_CHANNEL_PAGE: function() {
                 if (isShiftPressed()) {
                     VALUESET.PARAM.selectPreviousDevice();
                 } else {
-                    trackBank.scrollPageBackwards();
+                    tracksView.moveChannelPageBack();
                 }
             },
             SHIFT_CHANGE: function(note, value) {
@@ -200,6 +201,12 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
             })
         },
 
+        volumeMeter = new lep.VolumeMeter({
+            tracksView: tracksView,
+            overloadControlSet: CONTROLSET.ENCODERS,
+            usePeak: false
+        }),
+
         /**
          * ValueSets for the buttons selecting which value type (volume, pan etc) is assigned to the encoders/faders.
          * (!) The last two buttons do NOT represent value *type* but the -/+ buttons for the active value *PAGE*
@@ -243,22 +250,24 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
                             if (!isShiftPressed()) {
                                 return (this.ownValue === this.refObservable()) ? 127 : 0;
                             }
-                            var isLocked = isParamsValueSet ? switchableValueSet.lockedToDevice() : false;
+                            var isLocked = isParamsValueSet ? switchableValueSet.lockedToDevice() : switchableValueSet.lockedToTrack();
                             return isLocked ? 127 : 0;
-                        } : undefined,
+                        } : function() {
+                            return (isShiftPressed() || this.ownValue !== this.refObservable()) ? 0: 127;
+                        },
                         doubleClickAware: isLockableValueSet,
                         onClick: function(valueSet, refObs, isDoubleClick) {
                             var shiftPressed = isShiftPressed.peek();
-                            if (valueSet !== refObs()) {
+                            if (!shiftPressed && !isDoubleClick && (valueSet !== refObs())) {
                                 refObs(valueSet);
                             }
                             if (isParamsValueSet) {
                                 if (shiftPressed) {
-                                    valueSet.lockedToDevice.toggle();
-                                } else if (isDoubleClick) {
                                     valueSet.toggleDeviceWindow();
+                                } else if (isDoubleClick) {
+                                    valueSet.lockedToDevice.toggle();
                                 }
-                            } else if (isTrackSends && shiftPressed) {
+                            } else if (isTrackSends && (isDoubleClick || shiftPressed)) {
                                 valueSet.lockedToTrack.toggle();
                             }
                         }
@@ -425,17 +434,17 @@ lep.BCF2000 = function(bcfPresetNumber, bcfMidiChannel) {
             });
             new lep.Button({
                 name: 'LockDeviceBtn',
-                clickNote: NOTE_ACTION.LOCK_DEVICE,
+                clickNote: NOTE_ACTION.VU_METER,
                 midiChannel: bcfMidiChannel,
                 valueToAttach: new lep.KnockoutSyncedValue({
-                    name: 'PinnedToDevice',
+                    name: 'VolumeMeterSwitch',
                     ownValue: true,
-                    refObservable: VALUESET.PARAM.lockedToDevice,
+                    refObservable: volumeMeter.isEnabled,
                     onClick: function() {
                         if (isShiftPressed()) {
                             VALUESET.PARAM.toggleDeviceWindow();
                         } else {
-                            VALUESET.PARAM.lockedToDevice.toggle();
+                            volumeMeter.isEnabled.toggle();
                         }
                     }
                 })
