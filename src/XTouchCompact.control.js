@@ -155,7 +155,9 @@ lep.XTouchCompact = function() {
                 return new lep.Fader({
                     name: 'Fader' + index,
                     valueCC: CC.FIRST_FADER_MOVE + index,
-                    midiChannel: MIDI_CHANNEL
+                    midiChannel: MIDI_CHANNEL,
+                    muteOnTouch: true,
+                    touchCC: CC.FIRST_FADER_TOUCH + index
                 });
             }).withAutoSwap(),
             TOP1_BUTTONS: new lep.ControlSet('Top1Buttons', WINDOW_SIZE, function(index) {
