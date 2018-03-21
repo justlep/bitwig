@@ -52,7 +52,8 @@ lep.VolumeMeter = function(opts) {
             outPort = host.getMidiOutPort(0);
 
         track.addVuMeterObserver(valueScale, -1, usePeak, function(scaledValue) {
-            _isEnabled && outPort.sendMidi(midiByte0, midiByte1, scaledValue);
+            // FIXME scaledValue is expected in [0..127] but sometimes is 128 in Bitwig 2.3.2; remove the bounds-check when bug is fixed
+            _isEnabled && outPort.sendMidi(midiByte0, midiByte1, scaledValue < 128 ? scaledValue : 127);
         });
     });
 
