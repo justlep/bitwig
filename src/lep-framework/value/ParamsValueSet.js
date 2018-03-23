@@ -1,30 +1,37 @@
 /**
  * Represents a ValueSet of parameters from the Device Pages.
+ * This valueset can be locked
+ *  - to a selected device, so stays in control of the device even when a different device (or even track) is selected in the GUI
+ *  - to a device parameter page, so it remains in control of that page of parameters even if the user
+ *    (or another another MIDI controller's ParamsValueSet) selects a different parameter page visible in the GUI
  *
  * @constructor
  * @extends {lep.ValueSet}
  */
 lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
     /**
-     * @param {boolean} [followsSelectedPage=true] - if true, the ValueSet's current page follows the selection in the DAW
      * @constructs
      */
-    _init: function(followsSelectedPage) {
+    _init: function() {
         var self = this,
             PARAMS_PER_PAGE = 8,
             INSTANCE_NAME = 'ParamsValueSet' + lep.ParamsValueSet.instances.push(this),
             TRACK_VIEW = new lep.SelectedTrackView(),
             CURSOR_DEVICE = TRACK_VIEW.getCursorTrack().createCursorDevice(),
-            REMOTE_CONTROL_PAGE = (followsSelectedPage !== false) ?
-                                            CURSOR_DEVICE.createCursorRemoteControlsPage(PARAMS_PER_PAGE) :
-                                            CURSOR_DEVICE.createCursorRemoteControlsPage(INSTANCE_NAME, PARAMS_PER_PAGE, '');
+            REMOTE_CONTROL_PAGE_AUTOFOLLOWING = CURSOR_DEVICE.createCursorRemoteControlsPage(PARAMS_PER_PAGE),
+            REMOTE_CONTROL_PAGE = CURSOR_DEVICE.createCursorRemoteControlsPage(INSTANCE_NAME, PARAMS_PER_PAGE, ''),
+            _settableAutofollowingPage = REMOTE_CONTROL_PAGE_AUTOFOLLOWING.selectedPageIndex(),
+            _settableNonAutofollowingPage = REMOTE_CONTROL_PAGE.selectedPageIndex(),
+            _currentAutofollowingPage = ko.observable(0).updatedByBitwigValue(_settableAutofollowingPage),
+            _currentParameterPageName = ko.observable(''),
+            _paramPageNames = [];
+
 
         this._super(INSTANCE_NAME, PARAMS_PER_PAGE, 1, function(paramIndex) {
             return lep.StandardRangedValue.createRemoteControlValue(REMOTE_CONTROL_PAGE, paramIndex);
         });
 
-        var _effectiveCurrentPage = this.currentPage,
-            _paramPageNames = [];
+        var _effectiveCurrentPage = this.currentPage;
 
         this.trackView = TRACK_VIEW;
         this.deviceName = ko.observable('');
@@ -80,8 +87,12 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
             read: _effectiveCurrentPage,
             write: function(_newPageIndex) {
                 var newPageIndex = lep.util.limitToRange(_newPageIndex, 0, self.lastPage());
-                lep.logDev('setParameterPage({})', newPageIndex);
-                REMOTE_CONTROL_PAGE.selectedPageIndex().set(newPageIndex);
+                lep.logDebug('setParameterPage({})', newPageIndex);
+                if (self.lockedToPage.peek()) {
+                    _settableNonAutofollowingPage.set(newPageIndex);
+                } else {
+                    _settableAutofollowingPage.set(newPageIndex);
+                }
             }
         });
 
@@ -90,6 +101,7 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
             var newParameterPageName = _paramPageNames[newCurrentPage] || '-default-';
             lep.logDebug('Selected parameter page: {}', newParameterPageName);
             self.popupNotificationIfAttached('Parameter Page: ' + newParameterPageName);
+            _currentParameterPageName(newParameterPageName);
         }, -1);
 
         REMOTE_CONTROL_PAGE.pageNames().addValueObserver(function(pageNamesArrayValue) {
@@ -103,6 +115,20 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
         CURSOR_DEVICE.name().addValueObserver(function(deviceName) {
             lep.logDebug('Selected device: "{}"', deviceName);
             self.deviceName(deviceName || '_nodevname_');
+            // if (self.lockedToPage.peek()) {
+            //     self.lockedToPage(false);
+            // }
+        });
+
+        ko.computed(function() {
+            if (self.lockedToPage()) {
+                if (!self.lockedToDevice.peek()) {
+                    self.lockedToDevice(true);
+                }
+                self.popupNotificationIfAttached('Locked RC page: ' + _currentParameterPageName());
+            } else {
+                _settableNonAutofollowingPage.set(_currentAutofollowingPage());
+            }
         });
     },
 
