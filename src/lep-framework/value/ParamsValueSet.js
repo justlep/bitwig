@@ -67,6 +67,8 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
             CURSOR_DEVICE.isWindowOpen().toggle();
         };
 
+        this.lockedToPage = ko.observable(false).extend({toggleable: true});
+
         /**
          * @override
          */

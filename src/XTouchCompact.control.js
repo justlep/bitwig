@@ -325,18 +325,38 @@ lep.XTouchCompact = function() {
             lep.util.assert(targetControlSet instanceof lep.ControlSet,
                 'Invalid targetControlSet for createValueTypeSelectorValueSet(): {}', targetControlSet);
 
+            var paramsModeSelectorBtnIndex = SWITCHABLE_VALUESETS.indexOf(VALUESET.PARAM),
+                isParamsModeSelectorButtonInSameRowPressed = function(ksValue) {
+                    var paramsModeSelectorBtn = ksValue.controller.parentControlSet.controls[paramsModeSelectorBtnIndex];
+                    return paramsModeSelectorBtn.isClicked;
+                };
+
             return new lep.ValueSet(namePrefix + 'ValueTypeSelector', WINDOW_SIZE, 1, function(index) {
                 var isPrevPageIndex = (index === WINDOW_SIZE-2),
                     isNextPageBtn = (index === WINDOW_SIZE-1),
-                    switchableValueSet = !isPrevPageIndex && !isNextPageBtn && SWITCHABLE_VALUESETS[index];
+                    switchableValueSet = !isPrevPageIndex && !isNextPageBtn && SWITCHABLE_VALUESETS[index],
+                    isParamsValueSet = switchableValueSet === VALUESET.PARAM,
+                    isTrackSends = switchableValueSet === VALUESET.SELECTED_TRACK_SENDS,
+                    isLockableValueSet = isParamsValueSet || isTrackSends;
 
                 if (isPrevPageIndex) {
                     return new lep.KnockoutSyncedValue({
                         name: namePrefix + 'PrevValuePage',
                         ownValue: true,
                         refObservable: targetControlSet.hasPrevValuePage,
-                        onClick: targetControlSet.prevValuePage,
-                        velocityValueOn: BUTTON_VALUE.ON
+                        onClick: function() {
+                            if (isParamsModeSelectorButtonInSameRowPressed(this)) {
+                                VALUESET.PARAM.lockedToPage.toggle();
+                            } else {
+                                targetControlSet.prevValuePage();
+                            }
+                        },
+                        computedVelocity: function() {
+                            var canSwitchPage = this.refObservable(),
+                                isSwitchableLockedParamsPage = canSwitchPage && (targetControlSet.valueSet() === VALUESET.PARAM) &&
+                                                                 VALUESET.PARAM.lockedToPage();
+                            return canSwitchPage ? (isSwitchableLockedParamsPage ? BUTTON_VALUE.BLINK : BUTTON_VALUE.ON) : BUTTON_VALUE.OFF;
+                        }
                     });
                 }
                 if (isNextPageBtn) {
@@ -344,15 +364,22 @@ lep.XTouchCompact = function() {
                         name: namePrefix + 'NextValuePage',
                         ownValue: true,
                         refObservable: targetControlSet.hasNextValuePage,
-                        onClick: targetControlSet.nextValuePage,
-                        velocityValueOn: BUTTON_VALUE.ON
+                        onClick: function() {
+                            if (isParamsModeSelectorButtonInSameRowPressed(this)) {
+                                VALUESET.PARAM.lockedToPage.toggle();
+                            } else {
+                                targetControlSet.nextValuePage();
+                            }
+                        },
+                        computedVelocity: function() {
+                            var canSwitchPage = this.refObservable(),
+                                isSwitchableLockedParamsPage = canSwitchPage && (targetControlSet.valueSet() === VALUESET.PARAM) &&
+                                                                VALUESET.PARAM.lockedToPage();
+                            return canSwitchPage ? (isSwitchableLockedParamsPage ? BUTTON_VALUE.BLINK : BUTTON_VALUE.ON) : BUTTON_VALUE.OFF;
+                        }
                     });
                 }
                 if (switchableValueSet) {
-                    var isParamsValueSet = switchableValueSet === VALUESET.PARAM,
-                        isTrackSends = switchableValueSet === VALUESET.SELECTED_TRACK_SENDS,
-                        isLockableValueSet = isParamsValueSet || isTrackSends;
-
                     return new lep.KnockoutSyncedValue({
                         name: namePrefix + 'ValueTypeSelect-' + switchableValueSet.name,
                         ownValue: switchableValueSet,

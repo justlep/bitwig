@@ -29,6 +29,7 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
     for (var controlIndex = 0, control; controlIndex < numberOfControls; controlIndex++) {
         control = controlCreationFn(controlIndex);
         lep.util.assertBaseControl(control, 'controlCreationFn returned invalid BaseControl {} for ControlSet {}', control, name);
+        control.parentControlSet = this;
         this.controls.push(control);
     }
 
