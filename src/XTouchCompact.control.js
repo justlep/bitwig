@@ -366,7 +366,8 @@ lep.XTouchCompact = function() {
                         refObservable: targetControlSet.hasNextValuePage,
                         onClick: function() {
                             if (isParamsModeSelectorButtonInSameRowPressed(this)) {
-                                VALUESET.PARAM.lockedToPage.toggle();
+                                VALUESET.PARAM.gotoDevice();
+                                VALUESET.PARAM.toggleRemoteControlsSection();
                             } else {
                                 targetControlSet.nextValuePage();
                             }
@@ -395,7 +396,9 @@ lep.XTouchCompact = function() {
                         } : undefined,
                         doubleClickAware: isLockableValueSet,
                         onClick: function(valueSet, refObs, isDoubleClick) {
-                            if (isDoubleClick) {
+                            if (isParamsValueSet && hasMultipleParamsModeSelectorButtonsPressed()) {
+                                VALUESET.PARAM.toggleDeviceWindow();
+                            } else if (isDoubleClick) {
                                 if (isTrackSends) {
                                     valueSet.lockedToTrack.toggle();
                                 } else if (isParamsValueSet) {
@@ -422,7 +425,22 @@ lep.XTouchCompact = function() {
                 valueCC: CC.MAIN_FADER_MOVE,
                 midiChannel: MIDI_CHANNEL
             })
-        };
+        },
+        hasMultipleParamsModeSelectorButtonsPressed = (function() {
+            var selectorBtnIndex = SWITCHABLE_VALUESETS.indexOf(VALUESET.PARAM),
+                paramsModeButton1 = CONTROLSET.TOP1_BUTTONS.controls[selectorBtnIndex],
+                paramsModeButton2 = CONTROLSET.TOP2_BUTTONS.controls[selectorBtnIndex],
+                paramsModeButton3 = CONTROLSET.TOP3_BUTTONS.controls[selectorBtnIndex];
+
+            return function() {
+                var totalClicked = (paramsModeButton1.isClicked && 1 || 0) +
+                                   (paramsModeButton2.isClicked && 1 || 0) +
+                                   (paramsModeButton3.isClicked && 1 || 0);
+                return totalClicked > 1;
+            };
+        })();
+
+
 
     function initPreferences() {
         var preferences = host.getPreferences();

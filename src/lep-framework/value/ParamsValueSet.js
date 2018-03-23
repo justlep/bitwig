@@ -63,6 +63,10 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
             CURSOR_DEVICE.selectInEditor();
         };
 
+        this.toggleRemoteControlsSection = function() {
+            CURSOR_DEVICE.isRemoteControlsSectionVisible().toggle();
+        };
+
         this.toggleDeviceWindow = function() {
             CURSOR_DEVICE.isWindowOpen().toggle();
         };
