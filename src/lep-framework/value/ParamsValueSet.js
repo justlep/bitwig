@@ -130,6 +130,9 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
                 _settableNonAutofollowingPage.set(_currentAutofollowingPage());
             }
         });
+
+        // initially, unlock this instance from any device
+        host.scheduleTask(this.lockedToDevice.toggleOff, 200);
     },
 
     /**

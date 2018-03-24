@@ -51,6 +51,9 @@ lep.SelectedTrackView = function(opts) {
     };
 
     this.trackName = ko.observable().updatedByBitwigValue(_cursorTrack.name());
+
+    // initially, unlock this instance from any track
+    host.scheduleTask(this.locked.toggleOff, 200);
 };
 
 /**
