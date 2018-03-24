@@ -16,7 +16,7 @@
     "node": ">=6.9.1"
   },
   "scripts": {
-    "lint": "eslint --max-warnings 5 Gruntfile.js grunt/ src/",
+    "lint": "eslint --max-warnings 5 Gruntfile.js grunt/ src/ --ignore-pattern knockout-stripped.js",
     "test": "grunt validate test"
   },
   "main": "Gruntfile.js",
