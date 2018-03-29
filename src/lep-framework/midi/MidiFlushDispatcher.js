@@ -9,24 +9,32 @@ lep.MidiFlushDispatcher = function() {
         _isFirstFlushDone = false,
         _firstFlushFns = [],
         _outPort = null,
-        _keyedMidiQueue = {};
+        _keyedMidiQueue = {},
+        _queueNeedsFlush = true;
 
     try {
         _outPort = host.getMidiOutPort(0);
     } catch (err) {
-        lep.logDebug('No outport available');
+        lep.logDebug('FlushDispatcher: no outPort');
     }
 
     function _subsequentFlushHandler() {
-        var queueKeys = Object.keys(_keyedMidiQueue);
-        for (var i = 0, len = queueKeys.length, key, typeAndChannel, noteOrCC, rawVal; i < len; i++) {
-            key = queueKeys[i];
-            rawVal = _keyedMidiQueue[key];
-            delete _keyedMidiQueue[key];
+        if (_queueNeedsFlush) {
+            var queueKeys = Object.keys(_keyedMidiQueue);
+            // lep.logDev('Subsequent flush #{}.. queuedKeys = {}', lep.util.nextId(), queueKeys);
+            for (var i = 0, len = queueKeys.length, queueKey, typeAndChannel, noteOrCC, rawVal; i < len; i++) {
+                queueKey = queueKeys[i];
+                rawVal = _keyedMidiQueue[queueKey];
+                delete _keyedMidiQueue[queueKey];
 
-            typeAndChannel = rawVal >> 16;
-            noteOrCC = (rawVal >> 8) & 0xff;
-            _outPort.sendMidi(typeAndChannel, noteOrCC, rawVal & 0xff);
+                typeAndChannel = rawVal >> 16;
+                noteOrCC = (rawVal >> 8) & 0xff;
+
+                // lep.logDev('Sending {} {} {}', typeAndChannel.toString(16), noteOrCC.toString(16), rawVal & 0xff);
+
+                _outPort.sendMidi(typeAndChannel, noteOrCC, rawVal & 0xff);
+            }
+            _queueNeedsFlush = false;
         }
         ORIGINAL_FLUSH && ORIGINAL_FLUSH();
     }
@@ -62,6 +70,7 @@ lep.MidiFlushDispatcher = function() {
     this.enqueueNoteOn = function(channel, note, value) {
         var typeChannelNote = ((0x90 | channel) << 8) | note;
         _keyedMidiQueue[typeChannelNote] = (typeChannelNote << 8) | value;
+        _queueNeedsFlush = true;
     };
 
     /**
@@ -70,8 +79,9 @@ lep.MidiFlushDispatcher = function() {
      * @param {number} value - 0..127
      */
     this.enqueueCC = function(channel, cc, value) {
-        var typeChannelCC = ((0x90 | channel) << 8) | cc;
+        var typeChannelCC = ((0xB0 | channel) << 8) | cc;
         _keyedMidiQueue[typeChannelCC] = (typeChannelCC << 8) | value;
+        _queueNeedsFlush = true;
     };
 
     this.immediateNoteOn = function(channel, note, value) {
