@@ -86,6 +86,7 @@ function ApcMini() {
         },
 
         eventDispatcher = lep.MidiEventDispatcher.getInstance(),
+        flushDispatcher = lep.MidiFlushDispatcher.getInstance(),
         transport = lep.util.getTransport(),
         currentMatrixMode = ko.observable(MATRIX_MODE.LAUNCHERS).extend({restoreable: true}),
         currentFaderMode = ko.observable(FADER_MODE.VOLUME).extend({restoreable: true}),
@@ -559,7 +560,7 @@ function ApcMini() {
 
     lep.StandardRangedValue.globalTakeoverEnabled(true);
 
-    lep.util.onFirstFlush(function() {
+    flushDispatcher.onFirstFlush(function() {
         initButtons();
         initScrollButtons();
         initFaders();

@@ -98,6 +98,7 @@ lep.XTouchCompact = function() {
     var transport = lep.util.getTransport(),
         trackBank = host.createMainTrackBank(WINDOW_SIZE, SENDS_NUMBER, 0),
         eventDispatcher = lep.MidiEventDispatcher.getInstance(),
+        flushDispatcher = lep.MidiFlushDispatcher.getInstance(),
         tracksView = new lep.TracksView('Tracks', 8, 0, 0, trackBank),
         masterTrack = host.createMasterTrack(0),
         isShiftPressed = ko.observable(false).updatedBy(function(obs) {
@@ -547,7 +548,7 @@ lep.XTouchCompact = function() {
     eventDispatcher.onNotePressed(NOTE_ACTION.NEXT_DEVICE_OR_CHANNEL_PAGE, HANDLERS.NEXT_DEVICE_OR_CHANNEL_PAGE);
     eventDispatcher.onNotePressed(NOTE_ACTION.PREV_DEVICE_OR_CHANNEL_PAGE, HANDLERS.PREV_DEVICE_OR_CHANNEL_PAGE);
 
-    lep.util.onFirstFlush(function() {
+    flushDispatcher.onFirstFlush(function() {
         initTransportButtons();
         initEncoderLedRingsModeSwitching();
 

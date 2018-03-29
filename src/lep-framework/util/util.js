@@ -25,9 +25,7 @@ lep.util = (function() {
 
             throw new Error(lep.util.formatString.apply(null, emptySafeMessageAndArgsArray));
         },
-        startTimesById = [],
-        originalFlushFn = null,
-        firstFlushFns = null;
+        startTimesById = [];
 
     return {
         NOP: function(){},
@@ -255,38 +253,6 @@ lep.util = (function() {
             };
             newClass.prototype = newPrototype;
             return newClass;
-        },
-
-        /**
-         * Register a callback to be invoked by the very first flush() triggered by Bitwig.
-         * @param {function} handler
-         * @param {boolean} [skipOriginalFirst=false] - if true, the original global flush function (if present) will NOT be called along with the
-         *                                              given handler on first flush. By default, both the given first-flush handler and
-         *                                              the original flush function will be called on first flush.
-         */
-        onFirstFlush: function(handler, skipOriginalFirst) {
-            this.assertFunction(handler, 'Invalid handler for util.onFirstFlush');
-            this.assert(firstFlushFns !== -1, 'Cannot add first-flush handler - first flush already happened');
-            if (!firstFlushFns) {
-                firstFlushFns = [];
-                originalFlushFn = (typeof flush !== 'undefined') ? flush : undefined;
-                /** @global */
-                flush = function() {
-                    for (var i = 0, len = firstFlushFns.length; i < len; i++) {
-                        lep.logDebug('Invoking first-flush handler {} of {}', i+1, len);
-                        firstFlushFns[i]();
-                    }
-                    firstFlushFns = -1;
-                    flush = originalFlushFn;
-                    if (originalFlushFn && !skipOriginalFirst) {
-                        lep.logDebug('Invoking original flush handler.');
-                        originalFlushFn();
-                    }
-                    lep.logDebug('First flush finished. Original flush handler restored.');
-                };
-            }
-            firstFlushFns.push(handler);
-            lep.logDebug('Registered first-flush handler');
         }
     };
 

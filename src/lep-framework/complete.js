@@ -18,6 +18,7 @@ load('util/ko-extensions.js');
 load('util/ScrollableView.js');
 
 load('midi/MidiEventDispatcher.js');
+load('midi/MidiFlushDispatcher.js');
 
 load('control/BaseControl.js');
 load('control/ClickEncoder.js');
