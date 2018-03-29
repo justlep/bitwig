@@ -7,6 +7,10 @@
  */
 lep.Fader = lep.util.extendClass(lep.BaseControl, {
     _init: function(opts) {
+        if (!opts.isUnidirectional && typeof opts.useImmediateSync !== 'boolean') {
+            // bidirectional faders should be synced via flush unless explicitly configured otherwise
+            opts.useImmediateSync = false;
+        }
         this._super(opts);
 
         if (opts.muteOnTouch) {
