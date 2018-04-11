@@ -240,7 +240,7 @@ lep.XTouchCompact = function() {
                                refObs(newButtonMode);
                            }
                        });
-                   case 5:
+                   case 6:
                        return new lep.KnockoutSyncedValue({
                            name: 'ButtonModeSwitch',
                            ownValue: true,
@@ -248,7 +248,7 @@ lep.XTouchCompact = function() {
                            velocityValueOn: BUTTON_VALUE.BLINK,
                            onClick: keepMainConfig.toggle
                        });
-                   case 6:
+                   case 5:
                        return new lep.KnockoutSyncedValue({
                            name: 'VolumeMeterSwitch',
                            ownValue: true,
