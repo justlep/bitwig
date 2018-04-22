@@ -1,5 +1,10 @@
 
-v2.2.0 ( not yet released )
+v2.3.0 (22-Apr-2018)
+ - added Behringer X-Touch Compact
+ - BCF2000: added MultiSends mode; Params lockable to device
+ - abandoned BCR2000 script
+
+v2.2.0 (11-Feb-2018)
  - added Akai APC mini script
  - removed Morpher mode from BCF2000+BCF2000
  - fixed PerformancePad script after API changes in Bitwig 2.x
