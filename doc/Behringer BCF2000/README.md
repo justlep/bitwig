@@ -1,7 +1,5 @@
 # LeP's BCF2000 controller script for Bitwig
 
-### How to use
-
 (Labels like **[BUTTON]** mean **`SHIFT + BUTTON`**)
 
 [![][overviewImage]][overviewImage]
