@@ -16,9 +16,9 @@ The **upper buttons 1-6** determine what type of value (red labels) is assigned 
 [![][upperButtonsImage]][upperButtonsImage]
 
 Available value types are:
-* **Volume** (for channels 1-8)
-* **Pan** (for channels 1-8)
-* **Send** (for channels 1-8)
+* **Volume** (8 channels at a time)
+* **Pan** (8 channels at a time)
+* **Send** (8 channels at a time)
 * **MultiSend** (all **sends of the selected channel**)  
   (!) You can **double-click** this button to **lock to the selected channel** ("pinning" in Bitwig speak), so you can keep controlling one particular channel's sends even after another channel is selected.
 * **Parameters** (remote controls of the currently selected device)  
