@@ -28,12 +28,13 @@ Available value types are:
   **`SHIFT+Param`** reveals the device's remote controls panel.
 * **UserControls** (freely assignable)
 
-**`PrevPage`** and **`NextPage`** switch to the previous/next value page. Buttons are lit only if such a page exists.
-What that means depends on the value type:
+**`PrevPage`** and **`NextPage`** switch to the previous/next value page. What that means depends on the value type:
 * **Send**: the controlled send (e.g. 1) common for all controlled channels
 * **MultiSend**: initially you're controlling Send 1 to 8 of the selected channel. Pressing **`NextPage`** goes up 1 Send, so you'll be controlling Send 2 to 9 of the selected channel.
 * **Parameters**: switch between the selected **Remote Control Pages** of the selected device a device.   
 * **UserControls** 6 pages of freely-assignable user controls (8 per page, 48 altogether)
+
+Buttons are lit only if such a respective next/previous page exists.
 
 #### Mode "VALUE PAGE" 
 **Buttons 1-6** allow directly choosing the value page while **Button 7+8** work just like in VALUE TYPE mode.
