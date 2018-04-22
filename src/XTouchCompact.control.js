@@ -271,25 +271,6 @@ lep.XTouchCompact = function() {
                }
             });
         },
-
-        // createValuePageValueSet = function(namePrefix) {
-        //     lep.util.assertNonEmptyString(namePrefix, 'Invalid namePrefix for createValuePageValueSet: {}', namePrefix);
-        //     return new lep.ValueSet(namePrefix + 'ValuePageSelect', WINDOW_SIZE, 1, function(index) {
-        //         if (index >= WINDOW_SIZE-2) {
-        //             var prevOrNextValuePageBtnValue = VALUETYPE_BTN_VALUESET.FOR_ENCODERS.values[index];
-        //             lep.util.assert(prevOrNextValuePageBtnValue && prevOrNextValuePageBtnValue instanceof lep.KnockoutSyncedValue,
-        //                 'Unexpected type for VALUETYPE_BTN_VALUESET.FOR_ENCODERS.values[{}]', index);
-        //             return prevOrNextValuePageBtnValue;
-        //         }
-        //         return new lep.KnockoutSyncedValue({
-        //             name: 'EncoderValuePageSelect-' + index,
-        //             ownValue: index,
-        //             refObservable: CONTROLSET.TOP_ENCODERS.valuePage,
-        //             velocityValueOn: BUTTON_VALUE.ON
-        //         });
-        //     })
-        // },
-
         VALUESET = {
             VOLUME: lep.ValueSet.createVolumeValueSet(trackBank, WINDOW_SIZE),
             PAN:    lep.ValueSet.createPanValueSet(trackBank, WINDOW_SIZE),
