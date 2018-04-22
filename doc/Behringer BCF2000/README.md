@@ -2,7 +2,61 @@
 
 ### How to use
 
-See the [documentation in the Wiki][wikiLink].
+(Labels like **[BUTTON]** mean **`SHIFT + BUTTON`**)
+
+[![][overviewImage]][overviewImage]
+
+The script controls 8 channels at a time. The **`Channel Page`** buttons switch to the next/previous channel page. **`SHIFT+ChannelPage`** switches to the next/previous device.
+
+The 4 **encoder group buttons** (upper right) determine the mode of the two button rows left of them.  
+(!) If you **hold** those buttons, they'll **auto-switch back** to the previous mode when released. If you press them shortly, the mode remains selected.
+
+#### Mode "VALUE TYPE" (default mode)
+
+The **upper buttons 1-6** determine what type of value (red labels) is assigned to the rotatary encoders, the **lower buttons** do the same for the **faders**, so you can have any kind of value either on the encoders or on the faders anytime.  
+
+[![][upperButtonsImage]][upperButtonsImage]
+
+Available value types are:
+* **Volume** (for channels 1-8)
+* **Pan** (for channels 1-8)
+* **Send** (for channels 1-8)
+* **MultiSend** (all **sends of the selected channel**)  
+  (!) You can **double-click** this button to **lock to the selected channel** ("pinning" in Bitwig speak), so you can keep controlling one particular channel's sends even after another channel is selected.
+* **Parameters** (remote controls of the currently selected device)  
+  You can **double-click** this button to **lock to the device** (pin), so you can keep controlling it even after another device or channel is selected. This works independent from the MultiSend lock mode.  
+  **`SHIFT+Param`** reveals the device's remote controls panel.
+* **UserControls** (freely assignable)
+
+**`PrevPage`** and **`NextPage`** switch to the previous/next value page. Buttons are lit only if such a page exists.
+What that means depends on the value type:
+* **Send**: the controlled send (e.g. 1) common for all controlled channels
+* **MultiSend**: initially you're controlling Send 1 to 8 of the selected channel. Pressing **`NextPage`** goes up 1 Send, so you'll be controlling Send 2 to 9 of the selected channel.
+* **Parameters**: switch between the selected **Remote Control Pages** of the selected device a device.   
+* **UserControls** 6 pages of freely-assignable user controls (8 per page, 48 altogether)
+
+#### Mode "VALUE PAGE" 
+**Buttons 1-6** allow directly choosing the value page while **Button 7+8** work just like in VALUE TYPE mode.
+
+#### Mode "SOLO/MUTE"
+Upper buttons toggle the channel **SOLO**, lower buttons the channel **MUTE**.
+
+(You can enable "SOLO **exclusive**" behavior in Bitwig's preference dialog for the controller script. If enabled, soloing one channel will un-solo all others (default is non-exclusive))
+
+#### Mode "ARM/SELECT"
+The upper buttons toggle the channel **ARM TRACK**, the lower buttons **SELECTS** the channel.
+
+#### Mute noisy faders
+If you have lots of automation going on, you can "mute" the faders temporarily by pressing **`SHIFT+STOP`**, so they won't follow value changes in Bitwig anymore but still will send MIDI data when YOU move them. When un-muting them, they'll move back to the correct position immediately.
+
+#### Push+turn encoders for higher precision
+Holding an encoder pushed while twisting it allows for 4 times finer value adjustments.
+
+#### Auto-reset PunchIn/PunchOut when Playback stops
+By pressing the **`SHIFT+PunchOut`** button, you can toggle that both `PunchIn` and `PunchOut` will get turned off automatically whenever transport stops. This feature is enabled by default.
+
+[overviewImage]: https://raw.githubusercontent.com/justlep/bitwig/master/doc/Behringer%20BCF2000/img/overview.gif
+[upperButtonsImage]: https://raw.githubusercontent.com/justlep/bitwig/master/doc/Behringer%20BCF2000/img/upper-buttons.gif
 
 ---
 ### Required BCF Preset
