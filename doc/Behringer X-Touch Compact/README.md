@@ -57,8 +57,10 @@ When holding **`SHIFT`**, they become *Config* buttons with different meanings:
 
 ### What else..
 
-#### High precision changes through Push & Twist
-All rotatries are **Push encoders**. Holding them pushed while rotating them allows for **4 times finer value adjustments**.
+#### Push Encoders: high precision & reset to default 
+All rotatries are **Push encoders**. You can
+- hold them pressed while rotating them to make **4x more precise value adjustments**
+- double-press them to reset a value to its default
 
 #### Mute noisy faders
 If you have lots of automation going on, you can "mute" the faders temporarily by pressing **`SHIFT+STOP`**, so they won't follow value changes in Bitwig anymore but still will send MIDI data when YOU move them. When un-muting them, they'll move back to the correct position immediately.
