@@ -59,6 +59,15 @@ By pressing the **`SHIFT+PunchOut`** button, you can toggle that both `PunchIn` 
 [overviewImage]: https://raw.githubusercontent.com/justlep/bitwig/master/doc/Behringer%20BCF2000/img/overview.gif
 [upperButtonsImage]: https://raw.githubusercontent.com/justlep/bitwig/master/doc/Behringer%20BCF2000/img/upper-buttons.gif
 
+### Picture & replacement caps
+
+Here's a [picture of my device](https://raw.githubusercontent.com/justlep/bitwig/master/doc/Behringer%20BCF2000/img/wikiOnly/full.jpg). 
+
+For perfect grip, I replaced the crappy Behringer fader caps with nicer ones from **Alps**, and I can finally tell fader 4 from 5 at first glance ;). It's the Alps Lever 1 (inner 8x1.2mm, outer 25x13mm), and they're just 51 Cents a piece at [reichelt.de][faderShopUrl].
+
+[faderShopUrl]: http://www.reichelt.de/KNOPF-8X1-2SW/3/index.html?&ACTION=3&LA=446&ARTICLE=73938&artnr=KNOPF+8X1%2C2SW&SEARCH=alps+lever+1
+
+
 ---
 ### Required BCF Preset
 You need a special preset installed on your BCF for the script to work.
