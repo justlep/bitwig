@@ -8,12 +8,12 @@
 loadAPI(6);
 load('lep-framework/complete.js');
 
-host.defineController('Behringer', 'X-Touch Compact', '0.1', '58169cfc-2228-11e8-b467-0ed5f89f718b', 'Lennart Pegel');
+host.defineController('Behringer', 'X-Touch Compact', '1.0', '58169cfc-2228-11e8-b467-0ed5f89f718b', 'Lennart Pegel');
 host.defineMidiPorts(1, 1);
 host.addDeviceNameBasedDiscoveryPair(['X-TOUCH COMPACT'], ['X-TOUCH COMPACT']);
 
 function init() {
-    lep.setLogLevel(lep.LOGLEVEL.DEBUG);
+    lep.setLogLevel(lep.LOGLEVEL.WARN);
     new lep.XTouchCompact();
 }
 
