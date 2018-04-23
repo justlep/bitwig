@@ -7,7 +7,7 @@ _(click to see fullsize)_
 [![][overviewImage]][overviewImage]
 
 
-You control 8 channels at a time. The **`CH-Page`** buttons switch to the next/previous channel page. **`SHIFT + CH-PAGE`** selects the previous/next device in the selected channel. The **`MAIN Fader`** = Master Volume at any time.
+You're controlling 8 channels at a time. The **`CH-Page`** buttons switch to the next/previous channel page. **`SHIFT + CH-PAGE`** selects the previous/next device in the selected channel. The **`MAIN Fader`** = Master Volume at any time.
 
 ### Selecting what controls what
 In default mode (_**"Type mode"**_, as opposed to _**Mix mode**_), the **upper three button rows** determine what *"type of value"* is controlled by each of the three main control groups: 
@@ -88,4 +88,4 @@ The script is written for the X-Touch Compact's Layer A in default configuration
 [overviewImage]: https://raw.githubusercontent.com/justlep/bitwig/master/doc/Behringer%20X-Touch%20Compact/img/total.jpg
 [buttonModeImage]: https://raw.githubusercontent.com/justlep/bitwig/master/doc/Behringer%20X-Touch%20Compact/img/top-button-modes.jpg
 [bottomButtonsImage]: https://raw.githubusercontent.com/justlep/bitwig/master/doc/Behringer%20X-Touch%20Compact/img/bottom-buttons.jpg? 
-
+[stableFolder]: https://github.com/justlep/bitwig/tree/master/stable-version-for-download/
