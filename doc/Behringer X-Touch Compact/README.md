@@ -15,7 +15,10 @@ In default mode (_**"Type mode"**_, as opposed to _**Mix mode**_), the **upper t
 * **Middle buttons --> Right encoders** 
 * **Bottom buttons --> Faders**
 
-In each button row, the first 6 buttons define the assigned *type*, while the last two buttons can switch forth/back a *page* (where applicable). If you select a type that is already used for another control group, the two groups will *swap* their value types.
+In each button row, the first 6 buttons define the assigned *type*, while the last two buttons can switch forth/back a *page* (where applicable). So in the above image, the top encoders are controlling the Sends, the faders controlling Volumes and the  right encoders controlling the Device Parameters (remote controls). 
+If you select a type that is already used by another control group, the two groups will *swap* their value types. 
+
+
 The types in detail:
 
 * **Volume** (8 channels at a time)
@@ -42,7 +45,7 @@ The types in detail:
 
 [![][buttonModeImage]][buttonModeImage]
 
-Pressing **`SHIFT + Type/Mix`** changes the mode of the top button rows. In **Mix mode**, each button column corresponds to one channel, with the buttons meaning **Solo, Mute, Arm** (from to bottom). 
+Pressing **`SHIFT + Type/Mix`** changes the mode of the top button rows. In **Mix mode**, each button column corresponds to one channel, with the buttons meaning **Solo, Mute, Arm** (from top to bottom). 
 
 ### Buttons below faders
 [![][bottomButtonsImage]][bottomButtonsImage]
