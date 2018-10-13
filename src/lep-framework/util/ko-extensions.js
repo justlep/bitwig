@@ -63,6 +63,15 @@ ko.extenders.toggleable = function(target /*, opts */) {
 };
 
 /**
+ * Shorthand for {@code ko.observable(val).extend({toggleable:true})}
+ * @param {*} val - the observable's initial value
+ * @return {ko.observable} - an observable extended by the `toggleable` extender
+ */
+ko.toggleableObservable = function(val) {
+    return ko.observable(val).extend({toggleable: true});
+};
+
+/**
  * An extender allowing to restore the previous value of a writeable observable after it was changed.
  * Adds to the observable:
  *   - {Function} restore()

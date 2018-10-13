@@ -11,6 +11,7 @@ lep.util = (function() {
 
     var idsCounter = 0,
         transportInstance = null,
+        masterTrackInstancesBySceneSize = null,
         playingObservable = null,
         /**
          * Throws an error;
@@ -34,6 +35,24 @@ lep.util = (function() {
          */
         nextId: function() {
             return ++idsCounter;
+        },
+
+        /**
+         * @param {number} [optScenes=0]
+         * @return {MasterTrack|*}
+         */
+        getMasterTrack: function(optScenes) {
+            if (!masterTrackInstancesBySceneSize) {
+                masterTrackInstancesBySceneSize = {};
+            }
+            var scenes = optScenes || 0,
+                instance = masterTrackInstancesBySceneSize[scenes];
+
+            if (!instance) {
+                instance = host.createMasterTrack(scenes);
+                masterTrackInstancesBySceneSize[scenes] = instance;
+            }
+            return instance;
         },
         /**
          * @return {Transport} single, reused instance of Bitwig's transport object

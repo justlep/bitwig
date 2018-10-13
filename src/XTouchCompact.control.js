@@ -88,7 +88,7 @@ lep.XTouchCompact = function() {
             CONTROLS: {isControls: 1},
             VALUE_PAGE: {isValuePage: 1} // TODO
         },
-        keepMainConfig = ko.observable(false).extend({toggleable: true}),
+        keepMainConfig = ko.toggleableObservable(false),
         buttonMode = ko.observable(XT_BUTTON_MODE.MIXER);
 
     lep.ToggledValue.setAllDefaultVelocityValues(BUTTON_VALUE.ON, BUTTON_VALUE.OFF);
@@ -100,13 +100,9 @@ lep.XTouchCompact = function() {
         eventDispatcher = lep.MidiEventDispatcher.getInstance(),
         flushDispatcher = lep.MidiFlushDispatcher.getInstance(),
         tracksView = new lep.TracksView('Tracks', 8, 0, 0, trackBank),
-        masterTrack = host.createMasterTrack(0),
-        isShiftPressed = ko.observable(false).updatedBy(function(obs) {
-            eventDispatcher.onNote(NOTE_ACTION.SHIFT, function(noteOrCc, velocity /*, channel*/) {
-                obs(!!velocity);
-            }, null, MIDI_CHANNEL);
-        }),
-        clearPunchOnStop = ko.observable(true).extend({toggleable: true}),
+        isLoopPressed = eventDispatcher.createNotePressedObservable(NOTE.BTN_LOOP, MIDI_CHANNEL),
+        isShiftPressed = eventDispatcher.createNotePressedObservable(NOTE_ACTION.SHIFT, MIDI_CHANNEL),
+        clearPunchOnStop = ko.toggleableObservable(true),
 
         HANDLERS = {
             NEXT_DEVICE_OR_CHANNEL_PAGE: function() {
@@ -293,10 +289,8 @@ lep.XTouchCompact = function() {
             VALUESET.USERCONTROL
         ],
         VALUE = {
-            MASTER_VOLUME: new lep.StandardRangedValue({
-                name: 'MasterVol',
-                rangedValue: masterTrack.volume()
-            })
+            MASTER_VOLUME: lep.StandardRangedValue.createMasterVolumeValue(),
+            METRONOME_VOLUME: lep.StandardRangedValue.createMetronomeVolumeValue()
         },
         /**
          * ValueSets for the buttons selecting which value type (volume, pan etc) is assigned to the encoders/faders.
@@ -402,12 +396,28 @@ lep.XTouchCompact = function() {
         },
 
         CONTROL = {
-            MAIN_FADER: new lep.Fader({
-                name: 'MainFader',
-                valueCC: CC.MAIN_FADER_MOVE,
-                midiChannel: MIDI_CHANNEL
-            })
+            MAIN_FADER: (function() {
+                var isMainFaderTouched = eventDispatcher.createCCPositiveObservable(CC.MAIN_FADER_TOUCH, MIDI_CHANNEL),
+                    currentMainFaderValue = ko.computed(function() {
+                        if (isLoopPressed() && isShiftPressed()) {
+                            // holding shift+loop + touching the main fader should activate the Metronome in any case
+                            if (isMainFaderTouched() && !TRANSPORT_VALUE.METRONOME.isOn) {
+                                TRANSPORT_VALUE.METRONOME.togglingMethod();
+                            }
+                            return VALUE.METRONOME_VOLUME;
+                        }
+                        return VALUE.MASTER_VOLUME;
+                    });
+
+                return new lep.Fader({
+                    name: 'MainFader',
+                    valueCC: CC.MAIN_FADER_MOVE,
+                    midiChannel: MIDI_CHANNEL,
+                    valueToAttach: currentMainFaderValue
+                });
+            })()
         },
+
         hasMultipleParamsModeSelectorButtonsPressed = (function() {
             var selectorBtnIndex = SWITCHABLE_VALUESETS.indexOf(VALUESET.PARAM),
                 paramsModeButton1 = CONTROLSET.TOP1_BUTTONS.controls[selectorBtnIndex],
@@ -532,8 +542,6 @@ lep.XTouchCompact = function() {
     flushDispatcher.onFirstFlush(function() {
         initTransportButtons();
         initEncoderLedRingsModeSwitching();
-
-        CONTROL.MAIN_FADER.attachValue(VALUE.MASTER_VOLUME);
 
         CONTROLSET.TOP1_BUTTONS.setObservableValueSet(ko.computed(function() {
             return buttonMode().isMixer ? VALUESET.SOLO : VALUETYPE_SELECTOR_VALUESET.FOR_TOP_ENCODERS;

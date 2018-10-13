@@ -262,6 +262,34 @@
             useStrictNoteOff = useStrict;
             return this;
         };
+
+        /**
+         * Returns an observable that is true as long as the latest received value for the given note was > 0.
+         * @param {number} note
+         * @param {number} [channel]
+         * @return {observable<boolean>}
+         */
+        this.createNotePressedObservable = function(note, channel) {
+            var obs = ko.observable(false);
+            this.onNote(note, function(note, velocity /*, channel */) {
+                this(!!velocity);
+            }, obs, channel);
+            return obs;
+        };
+
+        /**
+         * Returns an observable that is true as long as the latest received value for the given CC was > 0.
+         * @param {number} cc
+         * @param {number} [channel]
+         * @return {observable<boolean>}
+         */
+        this.createCCPositiveObservable = function(cc, channel) {
+            var obs = ko.observable(false);
+            this.onCC(cc, function(cc, velocity /*, channel */) {
+                this(!!velocity);
+            }, obs, channel);
+            return obs;
+        };
     };
 
     /**

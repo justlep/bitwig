@@ -13,6 +13,7 @@ lep.StandardRangedValue = lep.util.extendClass(lep.BaseValue, {
      * @param {RangedValue} opts.rangedValue
      * @param {?RangedValue} [opts.indicateableValue] - defaults to opts.rangedValue
      * @param {?boolean} [opts.isTakeoverEnabled]
+     * @param {?boolean} opts.isNotIndicateable
      * @constructs
      */
     _init: function(opts) {
@@ -22,8 +23,13 @@ lep.StandardRangedValue = lep.util.extendClass(lep.BaseValue, {
 
         lep.util.assertObject(opts.rangedValue, 'Missing rangedValue for {}', opts.name);
         this.rangedValue = opts.rangedValue;
-        this.indicateableValue = opts.indicateableValue || opts.rangedValue;
-        lep.util.assertFunction(this.indicateableValue.setIndication, 'Invalid indicateableValue for {}', this.name);
+
+        if (opts.isNotIndicateable) {
+            this.setIndication = lep.util.NOP;
+        } else {
+            this.indicateableValue = opts.indicateableValue || opts.rangedValue;
+            lep.util.assertFunction(this.indicateableValue.setIndication, 'Invalid indicateableValue for {}', this.name);
+        }
 
         this._takeover = null;
         this.setTakeoverEnabled(opts.isTakeoverEnabled);
@@ -154,6 +160,34 @@ lep.StandardRangedValue.createVolumeValue = function(channelBank, channelIndex) 
     return new lep.StandardRangedValue({
         name: lep.util.formatString('Vol{}', channelIndex),
         rangedValue: channelBank.getItemAt(channelIndex).volume()
+    });
+};
+
+/**
+ * @param {boolean} [takeoverEnabled=false]
+ * @return {lep.StandardRangedValue}
+ * @static
+ */
+lep.StandardRangedValue.createMetronomeVolumeValue = function(takeoverEnabled) {
+    return new lep.StandardRangedValue({
+        name: lep.util.formatString('MetronomeVolume'),
+        rangedValue: lep.util.getTransport().metronomeVolume(),
+        isNotIndicateable: true,
+        isTakeoverEnabled: takeoverEnabled
+    });
+};
+
+/**
+ * @param {boolean} [takeoverEnabled=false]
+ * @param {number} [scenes=0]
+ * @return {lep.StandardRangedValue}
+ * @static
+ */
+lep.StandardRangedValue.createMasterVolumeValue = function(takeoverEnabled, scenes) {
+    return new lep.StandardRangedValue({
+        name: lep.util.formatString('MasterVolume'),
+        rangedValue: lep.util.getMasterTrack(scenes || 0).volume(),
+        isTakeoverEnabled: takeoverEnabled
     });
 };
 
