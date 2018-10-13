@@ -131,14 +131,19 @@ lep.KnockoutSyncedValue = lep.util.extendClass(lep.BaseValue, {
             isReleaseAfterLongClick = !isPressed && this.restoreRefAfterLongClick && this._checkAndResetLongClick(),
             skipWriteRef = false;
 
-        if (isReleaseAfterLongClick) {
-            // only restore the refObservable if the refObservable still has the value it was given by this button
-            if (ownValueEqualsRef && typeof this._savedRefValue !== 'undefined') {
+        // lep.logDev('---------\nisPressed: {},\ncurrentRefValue: {},\nisReleaseAfterLongClick: {}\nownValueEqualsRef: {}\n-------------',
+        //     isPressed,
+        //     currentRefValue && currentRefValue.name,
+        //     isReleaseAfterLongClick,
+        //     ownValueEqualsRef
+        // );
+
+        if (!isPressed) {
+            if (isReleaseAfterLongClick && typeof this._savedRefValue !== 'undefined') {
                 this.refObservable(this._savedRefValue);
-                // lep.logDebug('KSV {} restoring old value {}', this.name, this._savedRefValue);
+                // lep.logDebug('KSV {} restored old value {}', this.name, this._savedRefValue);
             }
             delete this._savedRefValue;
-            return;
         }
 
         if (this.toggleOnPressed !== isPressed) {
@@ -167,11 +172,7 @@ lep.KnockoutSyncedValue = lep.util.extendClass(lep.BaseValue, {
 
         if (this.restoreRefAfterLongClick) {
             this._lastClickTime = Date.now();
-            if (ownValueEqualsRef) {
-                delete this._savedRefValue;
-            } else {
-                this._savedRefValue = currentRefValue;
-            }
+            this._savedRefValue = currentRefValue;
         }
 
         if (!skipWriteRef && (!ownValueEqualsRef || this.forceRewrite)) {
