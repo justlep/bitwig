@@ -31,7 +31,7 @@ module.exports = function (grunt, opts) {
     ]);
 
     grunt.registerTask('validate', [
-        'exec:lint'
+        'npmRun:lint'
     ]);
 
     grunt.registerTask('test', [

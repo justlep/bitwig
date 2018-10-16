@@ -32,7 +32,7 @@
     "grunt-contrib-compress": "~1.4.1",
     "grunt-contrib-concat": "~1.0.1",
     "grunt-contrib-copy": "~1.0.0",
-    "grunt-exec": "~3.0.0",
+    "grunt-load-npm-run-tasks": "^1.0.1",
     "grunt-mocha-test": "~0.13.2",
     "load-grunt-config": "~0.19.2",
     "load-grunt-tasks": "~3.5.2",
@@ -42,5 +42,6 @@
   "lep": {
     "releaseDirectoryName": "LeP's Controller Scripts",
     "releaseZipFilenamePattern": "stable-version-for-download/LeP's Controller Scripts v{version}.zip"
-  }
+  },
+  "dependencies": {}
 }

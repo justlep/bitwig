@@ -34,5 +34,6 @@ module.exports = function (grunt) {
         data: data
     });
 
+    require('grunt-load-npm-run-tasks')(grunt);
     grunt.loadTasks('grunt/custom-tasks');
 };
