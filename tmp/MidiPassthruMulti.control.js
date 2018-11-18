@@ -7,7 +7,7 @@
 
 loadAPI(2);
 
-host.defineController('Generic', 'MidiPassthruMulti', '1.0', '3ed96c1c-6f29-11e8-adc0-fa7ae01bbebc', 'LeP');
+host.defineController('Generic', 'MidiPassthruMulti', '1.1', '3ed96c1c-6f29-11e8-adc0-fa7ae01bbebc', 'LeP');
 host.defineMidiPorts(1, 0);
 
 function init() {
@@ -17,7 +17,7 @@ function init() {
 
     for (var channel = 0, inputName; channel <= 15; channel++) {
         inputName = 'Ch ' + (channel+1);
-        inPort.createNoteInput(inputName, '?'+channel+'????').setShouldConsumeEvents(false);
+        inPort.createNoteInput(inputName, '?'+channel.toString(16)+'????').setShouldConsumeEvents(false);
     }
 
     println('MidiPassthruMulti ready');
