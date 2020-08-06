@@ -9,7 +9,7 @@
  * @param {string} opts.name - a speaking name for this instance
  * @param {*} [opts.value=0] - an underlying value that this BaseValue should wrap
  * @param {function} [opts.resetToDefault] - a function that resets this individual instance' value. (!) Avoid using this option.
-*                                            Rather define a `resetToDefault` override in a subclass' prototype.
+ *                                           Rather define a `resetToDefault` override in a subclass' prototype.
  * @constructor
  */
 lep.BaseValue = function(opts) {

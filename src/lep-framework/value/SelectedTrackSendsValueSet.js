@@ -28,7 +28,7 @@ lep.SelectedTrackSendsValueSet = lep.util.extendClass(lep.ValueSet, {
 
         this._super(INSTANCE_NAME, sendsPerPage, 1, function(sendIndex) {
             return new lep.StandardRangedValue({
-                name: lep.util.formatString('{}-Send{}', this.name, sendIndex),
+                name: lep.util.formatString('{}-Send{}', INSTANCE_NAME, sendIndex),
                 rangedValue: _sendBank.getItemAt(sendIndex)
             });
         });

@@ -14,6 +14,7 @@ lep.StandardRangedValue = lep.util.extendClass(lep.BaseValue, {
      * @param {?RangedValue} [opts.indicateableValue] - defaults to opts.rangedValue
      * @param {?boolean} [opts.isTakeoverEnabled]
      * @param {?boolean} opts.isNotIndicateable
+     * @param {?ko.observable<string>} opts.dynamicName
      * @constructs
      */
     _init: function(opts) {
@@ -23,6 +24,7 @@ lep.StandardRangedValue = lep.util.extendClass(lep.BaseValue, {
 
         lep.util.assertObject(opts.rangedValue, 'Missing rangedValue for {}', opts.name);
         this.rangedValue = opts.rangedValue;
+        this.dynamicName = opts.dynamicName;
 
         if (opts.isNotIndicateable) {
             this.setIndication = lep.util.NOP;
@@ -50,6 +52,13 @@ lep.StandardRangedValue = lep.util.extendClass(lep.BaseValue, {
             }
             self.syncToController();
         });
+
+        if (this.dynamicName) {
+            this.rangedValue.name().addValueObserver(100, '-', function(dynName) {
+                self.dynamicName(dynName);
+                // lep.logDev('Updated dynamic name of {} to "{}"', self.name, dynName);
+            });
+        }
 
         lep.StandardRangedValue._instances.push(this);
     },
@@ -230,7 +239,8 @@ lep.StandardRangedValue.createRemoteControlValue = function(remoteControlsPage, 
     lep.util.assertNumber(paramIndex, 'Invalid paramIndex for StandardRangedValue.createRemoteControlValue');
     return new lep.StandardRangedValue({
         name: lep.util.formatString('Param{}', paramIndex),
-        rangedValue: remoteControlsPage.getParameter(paramIndex)
+        rangedValue: remoteControlsPage.getParameter(paramIndex),
+        dynamicName: ko.observable()
     });
 };
 

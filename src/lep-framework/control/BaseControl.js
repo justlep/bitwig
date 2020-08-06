@@ -10,6 +10,8 @@
 lep.BaseControl = function(opts) {
     lep.util.assertString(opts.name, 'Missing name for BaseControl');
 
+    var self = this;
+
     this.name = opts.name;
 
     this.useValueNote = (typeof opts.valueNote === 'number');
@@ -64,7 +66,13 @@ lep.BaseControl = function(opts) {
     // skipped (and reset) during the next syncToMidi() if skipFeedbackLoops is not explicitly disabled
     this.nextFeedbackLoopValue = null;
     this.skipFeedbackLoops = !this.sendsDiffValues && !this.feedbackValueCorrectionMultiplier && opts.skipFeedbackLoops !== false;
-    
+
+    this.flushDispatcher = lep.MidiFlushDispatcher.getInstance();
+
+    this._sendUdpControlAndValueName = function(valueName) {
+        self.flushDispatcher.enqueueUdpNameChange(self.name, valueName);
+    };
+
     if (this.isBidirectional) {
         this.midiChannel4Sync = (typeof opts.midiChannel4Sync === 'number') ? opts.midiChannel4Sync : this.midiChannel;
         this.valueNote4Sync = (this.useValueNote && typeof opts.valueNote4Sync === 'number') ? opts.valueNote4Sync : this.valueNote;
@@ -75,7 +83,6 @@ lep.BaseControl = function(opts) {
         lep.util.assertNumberInRangeOrEmpty(this.valueCC4Sync,   0, 127, 'Invalid valueCC4Sync {} for {}', this.valueCC4Sync, this.name);
         lep.util.assertNumberInRangeOrEmpty(this.clickNote4Sync, 0, 127, 'Invalid clickNote4Sync {} for {}', this.clickNote4Sync, this.name);
 
-        this.flushDispatcher = lep.MidiFlushDispatcher.getInstance();
         this.useImmediateSync = opts.useImmediateSync !== false;
 
         // disable feedback-loop-prevention for asymmetric midi sync
@@ -143,9 +150,23 @@ lep.BaseControl.prototype = {
         }
         this.value = value;
         value.afterAttach(this);
+
+        if (this.flushDispatcher.isUdpEnabled()) {
+            var valueName = value.name;
+            if (value.dynamicName) {
+                // lep.logDev('added dyn name subscribtion from {}', this.name);
+                this._dynamicValueNameSubscription = value.dynamicName.subscribe(this._sendUdpControlAndValueName);
+                valueName = value.dynamicName();
+            }
+            this.flushDispatcher.enqueueUdpNameChange(this.name, valueName);
+        }
     },
     detachValue: function() {
         this.nextFeedbackLoopValue = null;
+        if (this._dynamicValueNameSubscription) {
+            this._dynamicValueNameSubscription = void this._dynamicValueNameSubscription.dispose();
+            // lep.logDev('removed dyn name subscription from {}', this.name);
+        }
         if (this.value) {
             this.value.onDetach();
             this.value = null;

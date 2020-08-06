@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Test</title>
+	<link rel="stylesheet" href="styles.css">
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="./app.js" type="module"></script>
+</head>
+<body>
+	<main class="device device--xtouchmini">
+		<img data-bind="attr: {src: imageUrl}" alt="">
+		<!-- ko foreach: controls -->
+		<div class="control" data-bind="style: style, text: valueName"></div>
+		<!-- /ko -->
+	</main>
+
+</body>
+</html>

@@ -10,7 +10,9 @@ lep.MidiFlushDispatcher = function() {
         _firstFlushFns = [],
         _outPort = null,
         _keyedMidiQueue = {},
-        _queueNeedsFlush = true;
+        _queueNeedsFlush = true,
+        _flushableUdpMessage,
+        _isUdpEnabled = false;
 
     try {
         _outPort = host.getMidiOutPort(0);
@@ -35,6 +37,15 @@ lep.MidiFlushDispatcher = function() {
                 _outPort.sendMidi(typeAndChannel, noteOrCC, rawVal & 0xff);
             }
             _queueNeedsFlush = false;
+        }
+        if (_flushableUdpMessage) {
+            var messageBytes = [];
+            for (var j = _flushableUdpMessage.length - 1; j >= 0; j--) {
+                // TODO make this unicode-safe
+                messageBytes[j] = _flushableUdpMessage.charCodeAt(j);
+            }
+            host.sendDatagramPacket('192.168.0.255', 7878, messageBytes);
+            _flushableUdpMessage = null;
         }
         ORIGINAL_FLUSH && ORIGINAL_FLUSH();
     }
@@ -82,6 +93,25 @@ lep.MidiFlushDispatcher = function() {
         var typeChannelCC = ((0xB0 | channel) << 8) | cc;
         _keyedMidiQueue[typeChannelCC] = (typeChannelCC << 8) | value;
         _queueNeedsFlush = true;
+    };
+
+    this.enqueueUdpNameChange = function(controlName, valueName) {
+        if (!_isUdpEnabled) {
+            return;
+        }
+        _flushableUdpMessage = (_flushableUdpMessage || '') + '[btwg] ' + controlName + ' --> ' + valueName + '\n';
+    };
+
+    this.setUdpEnabled = function(enabled) {
+        lep.logDev('UDP broadcasting is ' + (enabled ? 'enabled' : 'disabled'));
+        _isUdpEnabled = !!enabled;
+        if (!enabled) {
+            _flushableUdpMessage = null;
+        }
+    };
+
+    this.isUdpEnabled = function() {
+        return _isUdpEnabled;
     };
 
     this.immediateNoteOn = function(channel, note, value) {

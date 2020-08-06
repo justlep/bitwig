@@ -113,7 +113,7 @@ lep.ParamsValueSet = lep.util.extendClass(lep.ValueSet, {
         });
 
         CURSOR_DEVICE.name().addValueObserver(function(deviceName) {
-            lep.logDebug('Selected device: "{}"', deviceName);
+            lep.logDev('Selected device: "{}"', deviceName);
             self.deviceName(deviceName || '_nodevname_');
             // if (self.lockedToPage.peek()) {
             //     self.lockedToPage(false);

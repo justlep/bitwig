@@ -72,8 +72,13 @@ lep.ControlSet = function(name, numberOfControls, controlCreationFn) {
         }
     });
 
+    var _flushDispatcher = lep.MidiFlushDispatcher.getInstance();
+
     ko.computed(function() {
         var valueSet = self.valueSet();
+        if (valueSet) {
+            _flushDispatcher.enqueueUdpNameChange(self.name, valueSet.name);
+        }
         return valueSet ? valueSet.currentValues() : null;
     }).subscribe(function(newCurrentValues) {
         for (var i = (newCurrentValues||'').length - 1 ; i>= 0; i--) {

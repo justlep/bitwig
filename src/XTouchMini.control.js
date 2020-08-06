@@ -103,6 +103,8 @@ lep.XTouchMini = function() {
         isParamsModeBtnPressed = eventDispatcher.createNotePressedObservable(NOTE.PARAMS_MODE_BTN, MIDI_CHANNEL),
         clearPunchOnStop = ko.toggleableObservable(false);
 
+    flushDispatcher.setUdpEnabled(true);
+
     var HANDLERS = {
             PLAYING_STATUS_CHANGED: function(isPlaying) {
                 if (!isPlaying && clearPunchOnStop()) {
