@@ -20,7 +20,7 @@
         "no-param-reassign": 2,
         "no-else-return": 2,
         "space-unary-ops": [2, {"words": true, "nonwords": false}],
-        "linebreak-style": [2, "unix"],
+        "linebreak-style": [0, "unix"],
         "semi": [2, "always"],
         "no-cond-assign": [2, "always"],
         "no-lonely-if": 2,
@@ -32,7 +32,9 @@
         "radix": 2,
         "wrap-iife": [2, "inside"],
         "yoda": [2, "never"],
-        "no-implicit-globals": 0
+        "no-implicit-globals": 0,
+        "no-redeclare": [2, {"builtinGlobals": false}],
+        "no-prototype-builtins": 0
     },
     "plugins": [
         "log-filenames"
