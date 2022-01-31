@@ -1,4 +1,8 @@
 
+v2.3.1 (31-Jan-2022)
+ - fixed issue #13
+   (the track name field lost focus after first keystroke when renaming a track in a saved+reopened project)
+
 v2.3.0 (22-Apr-2018)
  - added Behringer X-Touch Compact
  - BCF2000: added MultiSends mode; Params lockable to device
