@@ -1,4 +1,4 @@
-# LeP's controller scripts for Bitwig [![Build Status](https://api.travis-ci.com/justlep/bitwig.svg?branch=master)](https://travis-ci.com/justlep/bitwig)
+# LeP's controller scripts for Bitwig [![Build Status](https://travis-ci.com/justlep/bitwig.svg?branch=master)](https://app.travis-ci.com/github/justlep/bitwig)
 ##### Available scripts (tested in Bitwig 2.3.4):
 * [AKAI APC mini](./doc/APCmini/)
 * [Behringer X-Touch Compact](./doc/Behringer%20X-Touch%20Compact/)
