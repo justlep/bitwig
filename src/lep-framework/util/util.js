@@ -143,6 +143,9 @@ lep.util = (function() {
         assertValueSet: function(expr) {
             (expr && expr instanceof lep.ValueSet) || throwError(arguments);
         },
+        assertObjectProxy: function(expr) {
+            (expr && typeof expr.createEqualsValue === 'function') || throwError(arguments);
+        },
         /**
          * Return a given number restricted to a min+max value.
          */
@@ -272,6 +275,21 @@ lep.util = (function() {
             };
             newClass.prototype = newPrototype;
             return newClass;
+        },
+
+        /**
+         * @param {ObjectProxy} proxy1
+         * @param {ObjectProxy} proxy2
+         * @return {function():boolean} - a function that returns true if the given two ObjectProxy (mostly CursorTrack/CursorDevice) are
+         *                                referencing the same element, i.e. if they are in sync 
+         */
+        createCursorSyncCheckFn: function(proxy1, proxy2) {
+            this.assertObjectProxy(proxy1);
+            this.assertObjectProxy(proxy2);
+            var val = proxy1.createEqualsValue(proxy2);
+            return function() {
+                return val.get();
+            };
         }
     };
 

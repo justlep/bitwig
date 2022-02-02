@@ -29,18 +29,14 @@ lep.SelectedTrackView = function(opts) {
 
     var _cursorTrack = host.createCursorTrack(_id, this.name, _numSends, _numScenes, false),
         _settableIsPinned = _cursorTrack.isPinned(),
-        _isTrackAlreadySelected = false;
+        isCursorTrackSynced = lep.util.createCursorSyncCheckFn(lep.SelectedTrackView._autoFollowingCursorTrack, _cursorTrack);
 
-    _cursorTrack.addIsSelectedInEditorObserver(function(isSelected) {
-        _isTrackAlreadySelected = isSelected;
-    });
-    
     lep.SelectedTrackView._autoFollowingCursorTrack.name().addValueObserver(function(trackName) {
         // lep.logWarn('Track of {} is now {}', self.name, trackName);
-        if (trackName && !_isTrackAlreadySelected && !self.locked()) {
+        if (trackName && !isCursorTrackSynced() && !self.locked()) {
             _cursorTrack.selectChannel(lep.SelectedTrackView._autoFollowingCursorTrack);
         }
-    });    
+    });
     
     this.locked = ko.computed({
         read: ko.observable(false).updatedByBitwigValue(_settableIsPinned),
