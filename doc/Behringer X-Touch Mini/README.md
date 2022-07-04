@@ -6,6 +6,7 @@ controlled by the rotary encoders. Bidirectional with LED ring feedback.
 ## Installation
 
 [![][setupImage]][setupImage]
+
 Make sure the script is properly selected & activated in Bitwig's controller settings.
 If set up correctly, it should look like in the picture above. 
 
@@ -20,7 +21,7 @@ _(click to see fullsize)_
   * Auto-disable punch-in/out whenever transport stops 
   * Overdub
   * Write Automation
-* The `BUTTON MODE` button (lower 2nd button) can either be held or pressed short to permanently toggle. 
+* The `BUTTON MODE` button (lower 2nd button) can either be held (to enable it temporarily) or pressed once (to enable it permanently). 
    While held or enabled (lit), the 6 lower right buttons will determine what the upper 8 buttons 
    are controlling (see labels in `[brackets]`):
 
@@ -34,7 +35,7 @@ With this mode enabled, the upper buttons determine the type of value that the 8
   - Initially, you're controlling "Send 1 - 8" of the selected channel. The **`-`** and **`+`** buttons switch 
     one send up/down, e.g. "Sends 2 - 9" after pressing **`+`** first time.
   - You can **lock MultiSend to the selected channel** ("pinning" in Bitwig speak) by **double-clicking** a 
-    **`MultiSend`** button, so you keep control over that channel's sends even when selecting a different channel.
+    **`MultiSend`** button, so you keep control over that channel's sends even when selecting a different channel in the GUI.
   - A blinking **`MultiSend`** button indicates it is locked.
 * **DEV-Param** (alias **Remote Controls** of the currently selected device; 2x lockable)
   - You can **lock (pin) to the device** by **double-clicking** this button, so you stay in control over that particular device even after navigating to a different device or channel.
