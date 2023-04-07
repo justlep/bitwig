@@ -122,6 +122,7 @@ lep.XTouchMini = function() {
                     name: 'TopEncoder' + index,
                     valueCC: CC.FIRST_ENCODER + index,
                     clickNote: NOTE.FIRST_ENCODER_CLICK + index,
+                    sendsDiffValues: false,
                     midiChannel: MIDI_CHANNEL
                 });
             }),

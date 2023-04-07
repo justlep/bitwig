@@ -1,4 +1,7 @@
 
+v2.3.2 (07-April-2023)
+ - fix for jumpy encoders bug on Behringer X-Touch Mini (issue #14)
+
 v2.3.1 (31-Jan-2022)
  - fixed issue #13
    (the track name field lost focus after first keystroke when renaming a track in a saved+reopened project)
