@@ -75,9 +75,12 @@ IMHO, Behringer's fader caps and encoder caps are complete garbage, being slick 
 
 ----
 ## Download & Installation <a name="dlinstall"></a>
-#### Layer A, default config required
+#### Custom Layer A required
 
-The script is written for the X-Touch Compact's Layer A in default configuration. If you need the config, you can [download LayerA.bin here](https://raw.githubusercontent.com/justlep/bitwig/master/doc/Behringer%20X-Touch%20Compact/LayerA.bin), then write it to your X-Touch Compact using Behringer's X-Touch Editor. (Tested with X-Touch Compact Firmware 1.12 / Editor Version 1.21).
+* The script requires a custom Layer A configuration.
+  Download [LayerA.bin here](https://raw.githubusercontent.com/justlep/bitwig/master/doc/Behringer%20X-Touch%20Compact/LayerA.bin), then write it to your X-Touch Compact using Behringer's X-Touch Editor. (Tested with X-Touch Compact Firmware 1.12 / Editor Version 1.21).
+
+* Also, make sure __GLOBAL CH__ is set to __"CH 13"__.
 
 #### Installation
 
